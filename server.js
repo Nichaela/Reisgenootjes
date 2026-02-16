@@ -19,7 +19,7 @@ app.get('/', function(req, res) {
 
 async function runGetStarted() {
   // Replace the uri string with your connection string
-  const uri = 'mongodb+srv://Fawn:Nicha@cluster0.8rilqqh.mongodb.net/?appName=Cluster0';
+  const uri = process.env.MONGO_URI;
   const client = new MongoClient(uri);
 
   try {
