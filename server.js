@@ -1,43 +1,66 @@
-const { MongoClient } = require('mongodb');
-const port = 3000;
-var express = require('express');
-var app = express();
+// dit is een boilerplate voor een node.js webserver met alle basis die je nodig hebt om je webserver aan de praat te krijgen
+// deze boilerplate is geen werkende webserver, maar een overzicht van de verschillende codefragmenten die je nodig hebt
+// kopieer deze dus niet integraal, maar zoek de stukjes die je nodig hebt en pas ze aan, zodat ze werken voor jouw project
 
-// set the view engine to ejs
-app.set('view engine', 'ejs');
+// Add info from .env file to process.env
+require('dotenv').config() 
 
-// helpt express form data uitlezen
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+// Initialise Express webserver
+const express = require('express')
+const app = express()
 
-// roept de public map op met behulp van express
-app.use(express.static('public'));
+app
+  .use(express.urlencoded({extended: true})) // middleware to parse form data from incoming HTTP request and add form fields to req.body
+  .use(express.static('static'))             // Allow server to serve static content such as images, stylesheets, fonts or frontend js from the directory named static
+  .set('view engine', 'ejs')                 // Set EJS to be our templating engine
 
-app.get('/', function(req, res) {
-  res.render('pages/index', {data});
-});
+// Use MongoDB
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb')
+// Construct URL used to connect to database from info in the .env file
+const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}/${process.env.DB_NAME}?retryWrites=true&w=majority`
+// Create a MongoClient
+const client = new MongoClient(uri, {
+    serverApi: {
+      version: ServerApiVersion.v1,
+      strict: true,
+      deprecationErrors: true,
+    }
+})
 
-async function runGetStarted() {
-  // Replace the uri string with your connection string
-  const uri = process.env.MONGO_URI;
-  const client = new MongoClient(uri);
+// Try to open a database connection
+client.connect()
+  .then(() => {
+    console.log('Database connection established')
+  })
+  .catch((err) => {
+    console.log(`Database connection error - ${err}`)
+    console.log(`For uri - ${uri}`)
+  })
+const db = client.db(process.env.DB_NAME)
+  const movies = db.collection(process.env.DB_COLLECTION)
+// A sample route, replace this with your own routes
+app.get('/', async (req, res) => {
+  const movie = await movies.findOne({title: "A Corner in Wheat"})
+  res.render('pages/index', { data: movie });
+})
 
-  try {
-    const database = client.db('sample_mflix');
-    const movies = database.collection('movies');
+// Middleware to handle not found errors - error 404
+app.use((req, res) => {
+  // log error to console
+  console.error('404 error at URL: ' + req.url)
+  // send back a HTTP response with status code 404
+  res.status(404).send('404 error at URL: ' + req.url)
+})
 
-    // Queries for a movie that has a title value of 'Back to the Future'
-    const query = { title: 'Back to the Future' };
-    const movie = await movies.findOne(query);
+// Middleware to handle server errors - error 500
+app.use((err, req, res) => {
+  // log error to console
+  console.error(err.stack)
+  // send back a HTTP response with status code 500
+  res.status(500).send('500: server error')
+})
 
-    console.log(movie);
-  } finally {
-    await client.close();
-  }
-}
-runGetStarted().catch(console.dir);
-
-
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
+// Start the webserver and listen for HTTP requests at specified port
+app.listen(process.env.PORT, () => {
+  console.log(`I did not change this message and now my webserver is listening at port ${process.env.PORT}`)
 })

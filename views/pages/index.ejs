@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('../partials/head'); %>
+</head>
+<body class="container">
+
+<header>
+  <%- include('../partials/header'); %>
+</header>
+
+<main>
+<% if (data) { %>
+  <h2><%= data.title %></h2>
+  <p><%= data.plot %></p>
+<% } else { %>
+  <p>Geen data</p>
+<% } %>
+
+
+</main>
+
+<footer>
+  <%- include('../partials/footer'); %>
+
+</body>
+</html>
