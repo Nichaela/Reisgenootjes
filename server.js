@@ -1,7 +1,7 @@
 const { MongoClient } = require('mongodb');
+const port = 3000;
 var express = require('express');
 var app = express();
-
 
 // set the view engine to ejs
 app.set('view engine', 'ejs');
@@ -36,3 +36,8 @@ async function runGetStarted() {
   }
 }
 runGetStarted().catch(console.dir);
+
+
+app.listen(port, () => {
+  console.log(`Example app listening on port ${port}`)
+})
