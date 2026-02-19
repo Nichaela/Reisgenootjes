@@ -1,26 +1,68 @@
 :root {
-    /* Text colors */
-    --clr-primary: #FC9B5E;
-    --clr-primary-dark: #F9AC72;
-    --clr-text: #154159;
-    --clr-surface: #E9F8FF;
-    --clr-neutral: #FFFFFF;
+  /* core colors */
+  --clr-primary: #FC9B5E;
+  --clr-primary-dark: #F9AC72;
+  --clr-text: #154159;
+  --clr-surface: #E9F8FF;
+  --clr-neutral: #FFFFFF;
 
-    /* Gradients */
-    --gradient-primary: linear-gradient(
+  /* gradients */
+  --gradient-primary: linear-gradient(
     180deg,
-    var(--clr-primary) 100%,
+    var(--clr-primary) 0%,
     var(--clr-primary-dark) 60%
-    );
+  );
 
-    --gradient-surface: linear-gradient(
+  --gradient-surface: linear-gradient(
     180deg,
-    var(--clr-surface) 100%,
+    var(--clr-surface) 0%,
     #F5FCFFB2 60%
-    );
+  );
 }
 
+/**************/
+/* CSS RESET  */
+/**************/
 
-h1 {
-    color: var(--clr-text);
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  color: var(--clr-text);
+  background: var(--clr-neutral);
+}
+
+/* Typografie */
+h1 { font-size: 2.25rem; } /* 36px */
+h2 { font-size: 1.75rem; } /* 28px */
+h3 { font-size: 1.5rem; }  /* 24px */
+
+/* Bottom nav */
+.bottom-nav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  background: var(--clr-neutral);
+  border-top: 1px solid rgba(0,0,0,0.1);
+  padding: 0.75rem 0.5rem;
+}
+
+.bottom-nav a {
+  text-align: center;
+  text-decoration: none;
+  padding: 0.5rem;
+  font-weight: 600;
+  color: var(--clr-text);
+}
+
+.bottom-nav a.active {
+  color: var(--clr-primary);
 }
