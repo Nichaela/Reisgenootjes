@@ -1,3 +1,26 @@
-p {
-    color: red;
+:root {
+    /* Text colors */
+    --clr-primary: #FC9B5E;
+    --clr-primary-dark: #F9AC72;
+    --clr-text: #154159;
+    --clr-surface: #E9F8FF;
+    --clr-neutral: #FFFFFF;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(
+    180deg,
+    var(--clr-primary) 100%,
+    var(--clr-primary-dark) 60%
+    );
+
+    --gradient-surface: linear-gradient(
+    180deg,
+    var(--clr-surface) 100%,
+    #F5FCFFB2 60%
+    );
+}
+
+
+h1 {
+    color: var(--clr-text);
 }

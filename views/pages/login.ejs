@@ -29,6 +29,11 @@
 
         <input type="submit">
     </form>
+    
+    <% if (error) { %>
+      <p class="error"><%= error %></p>
+    <% } %>
+
 
 </main>
 
@@ -36,9 +41,7 @@
   <%- include('../partials/footer'); %>
 </footer>
 
-  <script src="/js/api.js"></script>
-
-  <script src="/js/login.js"></script>
+  <!-- <script src="/js/api.js"></script> -->
 
 </body>
 

@@ -3,12 +3,19 @@ require('dotenv').config()
 
 // Initialise Express webserver
 const express = require('express')
+const session = require('express-session')
 const app = express()
+
 
 app
   .use(express.urlencoded({ extended: true })) // middleware to parse form data
   .use(express.static('public'))               // serve static files
   .set('view engine', 'ejs')                   // use EJS templating
+  .use(session({
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false
+}))
 
 // Use MongoDB
 const { MongoClient, ServerApiVersion } = require('mongodb')
@@ -26,6 +33,11 @@ const client = new MongoClient(uri, {
 })
 
 let users
+app.use((req, res, next) => {
+  res.locals.user = req.session.user || null
+  next()
+})
+
 
 async function start() {
   try {
@@ -48,9 +60,8 @@ async function start() {
 
     // Login form submit
     app.post('/login', async (req, res) => {
-      const { email, password } = req.body
-
-      const user = await users.findOne({ email: email })
+      const { username, password } = req.body
+      const user = await users.findOne({ name: username })
 
       if (!user) {
         return res.status(401).render('pages/login', {
@@ -64,6 +75,12 @@ async function start() {
         })
       }
 
+      req.session.user = {
+          _id: user._id,
+          name: user.name,
+          email: user.email
+        }
+    
       return res.redirect('/')
     })
 
@@ -76,7 +93,7 @@ async function start() {
     app.post('/register', async (req, res) => {
       const { email, username, password, dob } = req.body
 
-      const existingUser = await users.findOne({ email: email, name: username, pw: password})
+      const existingUser = await users.findOne({ email: email })
 
       if (existingUser) {
         return res.status(409).render('pages/register', {
@@ -97,6 +114,20 @@ async function start() {
     // Register success page
     app.get('/registerSuccess', (req, res) => {
       res.render('pages/registerSuccess')
+    })
+
+    app.get('/dashboard', (req, res) => {
+      if (!req.session.user) {
+        return res.redirect('/login')
+      }
+
+      res.render('pages/dashboard', { user: req.session.user })
+    })
+
+    app.get('/logout', (req, res) => {
+      req.session.destroy(() => {
+        res.redirect('/login')
+      })
     })
 
     // Middleware to handle not found errors - error 404
