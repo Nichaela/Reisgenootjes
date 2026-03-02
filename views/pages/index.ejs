@@ -1,1 +1,25 @@
 hhaha
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('../partials/head'); %>
+</head>
+<body>
+  <header>
+    <%- include('../partials/header'); %>
+  </header>
+
+  <main>
+
+  <% if (user) { %>
+  <p>Welkom <%= user.name %></p>
+  <% } %>
+
+  <h1 class="underline" >Reisgenootjes</h1>
+  <h2>heading 2</h2>
+  <h3>heading 3</h3>
+
+  </main>
+  <%- include('../partials/bottom-nav'); %>
+</body>
+</html>
