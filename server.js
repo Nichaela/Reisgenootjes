@@ -79,7 +79,7 @@ async function start() {
           _id: user._id,
           name: user.name,
           email: user.email
-        }
+       }
     
       return res.redirect('/')
     })
@@ -108,12 +108,12 @@ async function start() {
         dob: dob || null
       })
 
-      return res.redirect('/registerSuccess')
+      return res.redirect('/register-success')
     })
 
     // Register success page
-    app.get('/registerSuccess', (req, res) => {
-      res.render('pages/registerSuccess')
+    app.get('/register-success', (req, res) => {
+      res.render('pages/register-success')
     })
 
     app.get('/dashboard', (req, res) => {
