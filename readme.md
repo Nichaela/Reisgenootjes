@@ -6,7 +6,6 @@ In dit project is het doel om een werkende website te maken om solo reizigers aa
 * Kunnen matchen met andere reizigers;
 * Kunnen chatten;
 
-  ## API
-  De API's die wij gebruiken zijn:
-  *
-  *
+  ## Hoe bijdragen
+  Om mee te kunnen helpen aan dit project kun je de onderstaande tutorial volgen:
+  
