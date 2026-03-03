@@ -7,7 +7,6 @@ const session = require('express-session')
 const app = express()
 
 
-
 app
   .use(express.urlencoded({ extended: true })) // middleware to parse form data
   .use(express.static('public'))               // serve static files
