@@ -81,6 +81,16 @@ function registerGetRoutes() {
     res.render('pages/dashboard', { user: req.session.user })
   })
 
+
+  // hier is laura nu mee bezig
+  app.get('/discover', (req, res) => {
+    res.render('pages/discover', { user: req.session.user })
+  })
+  app.get('/create-post', (req, res) => {
+    res.render('pages/create-post', { user: req.session.user })
+  })
+  // 
+
   app.get('/logout', (req, res) => {
     req.session.destroy(() => {
       res.redirect('/login')
