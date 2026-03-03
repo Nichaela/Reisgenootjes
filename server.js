@@ -130,6 +130,13 @@ async function start() {
       })
     })
 
+    //route naar annabels pagina
+
+    app.get('/filter', (req, res) => {
+      res.render('pages/filter')
+    })
+
+
     // Middleware to handle not found errors - error 404
     app.use((req, res) => {
       if (req.url === '/.well-known/appspecific/com.chrome.devtools.json') {
