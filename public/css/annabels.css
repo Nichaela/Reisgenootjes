@@ -4,7 +4,7 @@ aside {
   }
   
   .filter-menu {
-    display: none;
+    display: none;      /* standaard verborgen */
     position: absolute;
     top: 100%;
     left: 0;
@@ -15,7 +15,7 @@ aside {
   }
   
   .filter-menu.show {
-    display: block;
+    display: block;     /* zichtbaar als class 'show' toegevoegd */
   }
   
   .filter-btn {
@@ -23,6 +23,11 @@ aside {
     margin: 0.2em 0;
     padding: 0.5em 1em;
     cursor: pointer;
+  }
+
+  .filter-btn.active {
+    background-color: #4CAF50; /* kies een kleur die je wilt */
+    color: white;
   }
 
   ul.all li,
