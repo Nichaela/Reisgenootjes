@@ -4,29 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Filter</title>
+    <link rel="stylesheet" href="css/annabels.css">
 </head>
 <body>
     <header>
-		<button aria-label="toggle menu">
-			<span></span>
-			<span></span>
-			<span></span>
-		</button>
+        
+        <aside>
+            <button class="filter-btn" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="people">People</button>
+            <button class="filter-btn" data-filter="animals">Animals</button>
+            <button class="filter-btn" data-filter="items">Items</button>
+          </aside>
 
-		<nav>
-			<ul>
-				<li><a class="huidig" aria-label="Home pagina van de website" href="index.html">Home</a></li>
-				<li><a aria-label="Pagina over sporten die worden aangeboden" href="#">Sport</a></li>
-				<li><a aria-label="Pagina over recreatie dat wordt aangeboden " href="#">Recreatief</a></li>
-				<li><a aria-label="Pagina met tarieven" href="tarieven.html">Tarieven</a></li>
-				<li><a aria-label="Pagin om te boeken" href="#">Boeken</a></li>
-				<li><a aria-label="Pagina om contact op te nemen" href="contact.html">Contact</a></li>
-			</ul>
-		</nav>
 
 	</header>
 
 
-    <script defer src="scripts/annabels.js"></script>
+    <ul class="all">
+        <li class="person">Gandalf</li>
+        <li class="animal">Bange leeuw</li>
+        <li class="item">Giftige appel</li>
+      </ul>
+
+    <script defer src="javascript/annabels.js"></script>
 </body>
 </html>

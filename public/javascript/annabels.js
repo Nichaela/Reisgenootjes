@@ -1,11 +1,10 @@
-// hamburger menu
-const deButton = document.querySelector("header button");
-const deNav = document.querySelector("header nav");
+const ul = document.querySelector("ul"); // je lijst
+const filterButtons = document.querySelectorAll(".filter-btn");
 
-
-deButton.onclick = toggleMenu;
-
-function toggleMenu () {
-  deButton.classList.toggle("is-open");
-  deNav.classList.toggle("is-open");
-}
+filterButtons.forEach(btn => {
+  btn.addEventListener("click", () => {
+    const filter = btn.dataset.filter;
+    ul.className = "";        // verwijder oude filter
+    ul.classList.add(filter); // voeg nieuwe filter toe
+  });
+});
