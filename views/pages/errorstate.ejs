@@ -1,1 +1,28 @@
-<h1>Iets kleins</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('../partials/head'); %>
+</head>
+<body>
+  <header>
+    <%- include('../partials/header'); %>
+  </header>
+
+  <main>
+
+  <% if (user) { %>
+  <p>Welkom <%= user.name %></p>
+  <% } %>
+
+  <h1 class="underline" >Reisgenootjes</h1>
+  <p>Heee, De pagina die je zoekt 
+kan niet gevonden worden...!</p>
+  <img src="/public/img/404.svg" alt="pagina niet gevonden">
+  </main>
+  <%- include('../partials/bottom-nav'); %>
+</body>
+</html>
+
+
+
+
