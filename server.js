@@ -88,10 +88,15 @@ function registerGetRoutes() {
     res.render('pages/create-post', { user: req.session.user })
   })
 
-  // Chatroom pagina
+    // Chatroom pagina
   app.get('/chatroom', (req, res) => {
     if (!req.session.user) return res.redirect('/login')
     res.render('pages/chatroom', { user: req.session.user })
+  })
+
+  app.get('/chat-channel', (req, res) => {
+    if (!req.session.user) return res.redirect('/login')
+    res.render('pages/chat-channel', { user: req.session.user })
   })
 
   app.get('/logout', (req, res) => {
@@ -142,18 +147,43 @@ function registerPostRoutes() {
 
 // ==========================================
 // 7. SOCKET.IO (Chat events)
+// source: https://medium.com/@basukori8463/build-a-real-time-chat-app-from-scratch-with-node-js-and-socket-io-9714b7076372
 // ==========================================
+let connectedUsers = 0
+
 function registerSocketHandlers() {
   io.on('connection', (socket) => {
-    console.log('🎉 A user connected:', socket.id)
+    connectedUsers++
+    console.log(`🎉 A user connected: ${socket.id} Total users: ${connectedUsers}`)
+
+    // Notify others that someone joined
+    socket.broadcast.emit(
+      'user notification',
+      `Someone joined the chat! (${connectedUsers} users online)`
+    )
 
     socket.on('chat message', (msg) => {
       console.log('📨 Message received:', msg)
       io.emit('chat message', msg)
     })
 
+    // Typing indicators
+    socket.on('typing', () => {
+      socket.broadcast.emit('typing')
+    })
+
+    socket.on('stop typing', () => {
+      socket.broadcast.emit('stop typing')
+    })
+
     socket.on('disconnect', () => {
-      console.log('👋 A user disconnected:', socket.id)
+      connectedUsers--
+      console.log(`👋 A user disconnected: ${socket.id} Total users: ${connectedUsers}`)
+
+      socket.broadcast.emit(
+        'user notification',
+        `Someone left the chat. (${connectedUsers} users online)`
+      )
     })
   })
 }
