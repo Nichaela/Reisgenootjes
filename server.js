@@ -1,33 +1,36 @@
 // ==========================================
 // 1. IMPORTS (Packages)
 // ==========================================
-
-// Add info from .env file to process.env
 require('dotenv').config()
 
-// Initialise Express webserver
 const express = require('express')
 const session = require('express-session')
-const app = express()
+const http = require('http')
+const socketIo = require('socket.io')
 
-// Use MongoDB
 const { MongoClient, ServerApiVersion } = require('mongodb')
 
-
+// ==========================================
+// 2. APP, SERVER, SOCKET.IO
+// ==========================================
+const app = express()
+const server = http.createServer(app)
+const io = socketIo(server)
 
 // ==========================================
-// 2. CONFIGURATIE & DATABASE
+// 3. CONFIGURATIE & DATABASE
 // ==========================================
-
 app
-  .use(express.urlencoded({ extended: true })) // middleware to parse form data
-  .use(express.static('public'))               // serve static files
-  .set('view engine', 'ejs')                   // use EJS templating
-  .use(session({
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: false
-}))
+  .use(express.urlencoded({ extended: true })) // parse form data
+  .use(express.static('public')) // serve static files
+  .set('view engine', 'ejs') // EJS templating
+  .use(
+    session({
+      secret: process.env.SESSION_SECRET,
+      resave: false,
+      saveUninitialized: false,
+    })
+  )
 
 // Construct URL used to connect to database from info in the .env file
 const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}/${process.env.DB_NAME}?retryWrites=true&w=majority`
@@ -38,26 +41,23 @@ const client = new MongoClient(uri, {
     version: ServerApiVersion.v1,
     strict: true,
     deprecationErrors: true,
-  }
+  },
 })
 
 let users
 
 // ==========================================
-// 3. MIDDLEWARE (Algemeen)
+// 4. MIDDLEWARE (Algemeen)
 // ==========================================
-
 app.use((req, res, next) => {
   res.locals.user = req.session.user || null
   next()
 })
 
 // ==========================================
-// 4. ROUTES (GET - Pagina's bekijken)
+// 5. ROUTES (GET - Pagina's bekijken)
 // ==========================================
-
 function registerGetRoutes() {
-
   app.get('/', (req, res) => {
     res.render('pages/index', { data: null })
   })
@@ -75,102 +75,99 @@ function registerGetRoutes() {
   })
 
   app.get('/dashboard', (req, res) => {
-    if (!req.session.user) {
-      return res.redirect('/login')
-    }
+    if (!req.session.user) return res.redirect('/login')
     res.render('pages/dashboard', { user: req.session.user })
   })
 
-
-  // hier is laura nu mee bezig
+  // Laura pagina's
   app.get('/discover', (req, res) => {
     res.render('pages/discover', { user: req.session.user })
   })
+
   app.get('/create-post', (req, res) => {
     res.render('pages/create-post', { user: req.session.user })
   })
-  // 
+
+  // Chatroom pagina
+  app.get('/chatroom', (req, res) => {
+    if (!req.session.user) return res.redirect('/login')
+    res.render('pages/chatroom', { user: req.session.user })
+  })
 
   app.get('/logout', (req, res) => {
-    req.session.destroy(() => {
-      res.redirect('/login')
-    })
+    req.session.destroy(() => res.redirect('/login'))
   })
 }
 
-
-
 // ==========================================
-// 5. POST ROUTES (Data verwerken)
+// 6. POST ROUTES (Data verwerken)
 // ==========================================
-
 function registerPostRoutes() {
-
   // Login
   app.post('/login', async (req, res) => {
     const { username, password } = req.body
     const user = await users.findOne({ name: username })
 
     if (!user) {
-      return res.status(401).render('pages/login', {
-        error: 'Onbekende gebruiker'
-      })
+      return res.status(401).render('pages/login', { error: 'Onbekende gebruiker' })
     }
 
     if (user.password !== password) {
-      return res.status(401).render('pages/login', {
-        error: 'Verkeerd wachtwoord'
-      })
+      return res.status(401).render('pages/login', { error: 'Verkeerd wachtwoord' })
     }
 
-    req.session.user = {
-      _id: user._id,
-      name: user.name,
-      email: user.email
-    }
-
+    req.session.user = { _id: user._id, name: user.name, email: user.email }
     return res.redirect('/')
   })
-
 
   // Register
   app.post('/register', async (req, res) => {
     const { email, username, password, dob } = req.body
 
-    const existingUser = await users.findOne({ email: email })
-
+    const existingUser = await users.findOne({ email })
     if (existingUser) {
-      return res.status(409).render('pages/register', {
-        error: 'Email bestaat al'
-      })
+      return res.status(409).render('pages/register', { error: 'Email bestaat al' })
     }
 
     await users.insertOne({
-      email: email,
+      email,
       name: username,
-      password: password,
-      dob: dob || null
+      password,
+      dob: dob || null,
     })
 
     return res.redirect('/register-success')
   })
-
 }
 
+// ==========================================
+// 7. SOCKET.IO (Chat events)
+// ==========================================
+function registerSocketHandlers() {
+  io.on('connection', (socket) => {
+    console.log('🎉 A user connected:', socket.id)
 
+    socket.on('chat message', (msg) => {
+      console.log('📨 Message received:', msg)
+      io.emit('chat message', msg)
+    })
+
+    socket.on('disconnect', () => {
+      console.log('👋 A user disconnected:', socket.id)
+    })
+  })
+}
 
 // ==========================================
-// 6. ERROR HANDLING & SERVER START
+// 8. ERROR HANDLING & SERVER START
 // ==========================================
-
 function registerErrorHandlers() {
-
   // 404 handler
   app.use((req, res) => {
     if (req.url === '/.well-known/appspecific/com.chrome.devtools.json') {
       return res.sendStatus(204)
     }
-    console.error('404 error at URL: ' + req.url)
+    console.error('404 error at URL:', req.url)
     res.status(404).send('404 error at URL: ' + req.url)
   })
 
@@ -181,8 +178,6 @@ function registerErrorHandlers() {
   })
 }
 
-
-
 async function start() {
   try {
     await client.connect()
@@ -191,17 +186,15 @@ async function start() {
     const db = client.db(process.env.DB_NAME)
     users = db.collection(process.env.DB_COLLECTION)
 
-    // Routes registreren
     registerGetRoutes()
     registerPostRoutes()
+    registerSocketHandlers()
     registerErrorHandlers()
 
-    // Server starten
     const port = process.env.PORT || 3000
-    app.listen(port, () => {
+    server.listen(port, () => {
       console.log(`Server draait op poort ${port}`)
     })
-
   } catch (err) {
     console.log('Database connection error:', err)
     console.log('For uri -', uri)
