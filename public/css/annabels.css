@@ -28,6 +28,10 @@
   transition: transform 0.3s ease;
 }
 
+ul {
+  list-style: none;
+}
+
 /* Menu zichtbaar als class show aanwezig is */
 .filter-menu.show {
   transform: translateX(0);
