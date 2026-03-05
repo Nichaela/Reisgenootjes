@@ -1,25 +1,39 @@
-// Selecteer de lijst en knoppen
-const ul = document.querySelector("ul");
 const filterButtons = document.querySelectorAll(".filter-btn");
 const toggleButton = document.getElementById("toggleFilter");
-const filterMenu = document.querySelector(".filter-menu");
+const filterMenu = document.getElementById("filterMenu");
+const closeButton = document.getElementById("closeMenu");
+const items = document.querySelectorAll(".all li");
 
-// Toggle dropdown menu bij klikken op de filter-knop
+// Open menu
 toggleButton.addEventListener("click", () => {
-  filterMenu.classList.toggle("show");
+  filterMenu.classList.add("show");
+  toggleButton.style.display = "none";
 });
 
-// Filter functionaliteit
+// Close menu
+closeButton.addEventListener("click", () => {
+  filterMenu.classList.remove("show");
+  toggleButton.style.display = "block";
+});
+
+// Filter knoppen
 filterButtons.forEach(btn => {
   btn.addEventListener("click", () => {
-    const filter = btn.dataset.filter;
 
-    // Filteren van de lijst
-    ul.className = "";
-    ul.classList.add(filter);
+    btn.classList.toggle("active");
+    const filter = btn.dataset.gender;
 
-    // Active class instellen
-    filterButtons.forEach(b => b.classList.remove("active")); // verwijder active van andere buttons
-    btn.classList.add("active");                             // voeg active toe aan geklikte button
+    items.forEach(item => {
+
+      const gender = item.dataset.gender;
+
+      if (filter === "all" || gender === filter) {
+        item.style.display = "block";
+      } else {
+        item.style.display = "none";
+      }
+
+    });
+
   });
 });

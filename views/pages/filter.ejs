@@ -1,34 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Filter</title>
-    <link rel="stylesheet" href="css/annabels.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Filter</title>
+  <link rel="stylesheet" href="css/annabels.css">
 </head>
+
 <body>
-    <header>
-        
-        <aside>
-            <button id="toggleFilter">Filter</button> <!-- dit is de knop om menu te openen -->
-            <div class="filter-menu">               <!-- dit is het dropdown menu -->
-              <button class="filter-btn" data-filter="all">All</button>
-              <button class="filter-btn" data-filter="people">People</button>
-              <button class="filter-btn" data-filter="animals">Animals</button>
-              <button class="filter-btn" data-filter="items">Items</button>
-            </div>
-          </aside>
 
+  <header>
+    <button id="toggleFilter" class="toggleFilter">Filter</button>
 
-	</header>
+    <div class="filter-menu" id="filterMenu">
+      <button class="close-menu" id="closeMenu">
+        <img src="img/leftarrow.svg" alt="sluit menu">
+      </button>
+      <button class="filter-btn" data-gender="all">Alles</button>
+      <button class="filter-btn" data-gender="man">Man</button>
+      <button class="filter-btn" data-gender="vrouw">Vrouw</button>
+      <button class="filter-btn" data-gender="anders">Anders</button>
 
+      <label>Datum vertrek</label>
+      <input type="date" id="dateFilter">
 
-    <ul class="all">
-        <li class="person">Gandalf</li>
-        <li class="animal">Bange leeuw</li>
-        <li class="item">Giftige appel</li>
-      </ul>
+      <label>Aantal dagen</label>
+      <input type="number" id="daysFilter">
 
-    <script defer src="javascript/annabels.js"></script>
+    </div>
+  </header>
+
+  <ul class="all">
+    <% users.forEach(user => { %>
+      <li 
+        data-gender="<%= user.gender %>" 
+        data-date="<%= user.datum_vertrek %>" 
+        data-days="<%= user.aantal_dagen %>">
+        <%= user.name %>
+      </li>
+    <% }) %>
+  </ul>
+
+  
+  <script defer src="javascript/annabels.js"></script>
 </body>
+
 </html>
