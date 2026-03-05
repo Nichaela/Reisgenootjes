@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('../partials/head'); %>
+</head>
+<body>
+  <header>
+    <%- include('../partials/header'); %>
+  </header>
+
+  <main>
+    <h1 class="underline" >Chatroom</h1>
+    <atricle>
+      <h2>Nieuwe match</h2>  
+      <!-- Deze worden alleen laten zien als ze bestaan! zet in if else aansporing om naar Match te gaan! -->
+      <!-- <section>
+        <h3>Naam</h3>
+        <p>Laatst bericht met deze user</p>
+      </section> 
+      <section>
+        <h3>Naam</h3>
+        <p>Laatst bericht met deze user</p>
+      </section>
+      <section>
+        <h3>Naam</h3>
+        <p>Laatst bericht met deze user</p>
+      </section>-->
+
+    </article>
+
+    <!-- horizontale lijst met profiel fotos -->
+    <h2>Recente gesprekken</h2>
+    
+  <% if (user) { %>
+  <p>Welkom <%= user.name %></p>
+  <% } %>
+
+  
+
+
+
+
+  </main>
+  <%- include('../partials/bottom-nav'); %>
+</body>
+</html>
