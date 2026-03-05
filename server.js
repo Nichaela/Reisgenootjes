@@ -136,7 +136,10 @@ async function start() {
         return res.sendStatus(204)
       }
       console.error('404 error at URL: ' + req.url)
-      res.status(404).send('404 error at URL: ' + req.url)
+       res.status(404).render('pages/errorstate', {
+    status: 404,
+    message: 'Pagina niet gevonden'
+  })
     })
 
     // Middleware to handle server errors - error 500
