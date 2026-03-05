@@ -113,12 +113,41 @@ h3 { font-size: 1.5rem; }  /* 24px */
   border: none;
   color: var(--clr-neutral);
   text-align: center;
+  width: fit-content;
 
   border-radius: 2rem; 
   /* padding & radius aanpassen !!!!! */
 }
 
 /* forms */
+.voortgangsbalk {
+  display: flex;
+  gap: 10px;
+}
+.voortgangsbalk div {
+  height: 5px;
+  width: 100%;
+  border-radius: 5px;
+}
+.voortgangsbalk-active {background-color: var(--clr-primary);}
+.voortgangsbalk-inactive {background-color: var(--clr-surface);}
+
+form {
+  display: grid;
+  gap: 10px;
+}
+form div {
+  display: flex;
+  gap: 10px;
+}
+form input.gradient-btn {
+  justify-self: right;
+}
+
+label {
+  margin-top: 20px;
+}
+
 input {
   background: var(--clr-surface);
   border: none;
@@ -126,6 +155,7 @@ input {
   height: 35px;
   padding: 10px;
   color: var(--clr-input-text);
+  width: 100%;
 }
 
 
