@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('../partials/head'); %>
+</head>
+<body>
+  <header>
+    <%- include('../partials/header'); %>
+  </header>
+
+  <main>
+
+    <% if (user) { %>
+    <p>Welkom <%= user.name %></p>
+    <% } %>
+
+    <h1 class="underline" >Maak je reis</h1>
+
+    <!-- voortagnsbalk -->
+     <h2>Hier iets van tekst nog</h2>
+     <h3>Algemene informatie</h3>
+
+    <!-- verschillende partials toevoegen? algemeen, extra enz -->
+     <section>
+        <form method="POST" action="/create-post">
+
+          <!-- cover foto -->
+
+          <label>Titel</label>
+          <input type="text" placeholder="Titel van de reis" />
+    
+          <label>Datum</label>
+          <div>
+            <input type="date" placeholder="Van" />
+            <input type="date" placeholder="Tot" />
+          </div>
+    
+          <label>Locatie</label>
+          <input type="text" placeholder="Locatie" />
+
+          <label>Hoeveel personen</label>
+          <input type="number" placeholder="personen" />
+
+          <input class="gradient-btn" type="submit" value="Volgende">
+        </form>
+    </section>
+
+    
+
+
+
+  </main>
+  <%- include('../partials/bottom-nav'); %>
+</body>
+</html>
