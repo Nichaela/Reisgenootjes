@@ -88,6 +88,12 @@ function registerGetRoutes() {
     res.render('pages/create-post', { user: req.session.user })
   })
   //
+
+  // hier is Stiene nu mee bezig
+  app.get('/matchen', (req, res) => {
+    res.render('pages/matchen', { user: req.session.user })
+  })
+  //
  
   app.get('/logout', (req, res) => {
     req.session.destroy(() => {
@@ -174,7 +180,7 @@ function registerErrorHandlers() {
   })
     })
  
-    
+
   // 500 handler
   app.use((err, req, res, next) => {
     console.error(err.stack)
