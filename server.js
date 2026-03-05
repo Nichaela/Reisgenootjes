@@ -150,6 +150,16 @@ function registerPostRoutes() {
       name: username,
       password: password,
       dob: dob || null
+    // Middleware to handle not found errors - error 404
+    app.use((req, res) => {
+      if (req.url === '/.well-known/appspecific/com.chrome.devtools.json') {
+        return res.sendStatus(204)
+      }
+      console.error('404 error at URL: ' + req.url)
+       res.status(404).render('pages/errorstate', {
+    status: 404,
+    message: 'Pagina niet gevonden'
+  })
     })
 
     return res.redirect('/register-success')

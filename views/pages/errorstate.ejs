@@ -10,15 +10,16 @@
 
   <main>
 
-  <% if (user) { %>
-  <p>Welkom <%= user.name %></p>
-  <% } %>
-
-  <h1 class="underline" >Reisgenootjes</h1>
+  <h1 class="underline" >Oeps!</h1>
   <p>Heee, De pagina die je zoekt 
 kan niet gevonden worden...!</p>
-  <img src="/public/img/404.svg" alt="pagina niet gevonden">
-  </main>
+  <img src="img/404.svg" alt="pagina niet gevonden">
+   <a href="/">Terug naar home</a>
+  <% if (user) { %>
+  <p>Welkom <%= user.name %></p>
+  <% } %> 
+
+  </main> 
   <%- include('../partials/bottom-nav'); %>
 </body>
 </html>
