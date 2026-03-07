@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('../partials/head'); %>
+</head>
+<body>
+  <header>
+    <%- include('../partials/header'); %>
+  </header>
+
+  <main>
+
+  <% if (user) { %>
+  <p>Welkom <%= user.name %></p>
+  <% } %>
+
+  <h1 class="underline" >Matchen</h1>
+  <!-- filterknop -->
+   <!-- like -->
+   <!-- Dislike -->
+   <section>
+  <img src="img/accounts/MarkvanFlied.jpg" alt="Account foto">
+  <2>Mark van Flied • 20</h2>
+    <ul>
+        <li>man</li>
+         <li>55 km van jou vandaan</li>
+         <li>Reizen door Oosterijk</li>
+         <li>2 Gezamenlijke interesse</li>
+    </ul>
+</section>
+<section>
+    State • Opzoek naar reisgenootje
+    <h2>Bio</h2>
+    <p>Hier komt een stukje tekst te staan wat meer verteld over het persoon zodat je een beter beeld krijgt met wie je op reis gaat</p>
+</section>
+<section>
+    State • Opzoek naar reisgenootje
+    <h2>Bio</h2>
+    <p>Hier komt een stukje tekst te staan wat meer verteld over het persoon zodat je een beter beeld krijgt met wie je op reis gaat</p>
+</section>
+
+<section>
+    <h2>interesse</h2>
+    <section class="interests">
+  <h2>Interesse</h2>
+
+<ul class="labels">
+    <li class="label">Sport</li>
+    <li class="label">Reizen</li>
+    <li class="label">Muziek</li>
+    <li class="label">Hiken</li>
+</ul>
+  <!-- <ul class="labels">
+    <% user.interests.forEach(function(interest) { %>
+      <li class="label"><%= interest %></li>
+    <% }) %>
+  </ul> -->
+</section>
+
+  </main>
+  <%- include('../partials/bottom-nav'); %>
+</body>
+</html>
