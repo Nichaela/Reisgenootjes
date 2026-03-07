@@ -88,6 +88,7 @@ h3 { font-size: 1.5rem; }  /* 24px */
 .underline {
     position: relative;
     display: inline-block;
+    margin-bottom: 1rem;
 }
 
 .underline::after {
@@ -113,20 +114,18 @@ h3 { font-size: 1.5rem; }  /* 24px */
   border: none;
   color: var(--clr-neutral);
   text-align: center;
+  width: fit-content;
 
   border-radius: 2rem; 
   /* padding & radius aanpassen !!!!! */
 }
 
-/* forms */
-input {
-  background: var(--clr-surface);
-  border: none;
-  border-radius: 5px;
-  height: 35px;
-  padding: 10px;
-  color: var(--clr-input-text);
-}
+
+
+
+
+
+
 
 
 

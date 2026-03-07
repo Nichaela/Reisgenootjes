@@ -14,36 +14,72 @@
     <p>Welkom <%= user.name %></p>
     <% } %>
 
-    <h1 class="underline" >Maak je reis</h1>
+    <form method="POST" action="/create-post" class="multi-step-form">
 
-    <!-- voortagnsbalk -->
-     <h2>Hier iets van tekst nog</h2>
-     <h3>Algemene informatie</h3>
+      <section class="form-step form-active">
+        <h1 class="underline" >Maak je reis</h1> 
+        <a href="discover"><img src="" alt="Terugknop naar discover"></a><!-- terugknop naar home -->
 
-    <!-- verschillende partials toevoegen? algemeen, extra enz -->
-     <section>
-        <form method="POST" action="/create-post">
-
-          <!-- cover foto -->
-
-          <label>Titel</label>
-          <input type="text" placeholder="Titel van de reis" />
+        <div class="voortgangsbalk">
+            <div class="voortgangsbalk-active"></div>
+            <div class="voortgangsbalk-inactive"></div>
+        </div>
     
-          <label>Datum</label>
-          <div>
-            <input type="date" placeholder="Van" />
-            <input type="date" placeholder="Tot" />
-          </div>
+        <h2>Hier iets van tekst nog</h2>
+        <h3>Algemene informatie</h3>
+
+        <!-- cover foto -->
+
+        <label>Titel</label>
+        <input type="text" placeholder="Titel van de reis" />
+
+        <label>Datum</label>
+        <div>
+          <input type="date" placeholder="Van" />
+          <input type="date" placeholder="Tot" />
+        </div>
+
+        <label>Locatie</label>
+        <input type="text" placeholder="Locatie" />
+
+        <label>Hoeveel personen</label>
+        <input type="number" placeholder="personen" />
+
+        <button type="button" class="gradient-btn" data-next>Volgende</button>
+      </section>
+
+      <section class="form-step">
+         <h1 class="underline" >Maak je reis</h1> <!-- dit mag dan geen h1 meer zijn????? -->
+        <button type="button" data-prev>pijltje terug</button>
+
+        <div class="voortgangsbalk">
+            <div class="voortgangsbalk-active"></div>
+            <div class="voortgangsbalk-active"></div>
+        </div>
     
-          <label>Locatie</label>
-          <input type="text" placeholder="Locatie" />
+        <h2>Hier iets van tekst nog</h2>
+        <h3>Details over de reis</h3>
 
-          <label>Hoeveel personen</label>
-          <input type="number" placeholder="personen" />
+        <label>Korte beschrijving</label>
+        <input type="text" placeholder="Omschrijving van de reis" />
 
-          <input class="gradient-btn" type="submit" value="Volgende">
-        </form>
-    </section>
+        <!-- route foto -->
+
+        <label>Benodigdheden</label>
+        <input type="text" placeholder="Wat heb je nodig voor deze reis?" />
+
+        <!-- iput type welke???? -->
+        <label>Leeftijd categorie</label>
+        <input type="text">
+
+        <label>Geslacht</label>
+        <input type="text">
+
+        <input class="gradient-btn" type="submit" value="Volgende">
+      </section>
+
+
+    </form>
 
     
 
@@ -51,5 +87,7 @@
 
   </main>
   <%- include('../partials/bottom-nav'); %>
+
+  <script src="../script/form.js"></script>
 </body>
 </html>
