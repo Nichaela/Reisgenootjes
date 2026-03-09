@@ -35,8 +35,8 @@
     <% users.forEach(user => { %>
       <li 
         data-gender="<%= user.gender %>" 
-        data-date="<%= user.datum_vertrek %>" 
-        data-days="<%= user.aantal_dagen %>">
+        data-date="<%= user.date %>" 
+        data-days="<%= user.days %>">
         <%= user.name %>
       </li>
     <% }) %>
