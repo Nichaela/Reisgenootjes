@@ -2,19 +2,15 @@
 <html lang="en">
 <head>
   <%- include('../partials/head'); %>
+  <link rel="stylesheet" href="css/form.css">
 </head>
+
 <body>
-  <header>
-    <%- include('../partials/header'); %>
-  </header>
 
   <main>
 
-    <% if (user) { %>
-    <p>Welkom <%= user.name %></p>
-    <% } %>
-
-    <form method="POST" action="/create-post" class="multi-step-form">
+    <!-- multer toevoegen voor fotos -->
+    <form method="POST" action="/post" class="multi-step-form" >
 
       <section class="form-step form-active">
         <h1 class="underline" >Maak je reis</h1> 
@@ -31,19 +27,19 @@
         <!-- cover foto -->
 
         <label>Titel</label>
-        <input type="text" placeholder="Titel van de reis" />
+        <input type="text" placeholder="Titel van de reis"  name="title"/>
 
         <label>Datum</label>
         <div>
-          <input type="date" placeholder="Van" />
-          <input type="date" placeholder="Tot" />
+          <input type="date" placeholder="Van" name="startDate" />
+          <input type="date" placeholder="Tot" name="endDate" />
         </div>
 
         <label>Locatie</label>
-        <input type="text" placeholder="Locatie" />
+        <input type="text" placeholder="Locatie" name="location" />
 
         <label>Hoeveel personen</label>
-        <input type="number" placeholder="personen" />
+        <input type="number" placeholder="personen" name="persons" />
 
         <button type="button" class="gradient-btn" data-next>Volgende</button>
       </section>
@@ -60,13 +56,13 @@
         <h2>Hier iets van tekst nog</h2>
         <h3>Details over de reis</h3>
 
-        <label>Korte beschrijving</label>
-        <input type="text" placeholder="Omschrijving van de reis" />
+        <label>Korte omschrijving</label>
+        <input type="text" placeholder="Omschrijving van de reis" name="discription" />
 
         <!-- route foto -->
 
         <label>Benodigdheden</label>
-        <input type="text" placeholder="Wat heb je nodig voor deze reis?" />
+        <textarea name="supplies" placeholder="Wat heb je nodig voor deze reis? (druk Enter voor nieuw item)"></textarea>
 
         <!-- iput type welke???? -->
         <label>Leeftijd categorie</label>
@@ -86,7 +82,10 @@
 
 
   </main>
-  <%- include('../partials/bottom-nav'); %>
+
+  <footer>
+    <%- include('../partials/bottom-nav'); %>
+  </footer>
 
   <script src="../script/form.js"></script>
 </body>

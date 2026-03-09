@@ -9,13 +9,8 @@
 
   /* gradients */
   --gradient-primary: linear-gradient(66deg, var(--clr-primary) -12.56%, rgba(249, 172, 114, 0.60) 120.1%);
-  
-
-  --gradient-surface: linear-gradient(
-    180deg,
-    var(--clr-surface) 0%,
-    #F5FCFFB2 60%
-  );
+  --gradient-dark:linear-gradient(255deg, rgba(21, 65, 89, 0.00) 20.48%, #154159 104.65%);
+  --gradient-surface: linear-gradient(180deg, var(--clr-surface) 0%,#F5FCFFB2 60%);
 }
 
 /* font */
