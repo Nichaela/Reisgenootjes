@@ -1,9 +1,42 @@
+/* welkom page */
+main{
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+section{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+
+    text-align: center;
+}
+
 span{
     font-family: indie-flower;
     font-weight: 400;
     color: var(--clr-primary);
 }
 
-h1,p{
-    text-align: center;
+main a:nth-of-type(1){
+    background: var(--gradient-primary);
+    color: var(--clr-neutral);
+    padding: 0.5rem 1rem;
+    border-radius: 5rem;
 }
+
+main a:nth-of-type(2){
+    color: var(--clr-text);
+
+    text-decoration: underline;
+    text-decoration-color: var(--clr-primary);
+    text-decoration-thickness: .125rem;
+    text-underline-offset: .2rem;
+}
+
+/* register page */
+
+/* inlog page */
