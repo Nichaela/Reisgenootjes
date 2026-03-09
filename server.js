@@ -59,11 +59,16 @@ function registerGetRoutes() {
   app.get('/', (req, res) => {
     res.render('pages/index', { data: null })
   })
+
+  app.get('/welkom', (req, res) => {
+    res.render('pages/welkom', { error: null })
+  })
  
+  // hier is Roos nu mee bezig
   app.get('/login', (req, res) => {
     res.render('pages/login', { error: null })
   })
- 
+  
   app.get('/register', (req, res) => {
     res.render('pages/register', { error: null })
   })
