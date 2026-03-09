@@ -1,0 +1,9 @@
+span{
+    font-family: indie-flower;
+    font-weight: 400;
+    color: var(--clr-primary);
+}
+
+h1,p{
+    text-align: center;
+}
