@@ -67,13 +67,8 @@
 
   /* gradients */
   --gradient-primary: linear-gradient(66deg, var(--clr-primary) -12.56%, rgba(249, 172, 114, 0.60) 120.1%);
-  
-
-  --gradient-surface: linear-gradient(
-    180deg,
-    var(--clr-surface) 0%,
-    #F5FCFFB2 60%
-  );
+  --gradient-dark: linear-gradient(255deg, rgba(21, 65, 89, 0.00) 20.48%, #154159 104.65%);
+  --gradient-surface: linear-gradient(180deg,var(--clr-surface) 0%,#F5FCFFB2 60%);
 }
 
 *,
@@ -131,9 +126,8 @@ h3 { font-size: 1.5rem; }  /* 24px */
   color: var(--clr-neutral);
   text-align: center;
   width: fit-content;
-
+  padding: .5rem 1%;
   border-radius: 2rem; 
-  /* padding & radius aanpassen !!!!! */
 }
 
 /* Bottom nav */

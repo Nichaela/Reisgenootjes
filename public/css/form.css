@@ -27,14 +27,19 @@
     margin-top: 20px;
   }
   
-  input {
+  input, textarea {
     background: var(--clr-surface);
     border: none;
     border-radius: 5px;
-    height: 35px;
-    padding: 10px;
+    height: 2rem;
+    padding: 1rem;
     color: var(--clr-input-text);
     width: 100%;
+  }
+
+  textarea {
+    height: fit-content;
+    resize: none;
   }
   
   /* multipage form */
