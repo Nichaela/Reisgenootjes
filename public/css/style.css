@@ -1,3 +1,18 @@
+:root {
+  /* core colors */
+  --clr-primary: #FC9B5E;
+  --clr-primary-dark: #F9AC72;
+  --clr-text: #154159;
+  --clr-surface: #E9F8FF;
+  --clr-neutral: #FFFFFF;
+  --clr-input-text: #BBBBBB;
+
+  /* gradients */
+  --gradient-primary: linear-gradient(66deg, var(--clr-primary) -12.56%, rgba(249, 172, 114, 0.60) 120.1%);
+  --gradient-dark:linear-gradient(255deg, rgba(21, 65, 89, 0.00) 20.48%, #154159 104.65%);
+  --gradient-surface: linear-gradient(180deg, var(--clr-surface) 0%,#F5FCFFB2 60%);
+}
+
 /* font */
 @font-face {
   font-family: 'inter'; 
