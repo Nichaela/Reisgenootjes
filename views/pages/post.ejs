@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('../partials/head'); %>
+  <link rel="stylesheet" href="css/form.css">
+  <link rel="stylesheet" href="css/post.css">
+</head>
+<body>
+
+  <main>
+    <section class="hero">
+        <a href="/discover">pijltje terug</a>
+        <p><!-- icoon --> <%= location %></p>
+        <h1><%= title %></h1>
+        <p><%= startDate %> tot <%= endDate %></p>
+        
+        <img src="<%= image %>" alt="<%= title %>" class="hero-img">
+
+        <ul>
+            <% 
+              const maxVisible = 3;
+              const extraCount = joinedPersons.length - maxVisible;
+              joinedPersons.slice(0, maxVisible).forEach(item => { 
+            %>
+              <li><%= item %></li>
+            <% }) %>
+          
+            <% if(extraCount > 0) { %>
+                <li class="more">+<%= extraCount %></li>
+            <% } %>
+        </ul>
+
+    </section>
+
+    <section>
+        <p><%= gender %> | <%= hobby %> | <%= age %> jaar</p>
+
+        <h2>Omschrijving</h2>
+        <p><%= discription %> </p>
+
+        <h2>De route</h2>
+        <img src="  " alt="route <%= title %>">
+
+        <h2>Benodigdheden</h2>
+        <ul>
+            <% supplies.forEach(item => { %>
+              <li><%= item %></li>
+            <% }) %>
+        </ul>
+    </section>
+  </main>
+
+  <footer>
+      <%- include('../partials/bottom-nav'); %>
+  </footer>
+
+  <script src="../script/form.js"></script>
+</body>
+</html>

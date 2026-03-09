@@ -2,12 +2,9 @@
 <html lang="en">
 <head>
   <%- include('../partials/head'); %>
+  
 </head>
 <body>
-  <header>
-    <%- include('../partials/header'); %>
-  </header>
-
   <main>
 
     <% if (user) { %>
@@ -52,6 +49,9 @@
 
 
   </main>
-  <%- include('../partials/bottom-nav'); %>
+
+  <footer>
+    <%- include('../partials/bottom-nav'); %>
+  </footer>
 </body>
 </html>
