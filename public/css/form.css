@@ -1,0 +1,52 @@
+/* forms */
+.voortgangsbalk {
+    display: flex;
+    gap: 10px;
+  }
+  .voortgangsbalk div {
+    height: 5px;
+    width: 100%;
+    border-radius: 5px;
+  }
+  .voortgangsbalk-active {background-color: var(--clr-primary);}
+  .voortgangsbalk-inactive {background-color: var(--clr-surface);}
+  
+  form {
+    display: grid;
+    gap: 10px;
+  }
+  form div {
+    display: flex;
+    gap: 10px;
+  }
+  form input.gradient-btn {
+    justify-self: right;
+  }
+  
+  label {
+    margin-top: 20px;
+  }
+  
+  input, textarea {
+    background: var(--clr-surface);
+    border: none;
+    border-radius: 5px;
+    height: 2rem;
+    padding: 1rem;
+    color: var(--clr-input-text);
+    width: 100%;
+  }
+
+  textarea {
+    height: fit-content;
+    resize: none;
+  }
+  
+  /* multipage form */
+  .form-step {
+    display: none;
+  }
+  
+  .form-step.form-active {
+    display: block;
+  }

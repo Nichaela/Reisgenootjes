@@ -59,11 +59,16 @@ function registerGetRoutes() {
   app.get('/', (req, res) => {
     res.render('pages/index', { data: null })
   })
+
+  app.get('/welkom', (req, res) => {
+    res.render('pages/welkom', { error: null })
+  })
  
+  // hier is Roos nu mee bezig
   app.get('/login', (req, res) => {
     res.render('pages/login', { error: null })
   })
- 
+  
   app.get('/register', (req, res) => {
     res.render('pages/register', { error: null })
   })
@@ -78,6 +83,8 @@ function registerGetRoutes() {
     }
     res.render('pages/dashboard', { user: req.session.user })
   })
+
+
  
  
   // hier is laura nu mee bezig
@@ -86,6 +93,16 @@ function registerGetRoutes() {
   })
   app.get('/create-post', (req, res) => {
     res.render('pages/create-post', { user: req.session.user })
+  })
+  app.get('/post', (req, res) => {
+    res.render('pages/post', { user: req.session.user })
+  })
+    
+  //
+
+  // hier is Stiene nu mee bezig
+  app.get('/matchen', (req, res) => {
+    res.render('pages/matchen', { user: req.session.user })
   })
   //
  
@@ -152,6 +169,14 @@ function registerPostRoutes() {
  
     return res.redirect('/register-success')
   })
+
+  //Post
+  app.post('/post', (req, res) => {
+    const supplies = req.body.supplies.split('\n') //checken of dit werkt
+
+    res.redirect('/post')
+  })
+
  
 }
  
@@ -174,7 +199,7 @@ function registerErrorHandlers() {
   })
     })
  
-    
+
   // 500 handler
   app.use((err, req, res, next) => {
     console.error(err.stack)

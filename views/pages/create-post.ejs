@@ -2,54 +2,95 @@
 <html lang="en">
 <head>
   <%- include('../partials/head'); %>
+  <link rel="stylesheet" href="css/form.css">
 </head>
+
 <body>
-  <header>
-    <%- include('../partials/header'); %>
-  </header>
 
   <main>
 
-    <% if (user) { %>
-    <p>Welkom <%= user.name %></p>
-    <% } %>
+    <!-- multer toevoegen voor fotos -->
+    <form method="POST" action="/post" class="multi-step-form" >
 
-    <h1 class="underline" >Maak je reis</h1>
+      <section class="form-step form-active">
+        <h1 class="underline" >Maak je reis</h1> 
+        <a href="discover">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M27.7501 16C27.7501 16.1989 27.6711 16.3896 27.5304 16.5303C27.3898 16.671 27.199 16.75 27.0001 16.75H6.81132L14.5301 24.47C14.6038 24.5386 14.6629 24.6214 14.7039 24.7134C14.7448 24.8054 14.7669 24.9047 14.7687 25.0054C14.7704 25.1062 14.7519 25.2062 14.7142 25.2996C14.6765 25.393 14.6203 25.4778 14.5491 25.549C14.4779 25.6202 14.3931 25.6764 14.2997 25.7141C14.2063 25.7518 14.1063 25.7703 14.0056 25.7686C13.9048 25.7668 13.8055 25.7447 13.7135 25.7038C13.6215 25.6628 13.5387 25.6037 13.4701 25.53L4.47007 16.53C4.32962 16.3893 4.25073 16.1987 4.25073 16C4.25073 15.8012 4.32962 15.6106 4.47007 15.47L13.4701 6.46997C13.6122 6.33749 13.8003 6.26537 13.9946 6.26879C14.1889 6.27222 14.3743 6.35093 14.5117 6.48835C14.6491 6.62576 14.7278 6.81114 14.7312 7.00545C14.7347 7.19975 14.6626 7.38779 14.5301 7.52997L6.81132 15.25H27.0001C27.199 15.25 27.3898 15.329 27.5304 15.4696C27.6711 15.6103 27.7501 15.8011 27.7501 16Z" fill="#154159"/>
+          </svg>
+        </a>
 
-    <!-- voortagnsbalk -->
-     <h2>Hier iets van tekst nog</h2>
-     <h3>Algemene informatie</h3>
-
-    <!-- verschillende partials toevoegen? algemeen, extra enz -->
-     <section>
-        <form method="POST" action="/create-post">
-
-          <!-- cover foto -->
-
-          <label>Titel</label>
-          <input type="text" placeholder="Titel van de reis" />
+        <div class="voortgangsbalk">
+            <div class="voortgangsbalk-active"></div>
+            <div class="voortgangsbalk-inactive"></div>
+        </div>
     
-          <label>Datum</label>
-          <div>
-            <input type="date" placeholder="Van" />
-            <input type="date" placeholder="Tot" />
-          </div>
+        <h2>Hier iets van tekst nog</h2>
+        <h3>Algemene informatie</h3>
+
+        <!-- cover foto -->
+
+        <label>Titel</label>
+        <input type="text" placeholder="Titel van de reis"  name="title"/>
+
+        <label>Datum</label>
+        <div>
+          <input type="date" placeholder="Van" name="startDate" />
+          <input type="date" placeholder="Tot" name="endDate" />
+        </div>
+
+        <label>Locatie</label>
+        <input type="text" placeholder="Locatie" name="location" />
+
+        <label>Hoeveel personen</label>
+        <input type="number" placeholder="personen" name="persons" />
+
+        <button type="button" class="gradient-btn" data-next>Volgende</button>
+      </section>
+
+      <section class="form-step">
+         <h1 class="underline" >Maak je reis</h1> <!-- dit mag dan geen h1 meer zijn????? -->
+        <button type="button" data-prev>pijltje terug</button>
+
+        <div class="voortgangsbalk">
+            <div class="voortgangsbalk-active"></div>
+            <div class="voortgangsbalk-active"></div>
+        </div>
     
-          <label>Locatie</label>
-          <input type="text" placeholder="Locatie" />
+        <h2>Hier iets van tekst nog</h2>
+        <h3>Details over de reis</h3>
 
-          <label>Hoeveel personen</label>
-          <input type="number" placeholder="personen" />
+        <label>Korte omschrijving</label>
+        <input type="text" placeholder="Omschrijving van de reis" name="discription" />
 
-          <input class="gradient-btn" type="submit" value="Volgende">
-        </form>
-    </section>
+        <!-- route foto -->
+
+        <label>Benodigdheden</label>
+        <textarea name="supplies" placeholder="Wat heb je nodig voor deze reis? (druk Enter voor nieuw item)"></textarea>
+
+        <!-- iput type welke???? -->
+        <label>Leeftijd categorie</label>
+        <input type="text">
+
+        <label>Geslacht</label>
+        <input type="text">
+
+        <input class="gradient-btn" type="submit" value="Volgende">
+      </section>
+
+
+    </form>
 
     
 
 
 
   </main>
-  <%- include('../partials/bottom-nav'); %>
+
+  <footer>
+    <%- include('../partials/bottom-nav'); %>
+  </footer>
+
+  <script src="../script/form.js"></script>
 </body>
 </html>
