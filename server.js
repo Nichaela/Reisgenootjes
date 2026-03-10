@@ -177,6 +177,26 @@ function registerPostRoutes() {
     res.redirect('/post')
   })
 
+    //route naar annabels pagina
+
+    app.get('/filter', async (req, res) => {
+      try {
+        const myUsers = await users
+          .find({ owner: "annabel" }) // alleen jouw records
+          .toArray();
+    
+        res.render('pages/filter', { users: myUsers });
+      } catch (err) {
+        console.error(err);
+        res.status(500).send("Fout bij ophalen data");
+      }
+    })
+
+    const myUsers = await users.find({ owner: "annabel" }).toArray();
+console.log(myUsers);
+
+
+    // Middleware to handle not found errors - error 404
  
 }
  
