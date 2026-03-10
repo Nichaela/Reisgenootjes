@@ -1,42 +1,46 @@
 /* forms */
 .voortgangsbalk {
-    display: flex;
-    gap: 10px;
-  }
-  .voortgangsbalk div {
-    height: 5px;
-    width: 100%;
-    border-radius: 5px;
-  }
+  display: flex;
+  gap: 10px;
+}
+
+.voortgangsbalk div {
+  height: 5px;
+  width: 100%;
+  border-radius: 5px;
+}
   .voortgangsbalk-active {background-color: var(--clr-primary);}
   .voortgangsbalk-inactive {background-color: var(--clr-surface);}
-  
-  form {
+
+form {
     display: grid;
     grid-template-rows: auto 1fr;
     margin: var(--space-side);
     position: relative;
     height: 80vh;
-  }
-  .form-step > a,
+}
+
+.form-step > a,
   .form-step > button[data-prev] {
     position: absolute;
     top: 0;
     right: 0;
-  }
-  form div {
-    display: flex;
-  }
-  form input.gradient-btn {
-    justify-self: right;
-  }
-  
-  label {
+}
+
+form div {
+  display: flex;
+}
+
+form input.gradient-btn {
+  justify-self: right;
+}
+
+label {
     display: block;
     margin-top: var(--space-gap-s);
-  }
-  
-  input, textarea, select {
+}
+
+input, textarea, select {
     background: var(--clr-surface);
     border: none;
     border-radius: 5px;
@@ -44,13 +48,14 @@
     color: var(--clr-input-text);
     width: 100%;
     padding: var(--space-gap-xs);
-  }
-  textarea {
+ }
+
+ textarea {
     height: fit-content;
     resize: none;
   }
-  
-  /* multipage form */
+
+ /* multipage form */
   .form-step {
     display: none;
   }
@@ -76,4 +81,33 @@
     position: absolute;
     right: 0;
     bottom: var(--space-gap-s);
+  }
+
+/* checkboxes voor aanmeldform */
+.options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.option input {
+  display: none;
+}
+
+.option span {
+  padding: 10px 20px;
+  border: .05rem solid var(--clr-text);
+  border-radius: 5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.option input:checked+span {
+  background: var(--gradient-primary);
+  color: white;
+  border: none;
+}
+    display: flex;
+    gap: 10px;
   }

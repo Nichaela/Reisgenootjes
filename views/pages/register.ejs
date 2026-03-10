@@ -9,7 +9,7 @@
 <body>
   <header>
     <%- include('../partials/header'); %>
-    <link rel="stylesheet" href="css/form.css">
+      <link rel="stylesheet" href="css/form.css">
   </header>
 
   <main>
@@ -21,8 +21,8 @@
 
         <!-- from van alle pagina's -->
         <form method="POST" action="/register" class="multi-step-form">
+          <h1 class="underline">Maak jou profiel</h1>
           <section class="form-step form-active"> <!-- eerste deel -->
-            <h2 class="underline">Maak jou profiel</h2>
 
             <div class="voortgangsbalk">
               <div class="voortgangsbalk-active"></div>
@@ -32,7 +32,7 @@
             </div>
 
             <p>Hier iets van tekst nog</p>
-            <p>Account aanmaken</p>
+            <h2>Account aanmaken</h2>
 
 
             <label for="name">Voornaam</label>
@@ -54,7 +54,6 @@
 
           </section>
           <section class="form-step"> <!--tweede deel-->
-            <h2 class="underline">Maak jou profiel</h2>
 
             <div class="voortgangsbalk">
               <div class="voortgangsbalk-active"></div>
@@ -64,9 +63,7 @@
             </div>
 
             <p>Hier iets van tekst nog</p>
-            <p>Account aanmaken</p>
-
-            <input type="file" name="avatar" accept="image/*">
+            <h2>Persoonlijke gegevens</h2>
 
             <label for="username">Naam</label>
             <input type="text" id="username" name="username" required>
@@ -88,63 +85,131 @@
             <button type="button" class="gradient-btn" data-next>Volgende</button>
           </section>
 
-            <section class="form-step"> <!--derde deel-->
-              <h2 class="underline">Maak jou profiel</h2>
-  
-              <div class="voortgangsbalk">
-                <div class="voortgangsbalk-active"></div>
-                <div class="voortgangsbalk-active"></div>
-                <div class="voortgangsbalk-active"></div>
-                <div class="voortgangsbalk-inactive"></div>
-              </div>
-  
-              <p>Welke manieren van reizen spreken jou aan?</p>
-              <p>Selecteer 5 onderwerpen</p>
+          <section class="form-step"> <!--derde deel-->
 
-              <button type="button" class="gradient-btn" data-next>Volgende</button>
-            </section>
+            <div class="voortgangsbalk">
+              <div class="voortgangsbalk-active"></div>
+              <div class="voortgangsbalk-active"></div>
+              <div class="voortgangsbalk-active"></div>
+              <div class="voortgangsbalk-inactive"></div>
+            </div>
 
-            <section class="form-step"> <!--vierde deel-->
-              <h2 class="underline">Jouw profiel</h2>
-  
-              <div class="voortgangsbalk">
-                <div class="voortgangsbalk-active"></div>
-                <div class="voortgangsbalk-active"></div>
-                <div class="voortgangsbalk-active"></div>
-                <div class="voortgangsbalk-active"></div>
-              </div>
-              
-              <input type="file" name="avatar" accept="image/*">
-              <input type="file" name="avatar" accept="image/*">
-              <input type="file" name="avatar" accept="image/*">
-              <input type="file" name="avatar" accept="image/*">
+            <p>Hier iets van tekst nog</p>
+            <h2>Profiel</h2>
 
-              <section>
-                <h3>Naam...</h3>
-                  <p> <!--icon--> Geslacht</p>
-                <div>
-                  <img src="" alt="">
-                  <p> <!--icon--> Leeftijd</p>
-                </div>
-              </section>
+            <input type="file" name="avatar" accept="image/*">
+            <input type="file" name="avatar" accept="image/*">
+            <input type="file" name="avatar" accept="image/*">
+            <input type="file" name="avatar" accept="image/*">
 
-              <p>Status • pas je status aan</p> <!-- even iets maken waardoor je dat kan aanpassen -->
+            <label for="status">Status</label>
+            <input type="text" name="status" id="status">
 
-              <h2>Bio</h2>
-              <p>Schrijf hier jouw bio...</p> <!-- even iets maken waardoor je dat kan aanpassen -->
+            <label for="Bio">Bio</label>
+            <input type="text" name="bio" id="bio">
 
-              <h2>Interesses</h2>
+            <button type="button" class="gradient-btn" data-next>Volgende</button>
+          </section>
 
-              <input class="gradient-btn" type="submit" value="Profiel aanmaken">
-            </section>
+          <section class="form-step"> <!--vierde deel-->
+
+            <div class="voortgangsbalk">
+              <div class="voortgangsbalk-active"></div>
+              <div class="voortgangsbalk-active"></div>
+              <div class="voortgangsbalk-active"></div>
+              <div class="voortgangsbalk-active"></div>
+            </div>
+
+            <p>Welke manieren van reizen spreken jou aan?</p>
+            <p>Selecteer 5 onderwerpen</p>
+
+            <div class="options">
+              <label class="option">
+                <input type="checkbox" name="interests" value="Backpacken">
+                <span>Backpacken</span>
+              </label>
+
+              <label class="option">
+                <input type="checkbox" name="interests" value="Kanoën">
+                <span>Kanoën</span>
+              </label>
+
+              <label class="option">
+                <input type="checkbox" name="interests" value="Zeilen">
+                <span>Zeilen</span>
+              </label>
+
+              <label class="option">
+                <input type="checkbox" name="interests" value="Auto">
+                <span>Auto</span>
+              </label>
+
+              <label class="option">
+                <input type="checkbox" name="interests" value="Trein">
+                <span>Trein</span>
+              </label>
+
+              <label class="option">
+                <input type="checkbox" name="interests" value="Huttentocht">
+                <span>Huttentocht</span>
+              </label>
+
+              <label class="option">
+                <input type="checkbox" name="interests" value="Kamperen">
+                <span>Kamperen</span>
+              </label>
+
+              <label class="option">
+                <input type="checkbox" name="interests" value="Stedentrip">
+                <span>Stedentrip</span>
+              </label>
+
+              <label class="option">
+                <input type="checkbox" name="interests" value="Liften">
+                <span>Liften</span>
+              </label>
+
+              <label class="option">
+                <input type="checkbox" name="interests" value="Fietsen">
+                <span>Fietsen</span>
+              </label>
+
+              <label class="option">
+                <input type="checkbox" name="interests" value="Camper">
+                <span>Camper</span>
+              </label>
+
+              <label class="option">
+                <input type="checkbox" name="interests" value="Roadtrip">
+                <span>Roadtrip</span>
+              </label>
+
+              <label class="option">
+                <input type="checkbox" name="interests" value="Duiken">
+                <span>Duiken</span>
+              </label>
+
+              <label class="option">
+                <input type="checkbox" name="interests" value="Hiken">
+                <span>Hiken</span>
+              </label>
+
+              <label class="option">
+                <input type="checkbox" name="interests" value="Zuipen">
+                <span>Zuipen</span>
+              </label>
+            </div>
+
+            <input class="gradient-btn" type="submit" value="Profiel aanmaken">
+          </section>
         </form>
 
   </main>
   <footer>
     <%- include('../partials/bottom-nav'); %>
-</footer>
+  </footer>
 
-    <script src="../script/form.js"></script>
+  <script src="../script/form.js"></script>
 
 </body>
 

@@ -13,14 +13,16 @@
 <main>
     <h2 class="underline">Login</h2>
     <form id="loginForm" method="POST" action="/login">
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" required>
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
  
-        <label for="password">Password:</label>
+        <label for="password">Wachtwoord:</label>
         <input type="password" id="password" name="password" required>
 
         <input class="gradient-btn" type="submit" value="Inloggen">
     </form>
+
+    <a href="">Wachtwoord vergeten?</a>
     
     <% if (error) { %>
       <p class="error"><%= error %></p>
