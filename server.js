@@ -34,7 +34,7 @@ app
 
 // Construct URL used to connect to database from info in the .env file
 const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}/${process.env.DB_NAME}?retryWrites=true&w=majority`
-
+ 
 // Create a MongoClient
 const client = new MongoClient(uri, {
   serverApi: {
@@ -43,9 +43,9 @@ const client = new MongoClient(uri, {
     deprecationErrors: true,
   },
 })
-
+ 
 let users
-
+ 
 // ==========================================
 // 4. MIDDLEWARE (Algemeen)
 // ==========================================
@@ -53,33 +53,41 @@ app.use((req, res, next) => {
   res.locals.user = req.session.user || null
   next()
 })
-
+ 
 // ==========================================
 // 5. ROUTES (GET - Pagina's bekijken)
 // ==========================================
+ 
 function registerGetRoutes() {
+ 
   app.get('/', (req, res) => {
     res.render('pages/index', { data: null })
   })
 
+  app.get('/welkom', (req, res) => {
+    res.render('pages/welkom', { error: null })
+  })
+ 
+  // hier is Roos nu mee bezig
   app.get('/login', (req, res) => {
     res.render('pages/login', { error: null })
   })
-
+  
   app.get('/register', (req, res) => {
     res.render('pages/register', { error: null })
   })
-
+ 
   app.get('/register-success', (req, res) => {
     res.render('pages/register-success')
   })
-
+ 
   app.get('/dashboard', (req, res) => {
     if (!req.session.user) return res.redirect('/login')
     res.render('pages/dashboard', { user: req.session.user })
   })
 
-  // Laura pagina's
+
+  // hier is laura nu mee bezig
   app.get('/discover', (req, res) => {
     res.render('pages/discover', { user: req.session.user })
   })
@@ -87,8 +95,19 @@ function registerGetRoutes() {
   app.get('/create-post', (req, res) => {
     res.render('pages/create-post', { user: req.session.user })
   })
+  app.get('/post', (req, res) => {
+    res.render('pages/post', { user: req.session.user })
+  })
+    
+  //
 
-    // Chatroom pagina
+  // hier is Stiene nu mee bezig
+  app.get('/matchen', (req, res) => {
+    res.render('pages/matchen', { user: req.session.user })
+  })
+  //
+ 
+   // Chatroom paginas Nicha
   app.get('/chatroom', (req, res) => {
     if (!req.session.user) return res.redirect('/login')
     res.render('pages/chatroom', { user: req.session.user })
@@ -98,11 +117,14 @@ function registerGetRoutes() {
     if (!req.session.user) return res.redirect('/login')
     res.render('pages/chat-channel', { user: req.session.user })
   })
-
+  
   app.get('/logout', (req, res) => {
-    req.session.destroy(() => res.redirect('/login'))
+    req.session.destroy(() => {
+      res.redirect('/login')
+    })
   })
 }
+ 
 
 // ==========================================
 // 6. POST ROUTES (Data verwerken)
@@ -112,37 +134,68 @@ function registerPostRoutes() {
   app.post('/login', async (req, res) => {
     const { username, password } = req.body
     const user = await users.findOne({ name: username })
-
+ 
     if (!user) {
       return res.status(401).render('pages/login', { error: 'Onbekende gebruiker' })
     }
-
+ 
     if (user.password !== password) {
-      return res.status(401).render('pages/login', { error: 'Verkeerd wachtwoord' })
+      return res.status(401).render('pages/login', {
+        error: 'Verkeerd wachtwoord'
+      })
     }
-
-    req.session.user = { _id: user._id, name: user.name, email: user.email }
+ 
+    req.session.user = {
+      _id: user._id,
+      name: user.name,
+      email: user.email
+    }
+ 
     return res.redirect('/')
   })
-
+ 
+ 
   // Register
   app.post('/register', async (req, res) => {
     const { email, username, password, dob } = req.body
-
-    const existingUser = await users.findOne({ email })
+ 
+    const existingUser = await users.findOne({ email: email })
+ 
     if (existingUser) {
       return res.status(409).render('pages/register', { error: 'Email bestaat al' })
     }
-
+ 
     await users.insertOne({
       email,
       name: username,
       password,
       dob: dob || null,
     })
-
+ 
     return res.redirect('/register-success')
   })
+
+  //Post
+  app.post('/post', (req, res) => {
+    const supplies = req.body.supplies.split('\n') //checken of dit werkt
+
+    res.redirect('/post')
+  })
+
+    //route naar annabels pagina
+
+    app.get('/filter', async (req, res) => {
+      try {
+        const myUsers = await users
+          .find({ owner: "annabel" }) // alleen jouw records
+          .toArray();
+    
+        res.render('pages/filter', { users: myUsers });
+      } catch (err) {
+        console.error(err);
+        res.status(500).send("Fout bij ophalen data");
+      }
+    })
 }
 
 // ==========================================
@@ -188,18 +241,29 @@ function registerSocketHandlers() {
   })
 }
 
+    // Middleware to handle not found errors - error 404
+ 
+}
+ 
+ 
+ 
 // ==========================================
 // 8. ERROR HANDLING & SERVER START
 // ==========================================
+ 
 function registerErrorHandlers() {
-  // 404 handler
-  app.use((req, res) => {
-    if (req.url === '/.well-known/appspecific/com.chrome.devtools.json') {
-      return res.sendStatus(204)
-    }
-    console.error('404 error at URL:', req.url)
-    res.status(404).send('404 error at URL: ' + req.url)
+  // Middleware to handle not found errors - error 404
+    app.use((req, res) => {
+      if (req.url === '/.well-known/appspecific/com.chrome.devtools.json') {
+        return res.sendStatus(204)
+      }
+      console.error('404 error at URL: ' + req.url)
+       res.status(404).render('pages/errorstate', {
+    status: 404,
+    message: 'Pagina niet gevonden'
   })
+    })
+ 
 
   // 500 handler
   app.use((err, req, res, next) => {
@@ -207,29 +271,37 @@ function registerErrorHandlers() {
     res.status(500).send('500: server error')
   })
 }
+ 
+ 
+ 
 
 async function start() {
   try {
     await client.connect()
     console.log('Database connection established')
-
+ 
     const db = client.db(process.env.DB_NAME)
     users = db.collection(process.env.DB_COLLECTION)
+ 
+    // Routes registreren
 
     registerGetRoutes()
     registerPostRoutes()
     registerSocketHandlers()
     registerErrorHandlers()
+ 
+    // Server starten
 
     const port = process.env.PORT || 3000
     server.listen(port, () => {
       console.log(`Server draait op poort ${port}`)
     })
+ 
   } catch (err) {
     console.log('Database connection error:', err)
     console.log('For uri -', uri)
     process.exit(1)
   }
 }
-
+ 
 start()

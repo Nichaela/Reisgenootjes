@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('../partials/head'); %>
+</head>
+<body>
+  <header>
+    <%- include('../partials/header'); %>
+    <link rel="stylesheet" href="css/matchen.css">
+  </header>
+
+  <main>
+
+  <% if (user) { %>
+  <p>Welkom <%= user.name %></p>
+  <% } %>
+
+  <h1 class="underline" >Matchen</h1>
+  <!-- filterknop -->
+   <!-- like -->
+   <!-- Dislike -->
+
+   <section>
+  <img src="img/accounts/MarkvanFlied.jpg" alt="Account foto">
+  <div class="profile-info">
+    <h2>Mark van Flied • 20</h2>
+    <ul>
+      <li>man</li>
+      <li>55 km van jou vandaan</li>
+      <li>Reizen door Oosterijk</li>
+      <li>2 Gezamenlijke interesse</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+    <p>State • Opzoek naar reisgenootje</p>
+    <h2>Bio</h2>
+    <p>Hier komt een stukje tekst te staan wat meer verteld over het persoon zodat je een beter beeld krijgt met wie je op reis gaat</p>
+</section>
+
+<section>
+  <h2>Interesse</h2>
+
+<ul class="hobbies">
+    <li class="hobby">Sport</li>
+    <li class="hobby">Reizen</li>
+    <li class="hobby">Muziek</li>
+    <li class="hobby">Hiken</li>
+</ul>
+</section>
+
+<section>
+  <h2>Geplande trip</h2>
+  <article class="reisoproep">
+    <img src="img/test-cover.jpg" alt="cover dolemietenreis">
+    <span>20 apr – 26 apr</span>
+    <p>Italië</p>
+    <h3>Tocht door de Dolomieten</h3>
+    <button>→</button>
+  </article>
+</section>
+
+<section>
+    <h2>Op zoek naar:</h2>
+    <p>Hier komt een stukje tekst te staan wat de persoon zoekt in een reisgenootje, stel dat deze reis het niet word kan je alsnog een reis met die persoon plannen of matchen voor een gesprek.</p>
+</section>
+
+<section>
+    <h2>Gallerij</h2>
+    <img src="img/accounts/markvoorkant.jpg" alt="mark van de voorkant">
+    <img src="img/accounts/markwandelen.jpg" alt="mark die aan het wandelen is">
+    <img src="img/accounts/tentje.jpg" alt="een tentje in de bergen met uitzicht">
+</section>
+
+
+  </main>
+  <%- include('../partials/bottom-nav'); %>
+</body>
+</html>

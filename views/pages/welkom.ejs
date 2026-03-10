@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../partials/head'); %>
+</head>
+
+<body class="container">
+
+    <header>
+        <%- include('../partials/header'); %>
+        <link rel="stylesheet" href="css/onboarding.css">
+    </header>
+
+    <main>
+        <section>
+            <h1>Welkom bij <span>Reisgenootje!</span></h1>
+            <p>Hier komen dan allemaal motiverende en activerende teksten</p>
+            <img src="img/welkom.png" alt=""> <!-- moet nog even een alt -->
+            <p>Vind je nieuwe reisgenootje</p>
+            <a href="/login">Inloggen</a>
+            <a href="/register">Aanmelden</a>
+        </section>
+
+
+        <% if (error) { %>
+            <p class="error">
+                <%= error %>
+            </p>
+            <% } %>
+    </main>
+    <footer>
+        <%- include('../partials/bottom-nav'); %>
+    </footer>
+
+</body>
+
+</html>

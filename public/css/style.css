@@ -9,13 +9,14 @@
 
   /* gradients */
   --gradient-primary: linear-gradient(66deg, var(--clr-primary) -12.56%, rgba(249, 172, 114, 0.60) 120.1%);
-  
+  --gradient-dark:linear-gradient(255deg, rgba(21, 65, 89, 0.00) 20.48%, #154159 104.65%);
+  --gradient-surface: linear-gradient(180deg, var(--clr-surface) 0%,#F5FCFFB2 60%);
 
-  --gradient-surface: linear-gradient(
-    180deg,
-    var(--clr-surface) 0%,
-    #F5FCFFB2 60%
-  );
+  /* spacing */
+  --space-side: 1.5rem;
+  --space-gap: 2rem;
+  --space-gap-s: 1rem;
+  --space-gap-xs: .5rem;
 }
 
 /* font */
@@ -24,37 +25,31 @@
   src: url(../font/inter/inter-Light.ttf) format('woff2');  
   font-weight: 300;
 }
-
 @font-face {
   font-family: 'inter';
   src: url(../font/inter/inter-ExtraLight.ttf) format('woff2');
   font-weight: 200;
 }
-
 @font-face {
   font-family: 'inter';
   src: url(../font/inter/inter-Regular.ttf) format('woff2');
   font-weight: 400;
 }
-
 @font-face {
   font-family: 'inter';
   src: url(../font/inter/inter-Medium.ttf) format('woff2');
   font-weight: 500;
 }
-
 @font-face {
   font-family: 'inter';
   src: url(../font/inter/inter-SemiBold.ttf) format('woff2');
   font-weight: 600;
 }
-
 @font-face {
   font-family: 'inter';
   src: url(../font/inter/inter-Bold.ttf) format('woff2');
   font-weight: 700;
 }
-
 @font-face {
   font-family: 'indie-flower';
   src: url(../font/indie-flower/indieFlower-Regular.ttf) format('woff2');
@@ -71,9 +66,10 @@
   list-style: none;
 }
 
-body {
+body, textarea {
   color: var(--clr-text);
   background: var(--clr-neutral);
+  font-family: 'inter';
 }
 
 main {
@@ -88,6 +84,7 @@ h3 { font-size: 1.5rem; }  /* 24px */
 .underline {
     position: relative;
     display: inline-block;
+    margin-bottom: 1rem;
 }
 
 .underline::after {
@@ -110,26 +107,20 @@ h3 { font-size: 1.5rem; }  /* 24px */
 
 
 /* buttons */
+button {
+  background-color: transparent;
+  border: none;
+}
+
 .gradient-btn {
   background-image: var(--gradient-primary);
   border: none;
   color: var(--clr-neutral);
   text-align: center;
-
+  width: fit-content;
+  padding: .5rem 1rem;
   border-radius: 2rem; 
-  /* padding & radius aanpassen !!!!! */
 }
-
-/* forms */
-input {
-  background: var(--clr-surface);
-  border: none;
-  border-radius: 5px;
-  height: 35px;
-  padding: 10px;
-  color: var(--clr-input-text);
-}
-
 
 
 
@@ -142,28 +133,24 @@ input {
   background: var(--clr-neutral);
   border-top: 1px solid rgba(0,0,0,0.1);
   padding: 0.75rem 0.5rem;
+  z-index: 10;
 }
 .bottom-nav ul {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
- 
 }
-
 .bottom-nav a {
   text-align: center;
   text-decoration: none;
   padding: 0.5rem;
   font-weight: 600;
   color: var(--clr-text);
-  
   display: flex;
   flex-direction: column;
 }
-
 .bottom-nav a.active {
   color: var(--clr-primary);
 }
-
 .bottom-nav img {
   order: -1;
 }
