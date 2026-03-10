@@ -192,9 +192,6 @@ function registerPostRoutes() {
       }
     })
 
-    const myUsers = await users.find({ owner: "annabel" }).toArray();
-console.log(myUsers);
-
 
     // Middleware to handle not found errors - error 404
  
@@ -220,11 +217,11 @@ function registerErrorHandlers() {
     })
  
 
-  // 500 handler
-  app.use((err, req, res, next) => {
-    console.error(err.stack)
-    res.status(500).send('500: server error')
-  })
+ // error handler
+app.use(function (err, req, res) {
+  console.error(err.stack)
+  res.status(500).send('500: server error')
+})
 }
  
  
