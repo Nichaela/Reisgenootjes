@@ -9,23 +9,26 @@
   width: 100%;
   border-radius: 5px;
 }
-
-.voortgangsbalk-active {
-  background-color: var(--clr-primary);
-}
-
-.voortgangsbalk-inactive {
-  background-color: var(--clr-surface);
-}
+  .voortgangsbalk-active {background-color: var(--clr-primary);}
+  .voortgangsbalk-inactive {background-color: var(--clr-surface);}
 
 form {
-  display: grid;
-  gap: 10px;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    margin: var(--space-side);
+    position: relative;
+    height: 80vh;
+}
+
+.form-step > a,
+  .form-step > button[data-prev] {
+    position: absolute;
+    top: 0;
+    right: 0;
 }
 
 form div {
   display: flex;
-  gap: 10px;
 }
 
 form input.gradient-btn {
@@ -33,27 +36,52 @@ form input.gradient-btn {
 }
 
 label {
-  margin-top: 20px;
+    display: block;
+    margin-top: var(--space-gap-s);
 }
 
-input {
-  background: var(--clr-surface);
-  border: none;
-  border-radius: 5px;
-  height: 35px;
-  padding: 10px;
-  color: var(--clr-input-text);
-  width: 100%;
-}
+input, textarea, select {
+    background: var(--clr-surface);
+    border: none;
+    border-radius: 5px;
+    min-height: 2rem;
+    color: var(--clr-input-text);
+    width: 100%;
+    padding: var(--space-gap-xs);
+ }
 
-/* multipage form */
-.form-step {
-  display: none;
-}
+ textarea {
+    height: fit-content;
+    resize: none;
+  }
 
-.form-step.form-active {
-  display: block;
-}
+ /* multipage form */
+  .form-step {
+    display: none;
+  }
+  .form-step.form-active {
+    display: block;
+  }
+  form h1 {
+    width: fit-content;
+  }
+  form p:first-of-type {
+    font-family: 'indie-flower';
+    color: var(--clr-primary);
+    font-size: 1.5rem;
+    text-align: center;
+    margin-top: 2rem;
+  }
+  form h2 {
+    font-weight: normal;
+    text-align: center;
+    margin-bottom: var(--space-gap);
+  }
+  form button[data-next], input.gradient-btn {
+    position: absolute;
+    right: 0;
+    bottom: var(--space-gap-s);
+  }
 
 /* checkboxes voor aanmeldform */
 .options {
@@ -80,3 +108,6 @@ input {
   color: white;
   border: none;
 }
+    display: flex;
+    gap: 10px;
+  }

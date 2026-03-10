@@ -1,3 +1,4 @@
+// multipage form verwijderen en tonen pages
 document.querySelectorAll(".multi-step-form").forEach(form => {
 
   const steps = form.querySelectorAll(".form-step");
@@ -41,4 +42,11 @@ checkboxes.forEach(box => {
       alert("Je mag maximaal 5 interesses kiezen.");
     }
   });
+
+// dropdown menu voor checkboxes (leeftijd)
+const dropdown = document.querySelector('.dropdown-checkbox');
+const button = dropdown.querySelector('button');
+
+button.addEventListener('click', () => {
+  dropdown.classList.toggle('open');
 });

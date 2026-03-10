@@ -6,6 +6,7 @@
 <body>
   <header>
     <%- include('../partials/header'); %>
+    <link rel="stylesheet" href="css/matchen.css">
   </header>
 
   <main>
@@ -18,44 +19,55 @@
   <!-- filterknop -->
    <!-- like -->
    <!-- Dislike -->
+
    <section>
   <img src="img/accounts/MarkvanFlied.jpg" alt="Account foto">
-  <2>Mark van Flied • 20</h2>
+  <div class="profile-info">
+    <h2>Mark van Flied • 20</h2>
     <ul>
-        <li>man</li>
-         <li>55 km van jou vandaan</li>
-         <li>Reizen door Oosterijk</li>
-         <li>2 Gezamenlijke interesse</li>
+      <li>man</li>
+      <li>55 km van jou vandaan</li>
+      <li>Reizen door Oosterijk</li>
+      <li>2 Gezamenlijke interesse</li>
     </ul>
+  </div>
 </section>
+
 <section>
-    State • Opzoek naar reisgenootje
-    <h2>Bio</h2>
-    <p>Hier komt een stukje tekst te staan wat meer verteld over het persoon zodat je een beter beeld krijgt met wie je op reis gaat</p>
-</section>
-<section>
-    State • Opzoek naar reisgenootje
+    <p>State • Opzoek naar reisgenootje</p>
     <h2>Bio</h2>
     <p>Hier komt een stukje tekst te staan wat meer verteld over het persoon zodat je een beter beeld krijgt met wie je op reis gaat</p>
 </section>
 
 <section>
-    <h2>interesse</h2>
-    <section class="interests">
   <h2>Interesse</h2>
 
-<ul class="labels">
-    <li class="label">Sport</li>
-    <li class="label">Reizen</li>
-    <li class="label">Muziek</li>
-    <li class="label">Hiken</li>
+<ul class="hobbies">
+    <li class="hobby">Sport</li>
+    <li class="hobby">Reizen</li>
+    <li class="hobby">Muziek</li>
+    <li class="hobby">Hiken</li>
 </ul>
-  <!-- <ul class="labels">
-    <% user.interests.forEach(function(interest) { %>
-      <li class="label"><%= interest %></li>
-    <% }) %>
-  </ul> -->
 </section>
+
+<section>
+    <h2>geplande trip</h2>
+    <article class="reisoproep">
+    <img src="img/test-cover.jpg" alt="cover dolemietenreis">
+    </article>
+</section>
+<section>
+    <h2>Op zoek naar:</h2>
+    <p>Hier komt een stukje tekst te staan wat de persoon zoekt in een reisgenootje, stel dat deze reis het niet word kan je alsnog een reis met die persoon plannen of matchen voor een gesprek.</p>
+</section>
+
+<section>
+    <h2>Gallerij</h2>
+    <img src="img/accounts/markvoorkant.jpg" alt="mark van de voorkant">
+    <img src="img/accounts/markwandelen.jpg" alt="mark die aan het wandelen is">
+    <img src="img/accounts/tentje.jpg" alt="een tentje in de bergen met uitzicht">
+</section>
+
 
   </main>
   <%- include('../partials/bottom-nav'); %>
