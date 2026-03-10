@@ -1,0 +1,33 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('../partials/head'); %>
+</head>
+<body>
+  <header>
+    <%- include('../partials/header'); %>
+  </header>
+  <main>
+    <% if (user) { %>
+    <h1 class="underline"><%= user.name %> u chat met ... </h1>
+    <% } %>
+    <div class="chat-container">
+        <div class="chat-header">
+            💬 Real-Time Chat
+        </div>
+        <div id="messages"></div>
+        <div id="typingIndicator" class="typing-indicator"></div>
+        <div class="input-container">
+            <input id="messageInput" type="text" placeholder="Type your message..." autocomplete="off">
+            <button id="sendButton">Send</button>
+        </div>
+    </div>
+  </main>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/chat-channel.js"></script>
+  <%- include('../partials/bottom-nav'); %>
+</body>
+</html>
+
+<!-- source: https://medium.com/@basukori8463/build-a-real-time-chat-app-from-scratch-with-node-js-and-socket-io-9714b7076372 -->
