@@ -192,9 +192,6 @@ function registerPostRoutes() {
       }
     })
 
-    const myUsers = await users.find({ owner: "annabel" }).toArray();
-console.log(myUsers);
-
 
     // Middleware to handle not found errors - error 404
  
