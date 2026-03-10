@@ -6,7 +6,7 @@
     display: flex;
     flex-direction: column;
     justify-content: flex-end; 
-    padding-bottom: 1.5rem; 
+    padding-bottom: var(--space-side);
 }
 
   .hero-img {
@@ -34,7 +34,7 @@
     position: relative;
     z-index: 2;
     color: var(--clr-neutral);
-    margin-left: 1.5rem;
+    margin-left: var(--space-side);
   }
   .hero p:nth-child(2) {
     font-family: 'indie-flower';
@@ -51,7 +51,7 @@
   .hero ul {
     position: absolute;      
     bottom: -1.5rem;           
-    right: 1.5rem;         
+    right: var(--space-side);         
     display: flex;
     list-style: none;
     padding: 0;
@@ -91,7 +91,7 @@ h2 {
 
 section:nth-child(2) {
     display: grid;
-    margin: 1.5rem;
+    margin: var(--space-side);
 }
     section:nth-child(2) img {
         width: 100%;
