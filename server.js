@@ -182,7 +182,7 @@ function registerPostRoutes() {
     app.get('/filter', async (req, res) => {
       try {
         const myUsers = await users
-          .find({ owner: "annabel" }) // alleen jouw records
+          .find({}) // alleen jouw records
           .toArray();
     
         res.render('pages/filter', { users: myUsers });

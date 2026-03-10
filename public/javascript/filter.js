@@ -1,0 +1,101 @@
+// ============
+// Variabelen
+// ============
+const filterButtons = document.querySelectorAll(".genders .filter-btn"); // Alleen gender knoppen
+const continentButtons = document.querySelectorAll(".continents .filter-btn"); // Continent knoppen
+const toggleButton = document.getElementById("toggleFilter");
+const filterMenu = document.getElementById("filterMenu");
+const closeButton = document.getElementById("closeMenu");
+const items = document.querySelectorAll(".all li");
+
+const dateFilter = document.getElementById("dateFilter");
+const daysFilter = document.getElementById("daysFilter");
+
+let activeFilters = new Set();       // gender
+let activeContinents = new Set();    // continent
+
+
+// =======================
+// Filter functie
+// =======================
+function filterItems() {
+  const selectedDate = dateFilter.value; //datum wordt uit inputveld gehaald
+  const selectedDays = daysFilter.value ? parseInt(daysFilter.value) : null; //maakt van het ingevoerde getal (string) een getal
+
+  items.forEach(item => {
+    const gender = item.dataset.gender; //data uit html halen
+    const continent = item.dataset.continent; 
+    const date = item.dataset.date;
+    const days = parseInt(item.dataset.days); //hetzelfde, maar omzetten string naar getal
+
+    let showItem = true; //standaard = item laten zien, kan later veranderen naar false
+
+    if (activeFilters.size > 0 && !activeFilters.has(gender)) showItem = false; //als er een filter is geselecteerd EN het item hoort niet bij het filter = verberg item
+    if (activeContinents.size > 0 && !activeContinents.has(continent)) showItem = false;
+    if (selectedDate && date !== selectedDate) showItem = false; //als een datum is gekozen EN datum van item is anders = verberg item
+    if (selectedDays !== null && days < selectedDays) showItem = false; //als er datum is gekozen EN item heeft minder dagen = verberg item
+
+    item.style.display = showItem ? "block" : "none"; //bij showitem -> display block & bij else -> display none
+  });
+}
+
+
+// =======================
+// Open/close menu
+// =======================
+toggleButton.addEventListener("click", () => {
+  filterMenu.classList.add("show");
+  toggleButton.style.display = "none";
+});
+
+closeButton.addEventListener("click", () => {
+  filterMenu.classList.remove("show");
+  toggleButton.style.display = "block";
+});
+
+
+// =======================
+// Gender filters
+// =======================
+filterButtons.forEach(btn => {
+  btn.addEventListener("click", () => {
+    const filter = btn.dataset.gender; //waarde wordt opgehaald (wordt er man/vrouw/anders geklikt)
+
+    if (activeFilters.has(filter)) {
+      activeFilters.delete(filter); //als filter al actief is en er wordt op geklikt -> verwijder filter
+      btn.classList.remove("active"); //active class wordt verwijderd
+    } else {
+      activeFilters.add(filter); //filter was nog niet actief -> filter wordt toegevoegd
+      btn.classList.add("active"); //krijgt active class
+    }
+
+    filterItems();
+  });
+});
+
+
+// =======================
+// Continent filters
+// =======================
+continentButtons.forEach(btn => {
+  btn.addEventListener("click", () => {
+    const filter = btn.dataset.continent;
+
+    if (activeContinents.has(filter)) {
+      activeContinents.delete(filter);
+      btn.classList.remove("active");
+    } else {
+      activeContinents.add(filter);
+      btn.classList.add("active");
+    }
+
+    filterItems();
+  });
+});
+
+
+// =======================
+// Datum & dagen filters
+// =======================
+dateFilter.addEventListener("change", filterItems); //er wordt opnieuw gefilterd als de datum wordt veranderd
+daysFilter.addEventListener("input", filterItems); //er wordt opnieuw gefilterd als de dagen wordt veranderd

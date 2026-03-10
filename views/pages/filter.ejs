@@ -2,11 +2,9 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Filter</title>
-  <link rel="stylesheet" href="css/filter.css">
+  <%- include('../partials/head'); %>
 </head>
+<link rel="stylesheet" href="css/filter.css">
 
 <body>
 
@@ -16,13 +14,20 @@
     </button>
 
     <div class="filter-menu" id="filterMenu">
+      <h2 class="underline">Filters</h2>
       <button class="close-menu" id="closeMenu">
         <img src="img/leftarrow.svg" alt="sluit menu">
       </button>
-      <button class="filter-btn" data-gender="all">Alles</button>
-      <button class="filter-btn" data-gender="man">Man</button>
-      <button class="filter-btn" data-gender="vrouw">Vrouw</button>
-      <button class="filter-btn" data-gender="anders">Anders</button>
+
+      <div class="genders">
+        <h3>Gender</h3>
+        <div class="buttons">
+          <button class="filter-btn" data-gender="man">Man</button>
+          <button class="filter-btn" data-gender="vrouw">Vrouw</button>
+          <button class="filter-btn" data-gender="anders">Anders</button>
+        </div>
+      </div>
+
 
       <label>Datum vertrek</label>
       <input type="date" id="dateFilter">
@@ -30,22 +35,33 @@
       <label>Aantal dagen</label>
       <input type="number" id="daysFilter">
 
+      <div class="continents">
+        <h3>Continenten</h3>
+        <div class="buttons">
+          <button class="filter-btn" data-continent="afrika">Afrika</button>
+          <button class="filter-btn" data-continent="azië">Azië</button>
+          <button class="filter-btn" data-continent="europa">Europa</button>
+          <button class="filter-btn" data-continent="amerika">Amerika</button>
+          <button class="filter-btn" data-continent="oceanië">Oceanië</button>
+        </div>
+      </div>
+
     </div>
   </header>
 
   <ul class="all">
-    <% users.forEach(user => { %>
-      <li 
-        data-gender="<%= user.gender %>" 
-        data-date="<%= user.date %>" 
-        data-days="<%= user.days %>">
+    <% users.forEach(user=> { %>
+      <li data-gender="<%= user.gender %>" data-date="<%= user.date %>" data-days="<%= user.days %>" data-continent="<%= user.continent %>">
         <%= user.name %>
       </li>
-    <% }) %>
+      <% }) %>
   </ul>
 
-  
-  <script defer src="javascript/annabels.js"></script>
+  <script defer src="javascript/filter.js"></script>
+
+  <footer>
+    <%- include('../partials/bottom-nav'); %>
+  </footer>
 </body>
 
 </html>
