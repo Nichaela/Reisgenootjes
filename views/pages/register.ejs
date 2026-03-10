@@ -1,46 +1,216 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <%- include('../partials/head'); %>
-  
+
 </head>
+
 <body>
-<header>
-  <%- include('../partials/header'); %>
-</header>
+  <header>
+    <%- include('../partials/header'); %>
+      <link rel="stylesheet" href="css/form.css">
+  </header>
 
   <main>
     <% if (error) { %>
-      <p class="error"> <%= error %> </p>
-    <% } %>
+      <p class="error">
+        <%= error %>
+      </p>
+      <% } %>
 
-    <h2>Register</h2>
-    
-    <form id="registerForm" action="/register" method="POST">
-    <label for="email">Email:</label>
-    <input type="email" id="email" name="email" autocomplete="email" required>
-    <br>
+        <!-- from van alle pagina's -->
+        <form method="POST" action="/register" class="multi-step-form">
+          <h1 class="underline">Maak jou profiel</h1>
+          <section class="form-step form-active"> <!-- eerste deel -->
 
-    <label for="username">Username:</label>
-    <input type="text" id="username" name="username" autocomplete="username" required>
-    <br>
+            <div class="voortgangsbalk">
+              <div class="voortgangsbalk-active"></div>
+              <div class="voortgangsbalk-inactive"></div>
+              <div class="voortgangsbalk-inactive"></div>
+              <div class="voortgangsbalk-inactive"></div>
+            </div>
 
-    <label for="password">Password:</label>
-    <input type="password" id="password" name="password" autocomplete="new-password" required>
-    <br>
+            <p>Hier iets van tekst nog</p>
+            <h2>Account aanmaken</h2>
 
-    <label for="dob">Date of birth:</label>
-    <input type="date" id="dob" name="dob">
-    <br>
 
-    <input type="submit" value="register">
-    </form>
+            <label for="name">Voornaam</label>
+            <input type="text" id="name" name="name" required>
+
+            <label for="lastName">Achternaam:</label>
+            <input type="text" id="lastName" name="lastName" required>
+
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required>
+
+            <label for="password">Wachtwoord</label>
+            <input type="password" id="wachtwoord" name="password" required>
+
+            <label for="confirmPassword">Herhaal wachtwoord</label>
+            <input type="password" id="confirmPassword" name="confirmPassword" required>
+
+            <button type="button" class="gradient-btn" data-next>volgende</button>
+
+          </section>
+          <section class="form-step"> <!--tweede deel-->
+
+            <div class="voortgangsbalk">
+              <div class="voortgangsbalk-active"></div>
+              <div class="voortgangsbalk-active"></div>
+              <div class="voortgangsbalk-inactive"></div>
+              <div class="voortgangsbalk-inactive"></div>
+            </div>
+
+            <p>Hier iets van tekst nog</p>
+            <h2>Persoonlijke gegevens</h2>
+
+            <label for="username">Naam</label>
+            <input type="text" id="username" name="username" required>
+
+            <label for="birthday">Verjaardag</label>
+            <input type="date" name="birthday" id="birthday" required>
+
+            <label for="telefoon">Telefoon</label>
+            <input type="tel" id="telefoon" name="telefoon">
+
+            <label for="gender">Gender</label>
+            <select name="gender" id="gender" required>
+              <option value="">Kies je gender</option>
+              <option value="Man">Man</option>
+              <option value="Vrouw">Vrouw</option>
+              <option value="Anders">Anders</option>
+            </select>
+
+            <button type="button" class="gradient-btn" data-next>Volgende</button>
+          </section>
+
+          <section class="form-step"> <!--derde deel-->
+
+            <div class="voortgangsbalk">
+              <div class="voortgangsbalk-active"></div>
+              <div class="voortgangsbalk-active"></div>
+              <div class="voortgangsbalk-active"></div>
+              <div class="voortgangsbalk-inactive"></div>
+            </div>
+
+            <p>Hier iets van tekst nog</p>
+            <h2>Profiel</h2>
+
+            <input type="file" name="avatar" accept="image/*">
+            <input type="file" name="avatar" accept="image/*">
+            <input type="file" name="avatar" accept="image/*">
+            <input type="file" name="avatar" accept="image/*">
+
+            <label for="status">Status</label>
+            <input type="text" name="status" id="status">
+
+            <label for="Bio">Bio</label>
+            <input type="text" name="bio" id="bio">
+
+            <button type="button" class="gradient-btn" data-next>Volgende</button>
+          </section>
+
+          <section class="form-step"> <!--vierde deel-->
+
+            <div class="voortgangsbalk">
+              <div class="voortgangsbalk-active"></div>
+              <div class="voortgangsbalk-active"></div>
+              <div class="voortgangsbalk-active"></div>
+              <div class="voortgangsbalk-active"></div>
+            </div>
+
+            <p>Welke manieren van reizen spreken jou aan?</p>
+            <p>Selecteer 5 onderwerpen</p>
+
+            <div class="options">
+              <label class="option">
+                <input type="checkbox" name="interests" value="Backpacken">
+                <span>Backpacken</span>
+              </label>
+
+              <label class="option">
+                <input type="checkbox" name="interests" value="Kanoën">
+                <span>Kanoën</span>
+              </label>
+
+              <label class="option">
+                <input type="checkbox" name="interests" value="Zeilen">
+                <span>Zeilen</span>
+              </label>
+
+              <label class="option">
+                <input type="checkbox" name="interests" value="Auto">
+                <span>Auto</span>
+              </label>
+
+              <label class="option">
+                <input type="checkbox" name="interests" value="Trein">
+                <span>Trein</span>
+              </label>
+
+              <label class="option">
+                <input type="checkbox" name="interests" value="Huttentocht">
+                <span>Huttentocht</span>
+              </label>
+
+              <label class="option">
+                <input type="checkbox" name="interests" value="Kamperen">
+                <span>Kamperen</span>
+              </label>
+
+              <label class="option">
+                <input type="checkbox" name="interests" value="Stedentrip">
+                <span>Stedentrip</span>
+              </label>
+
+              <label class="option">
+                <input type="checkbox" name="interests" value="Liften">
+                <span>Liften</span>
+              </label>
+
+              <label class="option">
+                <input type="checkbox" name="interests" value="Fietsen">
+                <span>Fietsen</span>
+              </label>
+
+              <label class="option">
+                <input type="checkbox" name="interests" value="Camper">
+                <span>Camper</span>
+              </label>
+
+              <label class="option">
+                <input type="checkbox" name="interests" value="Roadtrip">
+                <span>Roadtrip</span>
+              </label>
+
+              <label class="option">
+                <input type="checkbox" name="interests" value="Duiken">
+                <span>Duiken</span>
+              </label>
+
+              <label class="option">
+                <input type="checkbox" name="interests" value="Hiken">
+                <span>Hiken</span>
+              </label>
+
+              <label class="option">
+                <input type="checkbox" name="interests" value="Zuipen">
+                <span>Zuipen</span>
+              </label>
+            </div>
+
+            <input class="gradient-btn" type="submit" value="Profiel aanmaken">
+          </section>
+        </form>
 
   </main>
+  <footer>
+    <%- include('../partials/bottom-nav'); %>
+  </footer>
 
-
-  <script src="/js/api.js"></script>
-  <script src="/js/script.js"></script>
+  <script src="../script/form.js"></script>
 
 </body>
+
 </html>

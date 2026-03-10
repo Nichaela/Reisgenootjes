@@ -5,14 +5,16 @@
   "license": "ISC",
   "author": "",
   "type": "commonjs",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon server.js"
   },
   "keywords": [],
   "dependencies": {
     "dotenv": "^17.3.1",
     "ejs": "^4.0.1",
+    "eslint": "^10.0.2",
     "express": "^5.2.1",
     "express-session": "^1.19.0",
     "list.js": "^2.3.1",
@@ -24,6 +26,10 @@
     "@eslint/js": "^10.0.1",
     "eslint": "^10.0.3",
     "globals": "^17.4.0",
+    "mongodb": "^7.1.0",
+    "socket.io": "^4.8.3"
+  },
+  "devDependencies": {
     "nodemon": "^3.1.14"
   }
 }

@@ -7,28 +7,22 @@
 
 <header>
   <%- include('../partials/header'); %>
+  <link rel="stylesheet" href="css/form.css">
 </header>
 
 <main>
-  <!-- <div class="result">
-    <div id="cat_result" class="result"><p>placeholder cat</p></div>
-    <div id="dog_result" class="result"><p>placeholder dog</p></div>
-  </div>
-  <div>
-    <button id="cat_btn">Get cat</button>
-    <button id="dog_btn">Get dog</button>
-  </div> -->
-    
-    <h2>Login</h2>
+    <h2 class="underline">Login</h2>
     <form id="loginForm" method="POST" action="/login">
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" required>
-        <br> 
-        <label for="password">Password:</label>
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+ 
+        <label for="password">Wachtwoord:</label>
         <input type="password" id="password" name="password" required>
 
-        <input type="submit">
+        <input class="gradient-btn" type="submit" value="Inloggen">
     </form>
+
+    <a href="">Wachtwoord vergeten?</a>
     
     <% if (error) { %>
       <p class="error"><%= error %></p>
@@ -36,8 +30,10 @@
 
 
 </main>
+
+<footer>
   <%- include('../partials/bottom-nav'); %>
-  <!-- <script src="/js/api.js"></script> -->
+</footer>
 
 </body>
 
