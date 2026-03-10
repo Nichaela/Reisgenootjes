@@ -42,11 +42,11 @@ checkboxes.forEach(box => {
       alert("Je mag maximaal 5 interesses kiezen.");
     }
   });
-
+})
 // dropdown menu voor checkboxes (leeftijd)
 const dropdown = document.querySelector('.dropdown-checkbox');
 const button = dropdown.querySelector('button');
 
 button.addEventListener('click', () => {
   dropdown.classList.toggle('open');
-});
+})

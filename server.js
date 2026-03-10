@@ -11,7 +11,8 @@ const session = require('express-session')
 const app = express()
  
 // Use MongoDB
-const { MongoClient, ServerApiVersion } = require('mongodb')
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+
  
 // ==========================================
 // 2. CONFIGURATIE & DATABASE
@@ -39,7 +40,9 @@ const client = new MongoClient(uri, {
   }
 })
  
+// database collections
 let users
+let discover;
  
 // ==========================================
 // 3. MIDDLEWARE (Algemeen)
@@ -88,15 +91,59 @@ function registerGetRoutes() {
  
  
   // hier is laura nu mee bezig
-  app.get('/discover', (req, res) => {
-    res.render('pages/discover', { user: req.session.user })
-  })
+  app.get('/discover', async (req, res) => {
+    try {
+      const posts = await discover.find({}).toArray(); // alle posts ophalen
+  
+      res.render('pages/discover', { 
+        user: req.session.user,
+        posts: posts
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(500).send('Er ging iets mis bij het laden van posts');
+    }
+  });
+
   app.get('/create-post', (req, res) => {
     res.render('pages/create-post', { user: req.session.user })
   })
   app.get('/post', (req, res) => {
     res.render('pages/post', { user: req.session.user })
   })
+
+  app.get('/post/:id', async (req, res) => {
+    try {
+      const postId = req.params.id;
+
+      const post = await discover.findOne({ _id: new ObjectId(postId) });
+
+      if (!post) {
+        return res.status(404).send('Post niet gevonden');
+      }
+  
+      // Eventueel: personenlijst (als je dat in je DB opslaat)
+      const joinedPersons = post.persons || [];
+  
+      // Stuur alles door naar EJS
+      res.render('pages/post', {
+        title: post.title,
+        startDate: post.startDate,
+        endDate: post.endDate,
+        location: post.location,
+        image: post.image || '/path/to/default.jpg', // als je images wilt
+        joinedPersons: joinedPersons,
+        gender: post.gender,
+        hobby: post.hobby || 'Geen hobby opgegeven',
+        age: post.age.join(', '), // zet array om naar string
+        discription: post.discription,
+        supplies: post.supplies
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(500).send('Er ging iets mis bij het ophalen van de post');
+    }
+  });
     
   //
 
@@ -150,7 +197,7 @@ function registerPostRoutes() {
  
   // Register
   app.post('/register', async (req, res) => {
-    const { email, username, password, dob } = req.body
+    const { email, username, password, birthday } = req.body
  
     const existingUser = await users.findOne({ email: email })
  
@@ -164,21 +211,42 @@ function registerPostRoutes() {
       email: email,
       name: username,
       password: password,
-      dob: dob || null
+      birthday: birthday || null
     })
  
     return res.redirect('/register-success')
   })
 
-  //Post
-  app.post('/post', (req, res) => {
-    const supplies = req.body.supplies.split('\n') //checken of dit werkt
+  //create-post formulier 
+  app.post('/post', async (req, res) => {
+    const { title, startDate, endDate, location, persons, discription, gender } = req.body;
+    
+    // Age komt als array van de browser, of als string als 1 item
+    let age = req.body.age;
+    if (!Array.isArray(age)) {
+      age = age ? [age] : [];
+    }
 
-    res.redirect('/post')
+    // Supplies als array van nieuwe regels
+    const supplies = req.body.supplies ? req.body.supplies.split('\n') : [];
+
+    await discover.insertOne({
+      title,
+      startDate,
+      endDate,
+      location,
+      persons,
+      discription,
+      supplies,
+      age,
+      gender
+    })
+
+    return res.redirect('/post')
   })
-
- 
 }
+
+
  
  
  
@@ -216,6 +284,8 @@ async function start() {
  
     const db = client.db(process.env.DB_NAME)
     users = db.collection(process.env.DB_COLLECTION)
+
+    discover = db.collection('discover')
  
     // Routes registreren
     registerGetRoutes()

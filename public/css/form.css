@@ -108,6 +108,3 @@ input, textarea, select {
   color: white;
   border: none;
 }
-    display: flex;
-    gap: 10px;
-  }
