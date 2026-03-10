@@ -27,3 +27,18 @@ document.querySelectorAll(".multi-step-form").forEach(form => {
   });
 
 });
+
+
+// Aanmeld form checkbox
+const checkboxes = document.querySelectorAll('input[name="interests"]');
+const max = 5;
+
+checkboxes.forEach(box => {
+  box.addEventListener('change', () => {
+    const checked = document.querySelectorAll('input[name="interests"]:checked');
+    if (checked.length > max) {
+      box.checked = false;
+      alert("Je mag maximaal 5 interesses kiezen.");
+    }
+  });
+});
