@@ -132,8 +132,8 @@ function registerGetRoutes() {
 function registerPostRoutes() {
   // Login
   app.post('/login', async (req, res) => {
-    const { username, password } = req.body
-    const user = await users.findOne({ name: username })
+    const { email, password } = req.body
+    const user = await users.findOne({ email: email })
  
     if (!user) {
       return res.status(401).render('pages/login', { error: 'Onbekende gebruiker' })
@@ -147,17 +147,16 @@ function registerPostRoutes() {
  
     req.session.user = {
       _id: user._id,
-      name: user.name,
       email: user.email
     }
  
-    return res.redirect('/')
+    return res.redirect('/discover')
   })
  
  
   // Register
   app.post('/register', async (req, res) => {
-    const { email, username, password, dob } = req.body
+    const { name, lastName, email, password, username, birthday, tel, gender, profile, image1, image2, image3, status, bio, interests, opzoek} = req.body
  
     const existingUser = await users.findOne({ email: email })
  
@@ -166,13 +165,25 @@ function registerPostRoutes() {
     }
  
     await users.insertOne({
-      email,
-      name: username,
-      password,
-      dob: dob || null,
+      name: name,
+      lastName: lastName,
+      email: email,
+      password: password,
+      username: username,
+      birthday: birthday,
+      tel: tel,
+      gender: gender,
+      profile: profile,
+      image1: image1,
+      image2: image2,
+      image3: image3,
+      status: status,
+      bio: bio,
+      interests: interests,
+      opzoek: opzoek,
     })
  
-    return res.redirect('/register-success')
+    return res.redirect('/discover')
   })
 
   //Post
@@ -242,8 +253,7 @@ function registerSocketHandlers() {
 }
 
     // Middleware to handle not found errors - error 404
- 
-}
+
  
  
  

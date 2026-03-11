@@ -9,15 +9,19 @@
   width: 100%;
   border-radius: 5px;
 }
-  .voortgangsbalk-active {background-color: var(--clr-primary);}
-  .voortgangsbalk-inactive {background-color: var(--clr-surface);}
+
+.voortgangsbalk-active {background-color: var(--clr-primary);}
+.voortgangsbalk-inactive {background-color: var(--clr-surface);}
+
+.multi-step-form {
+    height: 80vh;
+}
 
 form {
-    display: grid;
-    grid-template-rows: auto 1fr;
-    margin: var(--space-side);
-    position: relative;
-    height: 80vh;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  margin: var(--space-side);
+  position: relative;
 }
 
 .form-step > a,
@@ -107,4 +111,14 @@ input, textarea, select {
   background: var(--gradient-primary);
   color: white;
   border: none;
+}
+
+/* a in inlog form */
+a {
+  color: var(--clr-text);
+
+    text-decoration: underline;
+    text-decoration-color: var(--clr-primary);
+    text-decoration-thickness: .125rem;
+    text-underline-offset: .2rem;
 }
