@@ -204,7 +204,6 @@ function registerPostRoutes() {
  
   // Register
   app.post('/register', async (req, res) => {
-    const { email, username, password, birthday } = req.body
     const { name, lastName, email, password, username, birthday, tel, gender, profile, image1, image2, image3, status, bio, interests, opzoek} = req.body
  
     const existingUser = await users.findOne({ email: email })
@@ -218,9 +217,8 @@ function registerPostRoutes() {
       lastName: lastName,
       email: email,
       password: password,
-      birthday: birthday || null
       username: username,
-      birthday: birthday,
+      birthday: birthday || null,
       tel: tel,
       gender: gender,
       profile: profile,
@@ -279,7 +277,7 @@ function registerPostRoutes() {
         res.status(500).send("Fout bij ophalen data");
       }
     })
-}
+
 
 // ==========================================
 // 7. SOCKET.IO (Chat events)
