@@ -7,16 +7,17 @@
   <header>
     <%- include('../partials/header'); %>
     <link rel="stylesheet" href="css/matchen.css">
+      <%- include('../partials/filter-menu'); %>
      
   </header>
 
   <main>
-
   <% if (user) { %>
   <p>Welkom <%= user.name %></p>
   <% } %>
 
   <h1 class="underline" >Matchen</h1>
+ 
   
   
 
