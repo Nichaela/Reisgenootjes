@@ -19,7 +19,8 @@
     "list.js": "^2.3.1",
     "listjs": "^0.1.1",
     "mongodb": "^7.1.0",
-    "nodenv": "^0.1.0"
+    "nodenv": "^0.1.0",
+    "socket.io": "^4.8.3"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"
