@@ -151,7 +151,7 @@ section:nth-of-type(6) {
   grid-template-columns: 150px 150px;
   grid-template-rows: 115px 115px;
   gap: 5px;
-  margin-bottom: 4rem;
+  margin-bottom: 1rem;
 }
 
 section:nth-of-type(6) img:nth-of-type(1) { 
@@ -186,3 +186,14 @@ section:nth-of-type(6)>h2 {
   width: 1px;
 }  
 
+section:last-of-type{
+    display: flex;
+    justify-content: space-between;
+}
+button {
+    margin-bottom: 5rem;
+    padding: 1rem;
+    background-color: var(--clr-text);
+    border-radius: 4rem;
+    border-style: none;
+}
