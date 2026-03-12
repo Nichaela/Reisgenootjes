@@ -198,7 +198,7 @@ function registerPostRoutes() {
     app.get('/filter', async (req, res) => {
       try {
         const myUsers = await users
-          .find({ owner: "annabel" }) // alleen jouw records
+          .find({}) // alleen jouw records
           .toArray();
     
         res.render('pages/filter', { users: myUsers });
@@ -275,11 +275,11 @@ function registerErrorHandlers() {
     })
  
 
-  // 500 handler
-  app.use((err, req, res, next) => {
-    console.error(err.stack)
-    res.status(500).send('500: server error')
-  })
+ // error handler
+app.use(function (err, req, res) {
+  console.error(err.stack)
+  res.status(500).send('500: server error')
+})
 }
  
  

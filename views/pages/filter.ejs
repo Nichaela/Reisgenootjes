@@ -2,35 +2,16 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Filter</title>
-  <link rel="stylesheet" href="css/annabels.css">
+  <%- include('../partials/head'); %>
 </head>
+<link rel="stylesheet" href="css/filter.css">
 
 <body>
 
   <header>
-    <button id="toggleFilter" class="toggleFilter">
-      <img src="img/filter-icon.svg" alt="Filter">
-    </button>
+    <%- include('../partials/filter-menu'); %>
 
-    <div class="filter-menu" id="filterMenu">
-      <button class="close-menu" id="closeMenu">
-        <img src="img/leftarrow.svg" alt="sluit menu">
-      </button>
-      <button class="filter-btn" data-gender="all">Alles</button>
-      <button class="filter-btn" data-gender="man">Man</button>
-      <button class="filter-btn" data-gender="vrouw">Vrouw</button>
-      <button class="filter-btn" data-gender="anders">Anders</button>
 
-      <label>Datum vertrek</label>
-      <input type="date" id="dateFilter">
-
-      <label>Aantal dagen</label>
-      <input type="number" id="daysFilter">
-
-    </div>
   </header>
 
   <ul class="all">
@@ -38,14 +19,21 @@
       <li 
         data-gender="<%= user.gender %>" 
         data-date="<%= user.date %>" 
-        data-days="<%= user.days %>">
+        data-days="<%= user.days %>" 
+        data-continent="<%= user.continent %>" 
+        data-birthday="<%= user.birthday %>">
+        
         <%= user.name %>
+  
       </li>
     <% }) %>
   </ul>
 
-  
-  <script defer src="javascript/annabels.js"></script>
+  <script defer src="javascript/filter.js"></script>
+
+  <footer>
+    <%- include('../partials/bottom-nav'); %>
+  </footer>
 </body>
 
 </html>
