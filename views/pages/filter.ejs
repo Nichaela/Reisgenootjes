@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <%- include('../partials/head'); %>
+</head>
+<link rel="stylesheet" href="css/filter.css">
+
+<body>
+
+  <header>
+    <%- include('../partials/filtermenu'); %>
+
+
+  </header>
+
+  <ul class="all">
+    <% users.forEach(user => { %>
+      <li 
+        data-gender="<%= user.gender %>" 
+        data-date="<%= user.date %>" 
+        data-days="<%= user.days %>" 
+        data-continent="<%= user.continent %>" 
+        data-birthday="<%= user.birthday %>">
+        
+        <%= user.name %>
+  
+      </li>
+    <% }) %>
+  </ul>
+
+  <script defer src="javascript/filter.js"></script>
+
+  <footer>
+    <%- include('../partials/bottom-nav'); %>
+  </footer>
+</body>
+
+</html>
