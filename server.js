@@ -193,12 +193,12 @@ function registerPostRoutes() {
     res.redirect('/post')
   })
 
-    //route naar annabels pagina
+    //route naar filter menu 
 
     app.get('/filter', async (req, res) => {
       try {
         const myUsers = await users
-          .find({}) // alleen jouw records
+          .find({}) 
           .toArray();
     
         res.render('pages/filter', { users: myUsers });
@@ -208,6 +208,24 @@ function registerPostRoutes() {
       }
     })
 }
+
+//filter op ontdek pagina
+
+app.get('/ontdekfilter', async (req, res) => {
+  try {
+    const myUsers = await users
+      .find({}) 
+      .toArray();
+
+    res.render('pages/ontdekfilter', { users: myUsers });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Fout bij ophalen data");
+  }
+})
+
+
+
 
 // ==========================================
 // 7. SOCKET.IO (Chat events)
