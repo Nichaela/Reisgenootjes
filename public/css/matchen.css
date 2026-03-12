@@ -190,7 +190,10 @@ section:last-of-type{
     display: flex;
     justify-content: space-between;
 }
-button {
+
+
+
+section button{
     margin-bottom: 5rem;
     padding: 1rem;
     background-color: var(--clr-text);
