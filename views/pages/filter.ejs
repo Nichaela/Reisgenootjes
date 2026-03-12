@@ -46,15 +46,28 @@
         </div>
       </div>
 
+
+      <label for="birthday">Leeftijd</label>
+      <input type="number" id="birthday" name="birthday" min="0" placeholder="bijv. 18">
+      
     </div>
+
+
   </header>
 
   <ul class="all">
-    <% users.forEach(user=> { %>
-      <li data-gender="<%= user.gender %>" data-date="<%= user.date %>" data-days="<%= user.days %>" data-continent="<%= user.continent %>">
+    <% users.forEach(user => { %>
+      <li 
+        data-gender="<%= user.gender %>" 
+        data-date="<%= user.date %>" 
+        data-days="<%= user.days %>" 
+        data-continent="<%= user.continent %>" 
+        data-birthday="<%= user.birthday %>">
+        
         <%= user.name %>
+  
       </li>
-      <% }) %>
+    <% }) %>
   </ul>
 
   <script defer src="javascript/filter.js"></script>
