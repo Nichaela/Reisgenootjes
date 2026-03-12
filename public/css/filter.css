@@ -3,6 +3,25 @@
   top: 0;
 }
 
+/* Target het input element */
+#birthday {
+  width: 100%;       /* breedte van de slider */
+  height: 8px;        /* hoogte van de track */
+  background: var(--clr-surface);
+  border-radius: 5px;
+  -webkit-appearance: none; /* verwijder default styling voor Webkit */
+}
+
+#birthday::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 2em;
+  width: 2em;
+  background: var(--gradient-primary);
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+
 /* Filter knop */
 .toggleFilter {
   position: fixed;
