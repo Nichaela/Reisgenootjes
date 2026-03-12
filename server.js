@@ -1,32 +1,37 @@
 // ==========================================
 // 1. IMPORTS (Packages)
 // ==========================================
- 
-// Add info from .env file to process.env
 require('dotenv').config()
- 
-// Initialise Express webserver
+
 const express = require('express')
 const session = require('express-session')
-const app = express()
- 
-// Use MongoDB
+const http = require('http')
+const socketIo = require('socket.io')
+
 const { MongoClient, ServerApiVersion } = require('mongodb')
- 
+
 // ==========================================
-// 2. CONFIGURATIE & DATABASE
+// 2. APP, SERVER, SOCKET.IO
 // ==========================================
- 
+const app = express()
+const server = http.createServer(app)
+const io = socketIo(server)
+
+// ==========================================
+// 3. CONFIGURATIE & DATABASE
+// ==========================================
 app
-  .use(express.urlencoded({ extended: true })) // middleware to parse form data
-  .use(express.static('public'))               // serve static files
-  .set('view engine', 'ejs')                   // use EJS templating
-  .use(session({
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: false
-}))
- 
+  .use(express.urlencoded({ extended: true })) // parse form data
+  .use(express.static('public')) // serve static files
+  .set('view engine', 'ejs') // EJS templating
+  .use(
+    session({
+      secret: process.env.SESSION_SECRET,
+      resave: false,
+      saveUninitialized: false,
+    })
+  )
+
 // Construct URL used to connect to database from info in the .env file
 const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}/${process.env.DB_NAME}?retryWrites=true&w=majority`
  
@@ -36,22 +41,21 @@ const client = new MongoClient(uri, {
     version: ServerApiVersion.v1,
     strict: true,
     deprecationErrors: true,
-  }
+  },
 })
  
 let users
  
 // ==========================================
-// 3. MIDDLEWARE (Algemeen)
+// 4. MIDDLEWARE (Algemeen)
 // ==========================================
- 
 app.use((req, res, next) => {
   res.locals.user = req.session.user || null
   next()
 })
  
 // ==========================================
-// 4. ROUTES (GET - Pagina's bekijken)
+// 5. ROUTES (GET - Pagina's bekijken)
 // ==========================================
  
 function registerGetRoutes() {
@@ -78,19 +82,16 @@ function registerGetRoutes() {
   })
  
   app.get('/dashboard', (req, res) => {
-    if (!req.session.user) {
-      return res.redirect('/login')
-    }
+    if (!req.session.user) return res.redirect('/login')
     res.render('pages/dashboard', { user: req.session.user })
   })
 
 
- 
- 
   // hier is laura nu mee bezig
   app.get('/discover', (req, res) => {
     res.render('pages/discover', { user: req.session.user })
   })
+
   app.get('/create-post', (req, res) => {
     res.render('pages/create-post', { user: req.session.user })
   })
@@ -106,6 +107,17 @@ function registerGetRoutes() {
   })
   //
  
+   // Chatroom paginas Nicha
+  app.get('/chatroom', (req, res) => {
+    if (!req.session.user) return res.redirect('/login')
+    res.render('pages/chatroom', { user: req.session.user })
+  })
+
+  app.get('/chat-channel', (req, res) => {
+    if (!req.session.user) return res.redirect('/login')
+    res.render('pages/chat-channel', { user: req.session.user })
+  })
+  
   app.get('/logout', (req, res) => {
     req.session.destroy(() => {
       res.redirect('/login')
@@ -113,23 +125,18 @@ function registerGetRoutes() {
   })
 }
  
- 
- 
+
 // ==========================================
-// 5. POST ROUTES (Data verwerken)
+// 6. POST ROUTES (Data verwerken)
 // ==========================================
- 
 function registerPostRoutes() {
- 
   // Login
   app.post('/login', async (req, res) => {
-    const { username, password } = req.body
-    const user = await users.findOne({ name: username })
+    const { email, password } = req.body
+    const user = await users.findOne({ email: email })
  
     if (!user) {
-      return res.status(401).render('pages/login', {
-        error: 'Onbekende gebruiker'
-      })
+      return res.status(401).render('pages/login', { error: 'Onbekende gebruiker' })
     }
  
     if (user.password !== password) {
@@ -140,34 +147,43 @@ function registerPostRoutes() {
  
     req.session.user = {
       _id: user._id,
-      name: user.name,
       email: user.email
     }
  
-    return res.redirect('/')
+    return res.redirect('/discover')
   })
  
  
   // Register
   app.post('/register', async (req, res) => {
-    const { email, username, password, dob } = req.body
+    const { name, lastName, email, password, username, birthday, tel, gender, profile, image1, image2, image3, status, bio, interests, opzoek} = req.body
  
     const existingUser = await users.findOne({ email: email })
  
     if (existingUser) {
-      return res.status(409).render('pages/register', {
-        error: 'Email bestaat al'
-      })
+      return res.status(409).render('pages/register', { error: 'Email bestaat al' })
     }
  
     await users.insertOne({
+      name: name,
+      lastName: lastName,
       email: email,
-      name: username,
       password: password,
-      dob: dob || null
+      username: username,
+      birthday: birthday,
+      tel: tel,
+      gender: gender,
+      profile: profile,
+      image1: image1,
+      image2: image2,
+      image3: image3,
+      status: status,
+      bio: bio,
+      interests: interests,
+      opzoek: opzoek,
     })
  
-    return res.redirect('/register-success')
+    return res.redirect('/discover')
   })
 
   //Post
@@ -191,16 +207,58 @@ function registerPostRoutes() {
         res.status(500).send("Fout bij ophalen data");
       }
     })
+}
 
+// ==========================================
+// 7. SOCKET.IO (Chat events)
+// source: https://medium.com/@basukori8463/build-a-real-time-chat-app-from-scratch-with-node-js-and-socket-io-9714b7076372
+// ==========================================
+let connectedUsers = 0
+
+function registerSocketHandlers() {
+  io.on('connection', (socket) => {
+    connectedUsers++
+    console.log(`🎉 A user connected: ${socket.id} Total users: ${connectedUsers}`)
+
+    // Notify others that someone joined
+    socket.broadcast.emit(
+      'user notification',
+      `Someone joined the chat! (${connectedUsers} users online)`
+    )
+
+    socket.on('chat message', (msg) => {
+      console.log('📨 Message received:', msg)
+      io.emit('chat message', msg)
+    })
+
+    // Typing indicators
+    socket.on('typing', () => {
+      socket.broadcast.emit('typing')
+    })
+
+    socket.on('stop typing', () => {
+      socket.broadcast.emit('stop typing')
+    })
+
+    socket.on('disconnect', () => {
+      connectedUsers--
+      console.log(`👋 A user disconnected: ${socket.id} Total users: ${connectedUsers}`)
+
+      socket.broadcast.emit(
+        'user notification',
+        `Someone left the chat. (${connectedUsers} users online)`
+      )
+    })
+  })
+}
 
     // Middleware to handle not found errors - error 404
- 
-}
+
  
  
  
 // ==========================================
-// 6. ERROR HANDLING & SERVER START
+// 8. ERROR HANDLING & SERVER START
 // ==========================================
  
 function registerErrorHandlers() {
@@ -226,6 +284,7 @@ app.use(function (err, req, res) {
  
  
  
+
 async function start() {
   try {
     await client.connect()
@@ -235,13 +294,16 @@ async function start() {
     users = db.collection(process.env.DB_COLLECTION)
  
     // Routes registreren
+
     registerGetRoutes()
     registerPostRoutes()
+    registerSocketHandlers()
     registerErrorHandlers()
  
     // Server starten
+
     const port = process.env.PORT || 3000
-    app.listen(port, () => {
+    server.listen(port, () => {
       console.log(`Server draait op poort ${port}`)
     })
  
