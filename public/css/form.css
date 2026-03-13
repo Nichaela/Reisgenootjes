@@ -122,3 +122,9 @@ a {
     text-decoration-thickness: .125rem;
     text-underline-offset: .2rem;
 }
+
+/* disabled button form*/
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
