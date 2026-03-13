@@ -7,6 +7,9 @@ const express = require('express')
 const session = require('express-session')
 const http = require('http')
 const socketIo = require('socket.io')
+const xss = require('xss')
+const validator = require('validator')
+const bcrypt = require('bcryptjs')
 
 const { MongoClient, ServerApiVersion } = require('mongodb')
 
@@ -51,6 +54,16 @@ let users
 // ==========================================
 app.use((req, res, next) => {
   res.locals.user = req.session.user || null
+  next()
+})
+
+// XSS sanitizing middleware
+app.use((req, res, next) => {
+  if (req.body) {
+    for (let key in req.body) {
+      req.body[key] = xss(req.body[key])
+    }
+  }
   next()
 })
  
@@ -133,16 +146,20 @@ function registerPostRoutes() {
   // Login
   app.post('/login', async (req, res) => {
     const { email, password } = req.body
+
+    // validator checks
+    if (!validator.isEmail(email)) {
+      return res.status(400).render('pages/login', { error: 'Ongeldig emailadres' })
+    }
+
     const user = await users.findOne({ email: email })
- 
     if (!user) {
       return res.status(401).render('pages/login', { error: 'Onbekende gebruiker' })
     }
  
-    if (user.password !== password) {
-      return res.status(401).render('pages/login', {
-        error: 'Verkeerd wachtwoord'
-      })
+    const passwordMatch = await bcrypt.compare(password, user.password)
+    if (!passwordMatch) {
+      return res.status(401).render('pages/login', { error: 'Ongeldig wachtwoord' })
     }
  
     req.session.user = {
@@ -156,31 +173,45 @@ function registerPostRoutes() {
  
   // Register
   app.post('/register', async (req, res) => {
-    const { name, lastName, email, password, username, birthday, tel, gender, profile, image1, image2, image3, status, bio, interests, opzoek} = req.body
+    const { name, lastName, email, password, username, birthday,
+      tel, gender, profile, image1, image2, image3, status,
+      bio, interests, opzoek
+    } = req.body
  
-    const existingUser = await users.findOne({ email: email })
- 
+    // validator checks
+    if (!validator.isEmail(email)) {
+      return res.status(400).render('pages/register', { error: 'Ongeldig emailadres' })
+    }
+
+    if (!validator.isLength(password, { min: 8 })) {
+      return res.status(400).render('pages/register', { error: 'Wachtwoord moet minimaal 8 tekens bevatten' })
+    }
+
+    const existingUser = await users.findOne({ email })
     if (existingUser) {
       return res.status(409).render('pages/register', { error: 'Email bestaat al' })
     }
+
+    // password hashing
+    const hashedPassword = await bcrypt.hash(password, 10)
  
     await users.insertOne({
-      name: name,
-      lastName: lastName,
-      email: email,
-      password: password,
-      username: username,
-      birthday: birthday,
-      tel: tel,
-      gender: gender,
-      profile: profile,
-      image1: image1,
-      image2: image2,
-      image3: image3,
-      status: status,
-      bio: bio,
-      interests: interests,
-      opzoek: opzoek,
+      name,
+      lastName,
+      email,
+      password: hashedPassword,
+      username,
+      birthday,
+      tel,
+      gender,
+      profile,
+      image1,
+      image2,
+      image3,
+      status,
+      bio,
+      interests,
+      opzoek
     })
  
     return res.redirect('/discover')
