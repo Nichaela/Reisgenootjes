@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <%- include('../partials/head'); %>
-  <link rel="stylesheet" href="css/form.css">
-  <link rel="stylesheet" href="css/post.css">
+  <link rel="stylesheet" href="/css/form.css">
+  <link rel="stylesheet" href="/css/post.css">
 </head>
 <body>
 
@@ -23,26 +23,14 @@
         <h1><%= title %></h1>
         <p><%= startDate %> tot <%= endDate %></p>
         
-        <img src="<%= image %>" alt="<%= title %>" class="hero-img">
+        <!-- <img src="<%= image %>" alt="<%= title %>" class="hero-img"> -->
 
-        <ul>
-            <% 
-              const maxVisible = 3;
-              const extraCount = joinedPersons.length - maxVisible;
-              joinedPersons.slice(0, maxVisible).forEach(item => { 
-            %>
-              <li><%= item %></li>
-            <% }) %>
-          
-            <% if(extraCount > 0) { %>
-                <li class="more">+<%= extraCount %></li>
-            <% } %>
-        </ul>
 
     </section>
 
     <section>
-        <p><%= gender %> | <%= hobby %> | <%= age %> jaar</p>
+      <!-- dit aanpassen uit database maker gebuiker  -->
+        <p><%= gender %> | <%= age %> jaar</p>
 
         <h2>Omschrijving</h2>
         <p><%= discription %> </p>
@@ -52,9 +40,9 @@
 
         <h2>Benodigdheden</h2>
         <ul>
-            <% supplies.forEach(item => { %>
-              <li><%= item %></li>
-            <% }) %>
+          <% supplies.forEach(item => { %>
+            <li><%= item %></li>
+          <% }) %>
         </ul>
     </section>
   </main>
@@ -63,6 +51,6 @@
       <%- include('../partials/bottom-nav'); %>
   </footer>
 
-  <script src="../script/form.js"></script>
+  <script src="/script/form.js"></script>
 </body>
 </html>

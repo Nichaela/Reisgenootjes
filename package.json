@@ -15,7 +15,6 @@
     "bcryptjs": "^3.0.3",
     "dotenv": "^17.3.1",
     "ejs": "^4.0.1",
-    "eslint": "^10.0.2",
     "express": "^5.2.1",
     "express-session": "^1.19.0",
     "list.js": "^2.3.1",
