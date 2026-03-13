@@ -20,17 +20,20 @@ const io = socketIo(server)
 // ==========================================
 // 3. CONFIGURATIE & DATABASE
 // ==========================================
+// source: https://socket.io/how-to/use-with-express-session
+const sessionMiddleware = session({
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+})
+
 app
-  .use(express.urlencoded({ extended: true })) // parse form data
-  .use(express.static('public')) // serve static files
-  .set('view engine', 'ejs') // EJS templating
-  .use(
-    session({
-      secret: process.env.SESSION_SECRET,
-      resave: false,
-      saveUninitialized: false,
-    })
-  )
+  .use(express.urlencoded({ extended: true }))
+  .use(express.static('public'))
+  .set('view engine', 'ejs')
+  .use(sessionMiddleware)
+
+io.engine.use(sessionMiddleware)
 
 // Construct URL used to connect to database from info in the .env file
 const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}/${process.env.DB_NAME}?retryWrites=true&w=majority`
@@ -109,12 +112,12 @@ function registerGetRoutes() {
  
    // Chatroom paginas Nicha
   app.get('/chatroom', (req, res) => {
-    if (!req.session.user) return res.redirect('/login')
+    // if (!req.session.user) return res.redirect('/login')
     res.render('pages/chatroom', { user: req.session.user })
   })
 
   app.get('/chat-channel', (req, res) => {
-    if (!req.session.user) return res.redirect('/login')
+    // if (!req.session.user) return res.redirect('/login')
     res.render('pages/chat-channel', { user: req.session.user })
   })
   
@@ -132,27 +135,34 @@ function registerGetRoutes() {
 function registerPostRoutes() {
   // Login
   app.post('/login', async (req, res) => {
-    const { username, password } = req.body
-    const user = await users.findOne({ name: username })
- 
-    if (!user) {
-      return res.status(401).render('pages/login', { error: 'Onbekende gebruiker' })
+  const { email, password } = req.body
+  const user = await users.findOne({ email: email })
+
+  if (!user) {
+    return res.status(401).render('pages/login', { error: 'Onbekende gebruiker' })
+  }
+
+  if (user.password !== password) {
+    return res.status(401).render('pages/login', {
+      error: 'Verkeerd wachtwoord'
+    })
+  }
+
+  req.session.user = {
+    _id: user._id,
+    name: user.name,
+    email: user.email
+  }
+
+  req.session.save((err) => {
+    if (err) {
+      console.error('Session save error:', err)
+      return res.status(500).send('Kon sessie niet opslaan')
     }
- 
-    if (user.password !== password) {
-      return res.status(401).render('pages/login', {
-        error: 'Verkeerd wachtwoord'
-      })
-    }
- 
-    req.session.user = {
-      _id: user._id,
-      name: user.name,
-      email: user.email
-    }
- 
+
     return res.redirect('/')
   })
+})
  
  
   // Register
@@ -206,13 +216,25 @@ let connectedUsers = 0
 
 function registerSocketHandlers() {
   io.on('connection', (socket) => {
+    console.log('session user:', socket.request.session.user)
+    const user = socket.request.session.user
+    if (!user) {
+      return socket.disconnect()
+    }
+
+    socket.join(user._id.toString())
+    socket.emit('private message', {
+    fromName: 'Server test',
+    text: 'Dit zie alleen jij',
+    timestamp: new Date().toISOString()
+  })
     connectedUsers++
     console.log(`🎉 A user connected: ${socket.id} Total users: ${connectedUsers}`)
 
     // Notify others that someone joined
     socket.broadcast.emit(
       'user notification',
-      `Someone joined the chat! (${connectedUsers} users online)`
+      `${user.name} joined the chat! (${connectedUsers} users online)`
     )
 
     socket.on('chat message', (msg) => {
@@ -235,16 +257,11 @@ function registerSocketHandlers() {
 
       socket.broadcast.emit(
         'user notification',
-        `Someone left the chat. (${connectedUsers} users online)`
+        `${user.name} left the chat. (${connectedUsers} users online)`
       )
     })
   })
 }
-
-    // Middleware to handle not found errors - error 404
- 
-}
- 
  
  
 // ==========================================
