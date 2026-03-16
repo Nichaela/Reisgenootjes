@@ -202,8 +202,8 @@ function registerGetRoutes() {
     }
   })
   //
- 
-   // Chatroom paginas Nicha
+
+  // Chatroom paginas Nicha
   app.get('/chatroom', async (req, res) => {
     if (!req.session.user) return res.redirect('/login')
 
@@ -220,29 +220,30 @@ function registerGetRoutes() {
 
   // route voor een privéchat met 1 specifieke gebruiker
   app.get('/chat-channel/:userId', async (req, res) => {
-  if (!req.session.user) return res.redirect('/login')
+    if (!req.session.user) return res.redirect('/login')
 
-  const chatPartnerId = req.params.userId
-  const chatPartner = await users.findOne({ _id: new ObjectId(chatPartnerId) })
+    const chatPartnerId = req.params.userId
+    const chatPartner = await users.findOne({ _id: new ObjectId(chatPartnerId) })
 
-  if (!chatPartner) {
-    return res.status(404).render('pages/errorstate', {
-      status: 404,
-      message: 'Gebruiker niet gevonden'
-    })
-  }
-
-  res.render('pages/chat-channel', {
-    user: req.session.user,
-    chatPartner: {
-      _id: chatPartner._id.toString(),
-      name: chatPartner.name
+    if (!chatPartner) {
+      return res.status(404).render('pages/errorstate', {
+        status: 404,
+        message: 'Gebruiker niet gevonden'
+      })
     }
-  })
 
-  app.get('/logout', (req, res) => {
-    req.session.destroy(() => {
-      res.redirect('/login')
+    res.render('pages/chat-channel', {
+      user: req.session.user,
+      chatPartner: {
+        _id: chatPartner._id.toString(),
+        name: chatPartner.name
+      }
+    })
+
+    app.get('/logout', (req, res) => {
+      req.session.destroy(() => {
+        res.redirect('/login')
+      })
     })
   })
 }
@@ -498,9 +499,9 @@ function registerSocketHandlers() {
 
 // Middleware to handle not found errors - error 404
 
-    
-    
- 
+
+
+
 // ==========================================
 // 8. ERROR HANDLING & SERVER START
 // ==========================================
