@@ -1,28 +1,29 @@
 main {
-    min-height: 100vh;
-    margin: 0.5rem;
+  min-height: 100vh;
+  margin: 0.5rem;
 }
 
 section {
-    margin: 1.5rem 0 1.5rem 0;
+  margin: 1.5rem 0 1.5rem 0;
 }
 
 section h2 {
-    font-family: 'indie-flower';
-    font-size: 1.5rem;
+  font-family: 'indie-flower';
+  font-size: 1.5rem;
 }
 
 section:nth-of-type(1) {
   position: relative;
 }
 
-section:nth-of-type(1)::after {
+  section:nth-of-type(1)::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 50%);
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.6) 0%, transparent 50%);
   border-radius: 0.5rem;
-}
+}  
+
 
 section:nth-of-type(1) img {
   display: block;
@@ -38,8 +39,8 @@ section:nth-of-type(1) img {
 }
 
 .profile-info>h2 {
-    color: var(--clr-neutral);
-    font-family: 'inter';
+  color: var(--clr-neutral);
+  font-family: 'inter';
 }
 
 main ul {
@@ -57,11 +58,11 @@ main li {
 
 main li img {
   height: 1rem;
-  
+
 }
 
 .hobbies {
-    display: flex;
+  display: flex;
 }
 
 .hobby {
@@ -72,10 +73,80 @@ main li img {
 }
 
 
+/* reisoproep */
+.reisoproep {
+  position: relative;
+}
+
+.reisoproep::after {
+  position: absolute;
+  border-radius: 0.5rem;
+  inset: 0;
+  content: '';
+  background: var(--gradient-dark);
+  z-index: 1;
+  overflow: hidden;
+}
+
+.reisoproep>img {
+  height: 150px;
+  width: 312px;
+  object-fit: cover;
+  border-radius: 0.5rem;
+  z-index: -1;
+  display: block;
+}
+
+.reisoproep span {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 2;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(6px);
+  color: white;
+  font-size: 0.75rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: 5rem;
+}
+
+.reisoproep p {
+  position: absolute;
+  bottom: 2.5rem;
+  left: 0.75rem;
+  z-index: 2;
+  color: white;
+  font-size: 0.75rem;
+}
+
+.reisoproep h3 {
+  position: absolute;
+  bottom: 0.75rem;
+  left: 0.75rem;
+  z-index: 2;
+  color: white;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.reisoproep button {
+  position: absolute;
+  bottom: 0.75rem;
+  right: 1rem;
+  z-index: 2;
+  background: white;
+  border: none;
+  border-radius: 50%;
+  width: 2rem;
+  height: 2rem;
+  cursor: pointer;
+  font-size: 1rem;
+}
 
 
 
-/* Gallerij */
+
+/* Gallerij voor het profiel*/
 /* Grid gemaakt met gridgenerator */
 section:nth-of-type(6) {
   display: grid;
@@ -85,21 +156,23 @@ section:nth-of-type(6) {
   margin-bottom: 1rem;
 }
 
-section:nth-of-type(6) img:nth-of-type(1) { 
+section:nth-of-type(6) img:nth-of-type(1) {
   grid-area: 1 / 1 / 3 / 2;
   width: 150px;
   height: 235px;
   object-fit: cover;
   border-radius: 5px;
 }
-section:nth-of-type(6) img:nth-of-type(2) { 
+
+section:nth-of-type(6) img:nth-of-type(2) {
   grid-area: 1 / 2 / 2 / 3;
   width: 150px;
   height: 115px;
   object-fit: cover;
   border-radius: 5px;
 }
-section:nth-of-type(6) img:nth-of-type(3) { 
+
+section:nth-of-type(6) img:nth-of-type(3) {
   grid-area: 2 / 2 / 3 / 3;
   width: 150px;
   height: 115px;
@@ -107,27 +180,26 @@ section:nth-of-type(6) img:nth-of-type(3) {
   border-radius: 5px;
 }
 
-section:nth-of-type(6)>h2 {
-    clip: rect(0 0 0 0);
+section:nth-of-type(6) h2 {
+  clip: rect(0 0 0 0);
   clip-path: inset(50%);
   height: 1px;
   overflow: hidden;
   position: absolute;
   white-space: nowrap;
   width: 1px;
-}  
+}
 
-section:last-of-type{
-    display: flex;
-    justify-content: space-between;
+section:last-of-type {
+  display: flex;
+  justify-content: space-between;
 }
 
 
-
-section button{
-    margin-bottom: 5rem;
-    padding: 1rem;
-    background-color: var(--clr-text);
-    border-radius: 4rem;
-    border-style: none;
+section button {
+  margin-bottom: 5rem;
+  padding: 1rem;
+  background-color: var(--clr-text);
+  border-radius: 4rem;
+  border-style: none;
 }
