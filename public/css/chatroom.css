@@ -1,5 +1,36 @@
 /* chatroom */
 /* source: https://medium.com/@basukori8463/build-a-real-time-chat-app-from-scratch-with-node-js-and-socket-io-9714b7076372 */
+
+
+.chat-list-item  {
+   margin-bottom: 2em;
+   a {
+    display: flex;
+    flex-direction: row;
+   }
+}
+.chat-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.profile-pic-wrapper { 
+    width: 150px;
+    height: 150px;
+    border-radius: 100%; 
+    overflow: hidden; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+} 
+
+.profile-pic { 
+    width: 100%; 
+    height: 100%; 
+    object-fit: cover; 
+}
+
+/* chat-channel */
 .chat-container {
     background: white;
     border-radius: 10px;
