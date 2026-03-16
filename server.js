@@ -42,8 +42,7 @@ app
 io.engine.use(sessionMiddleware)
 
 // Construct URL used to connect to database from info in the .env file
-const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}/${process.env.DB_NAME}?retryWrites=true&w=majority`
-
+const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}/?retryWrites=true&w=majority`
 // Create a MongoClient
 const client = new MongoClient(uri, {
   serverApi: {
@@ -167,9 +166,22 @@ function registerGetRoutes() {
     }
   })
 
-  app.get('/matchen', (req, res) => {
-    res.render('pages/matchen', { user: req.session.user })
-  })
+  // Matchen route
+  app.get('/matchen', async (req, res) => {
+  const post = await discover.findOne({});
+  const matchUser = await users.findOne({ _id: new ObjectId(post.userId) });
+    const today = new Date();
+  const birthDate = new Date(matchUser.birthday);
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const month = today.getMonth() - birthDate.getMonth();
+  if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) age--;
+
+  res.render('pages/matchen', { user: req.session.user, post: post, matchUser: matchUser, age: age })
+})
+
+
+
+  //
 
   app.get('/profiel', async (req, res) => {
     if (!req.session.user) return res.redirect('/login')
@@ -188,6 +200,12 @@ function registerGetRoutes() {
       res.status(500).send('Fout bij ophalen van profiel')
     }
   })
+  //
+
+  
+  
+   // Chatroom paginas Nicha
+  app.get('/chatroom', (req, res) => {
 
   app.get('/chatroom', async (req, res) => {
     if (!req.session.user) return res.redirect('/login')
