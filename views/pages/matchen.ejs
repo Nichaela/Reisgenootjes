@@ -2,21 +2,23 @@
 <html lang="en">
 <head>
   <%- include('../partials/head'); %>
+  <link rel="stylesheet" href="css/matchen.css">
+  <link rel="stylesheet" href="css/filter.css">
+   <script defer src="javascript/filter.js"></script>
 </head>
 <body>
   <header>
     <%- include('../partials/header'); %>
-    <link rel="stylesheet" href="css/matchen.css">
-     
   </header>
 
   <main>
-
-  <% if (user) { %>
+   <% if (user) { %>
   <p>Welkom <%= user.name %></p>
-  <% } %>
+  <% } %> 
 
   <h1 class="underline" >Matchen</h1>
+  <%- include('../partials/filtermenu'); %>
+ 
   
   
 

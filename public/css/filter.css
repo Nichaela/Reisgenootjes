@@ -1,4 +1,4 @@
-.underline h2 {
+.filter-menu h2 {
   position: absolute;
   top: 0;
 }
@@ -58,7 +58,7 @@
   transition: transform 0.3s ease;
 }
 
-ul {
+.filter-menu ul {
   list-style: none;
 }
 

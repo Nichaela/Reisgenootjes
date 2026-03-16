@@ -7,8 +7,11 @@ const express = require('express')
 const session = require('express-session')
 const http = require('http')
 const socketIo = require('socket.io')
+const xss = require('xss')
+const validator = require('validator')
+const bcrypt = require('bcryptjs')
 
-const { MongoClient, ServerApiVersion } = require('mongodb')
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb')
 
 // ==========================================
 // 2. APP, SERVER, SOCKET.IO
@@ -44,14 +47,25 @@ const client = new MongoClient(uri, {
   },
 })
  
+// database collections
 let users
-let discovery
+let discover;
  
 // ==========================================
 // 4. MIDDLEWARE (Algemeen)
 // ==========================================
 app.use((req, res, next) => {
   res.locals.user = req.session.user || null
+  next()
+})
+
+// XSS sanitizing middleware
+app.use((req, res, next) => {
+  if (req.body) {
+    for (let key in req.body) {
+      req.body[key] = xss(req.body[key])
+    }
+  }
   next()
 })
  
@@ -81,6 +95,27 @@ function registerGetRoutes() {
   app.get('/register-success', (req, res) => {
     res.render('pages/register-success')
   })
+
+
+  app.get('/profile', async (req, res) => {
+    if (!req.session.user) return res.redirect('/login')
+    
+    try {
+      const { ObjectId } = require('mongodb')
+      const mijnReizen = await discover.find({ 
+        userId: new ObjectId(req.session.user._id) 
+      }).toArray()
+      
+      res.render('pages/profile', { 
+        user: req.session.user,
+        reizen: mijnReizen 
+      })
+    } catch (err) {
+      console.error(err)
+      res.status(500).send('Fout bij ophalen van jouw reizen')
+    }
+  })
+
  
   app.get('/dashboard', (req, res) => {
     if (!req.session.user) return res.redirect('/login')
@@ -89,22 +124,75 @@ function registerGetRoutes() {
 
 
   // hier is laura nu mee bezig
+  app.get('/discover', async (req, res) => {
+    try {
+      const posts = await discover.find({}).toArray(); // alle posts ophalen
+  
+      res.render('pages/discover', { 
+        user: req.session.user,
+        posts: posts
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(500).send('Er ging iets mis bij het laden van posts');
+    }
+  });
   app.get('/discover', (req, res) => {
     res.render('pages/discover', { user: req.session.user })
   })
 
   app.get('/create-post', (req, res) => {
+    if (!req.session.user) return res.redirect('/welkom')  
     res.render('pages/create-post', { user: req.session.user })
   })
+
   app.get('/post', (req, res) => {
     res.render('pages/post', { user: req.session.user })
   })
+
+  app.get('/post/:id', async (req, res) => {
+    try {
+      const postId = req.params.id;
+      const post = await discover.findOne({ _id: new ObjectId(postId) });
+
+      if (!post) {
+        return res.status(404).send('Post niet gevonden');
+      }
+
+      res.render('pages/post', { post });
+
+    } catch (err) {
+      console.error(err);
+      res.status(500).send('Er ging iets mis bij het ophalen van de post');
+    }
+  });
     
   //
 
-  // hier is Stiene nu mee bezig
+  // Matchen route
   app.get('/matchen', (req, res) => {
     res.render('pages/matchen', { user: req.session.user })
+  })
+  //
+
+    // profiel route
+  app.get('/profiel', async (req, res) => {
+    if (!req.session.user) return res.redirect('/login')
+  
+    try {
+      const mijnPosts = await discover.find({ 
+        userId: new ObjectId(req.session.user._id) 
+      }).toArray()
+  
+      res.render('pages/profiel', { 
+        user: req.session.user,
+        posts: mijnPosts
+      })
+  
+    } catch (err) {
+      console.error(err)
+      res.status(500).send('Fout bij ophalen van profiel')
+    }
   })
   //
  
@@ -126,6 +214,20 @@ function registerGetRoutes() {
   })
 }
  
+    //route naar annabels pagina
+
+    app.get('/filter', async (req, res) => {
+      try {
+        const myUsers = await users
+          .find({}) // alleen jouw records
+          .toArray();
+    
+        res.render('pages/filter', { users: myUsers });
+      } catch (err) {
+        console.error(err);
+        res.status(500).send("Fout bij ophalen data");
+      }
+    })
 
 // ==========================================
 // 6. POST ROUTES (Data verwerken)
@@ -134,21 +236,34 @@ function registerPostRoutes() {
   // Login
   app.post('/login', async (req, res) => {
     const { email, password } = req.body
+
+    // validator checks
+    if (!validator.isEmail(email)) {
+      return res.status(400).render('pages/login', { error: 'Ongeldig emailadres' })
+    }
+
     const user = await users.findOne({ email: email })
- 
     if (!user) {
       return res.status(401).render('pages/login', { error: 'Onbekende gebruiker' })
     }
  
-    if (user.password !== password) {
-      return res.status(401).render('pages/login', {
-        error: 'Verkeerd wachtwoord'
-      })
+    const passwordMatch = await bcrypt.compare(password, user.password)
+    if (!passwordMatch) {
+      return res.status(401).render('pages/login', { error: 'Ongeldig wachtwoord' })
     }
  
     req.session.user = {
       _id: user._id,
-      email: user.email
+      email: user.email,
+      name: user.name,
+      lastName: user.lastName,
+      username: user.username,
+      bio: user.bio,
+      profile: user.profile,
+      gender: user.gender,
+      birthday: user.birthday,
+      interests: user.interests,
+      opzoek: user.opzoek
     }
  
     return res.redirect('/discover')
@@ -157,32 +272,52 @@ function registerPostRoutes() {
  
   // Register
   app.post('/register', async (req, res) => {
-    const { name, lastName, email, password, username, birthday, tel, gender, profile, image1, image2, image3, status, bio, interests, opzoek} = req.body
+    const { name, lastName, email, password, username, birthday,
+      tel, gender, profile, image1, image2, image3, status,
+      bio, interests, opzoek
+    } = req.body
  
-    const existingUser = await users.findOne({ email: email })
- 
+    // validator checks
+    if (!validator.isEmail(email)) {
+      return res.status(400).render('pages/register', { error: 'Ongeldig emailadres' })
+    }
+    if (!validator.isLength(password, { min: 8 })) {
+      return res.status(400).render('pages/register', { error: 'Wachtwoord moet minimaal 8 tekens bevatten' })
+    }
+    const existingUser = await users.findOne({ email })
     if (existingUser) {
       return res.status(409).render('pages/register', { error: 'Email bestaat al' })
     }
- 
-    await users.insertOne({
-      name: name,
-      lastName: lastName,
-      email: email,
-      password: password,
-      username: username,
-      birthday: birthday,
-      tel: tel,
-      gender: gender,
-      profile: profile,
-      image1: image1,
-      image2: image2,
-      image3: image3,
-      status: status,
-      bio: bio,
-      interests: interests,
-      opzoek: opzoek,
+
+    // password hashing
+    const hashedPassword = await bcrypt.hash(password, 10)
+        
+    const result = await users.insertOne({
+      name,
+      lastName,
+      email,
+      password: hashedPassword,
+      username,
+      birthday,
+      tel,
+      gender,
+      profile,
+      image1,
+      image2,
+      image3,
+      status,
+      bio,
+      interests,
+      opzoek
     })
+
+    // sessie opslaan na registratie
+    const nieuweUser = await users.findOne({ _id: result.insertedId })
+    req.session.user = {
+      _id: nieuweUser._id,
+      email: nieuweUser.email,
+      name: nieuweUser.name
+    }
  
     return res.redirect('/discover')
   })
@@ -232,6 +367,36 @@ app.get('/ontdekfilter', async (req, res) => {
     res.status(500).send("Fout bij ophalen data");
   }
 })
+  //create-post formulier 
+  app.post('/post', async (req, res) => {
+    if (!req.session.user) return res.redirect('/login')
+    const { title, startDate, endDate, location, persons, discription, gender } = req.body;
+
+    let age = req.body.age;
+    if (!Array.isArray(age)) {
+      age = age ? [age] : [];
+    }
+    
+    // Supplies als array van nieuwe regels
+    const supplies = req.body.supplies ? req.body.supplies.split('\n') : [];
+
+    const result = await discover.insertOne({ 
+      userId: new ObjectId(req.session.user._id), // koppeling aan gebruiker die ingelogd is
+      title,
+      startDate,
+      endDate,
+      location,
+      persons,
+      discription,
+      supplies,
+      age,
+      gender
+    })
+
+    return res.redirect(`/post/${result.insertedId}`)
+  })
+}
+
 
 
 // ==========================================
@@ -277,7 +442,7 @@ function registerSocketHandlers() {
   })
 }
 
-    // Middleware to handle not found errors - error 404
+// Middleware to handle not found errors - error 404
 
  
  
@@ -306,9 +471,6 @@ app.use(function (err, req, res) {
   res.status(500).send('500: server error')
 })
 }
- 
- 
- 
 
 async function start() {
   try {
@@ -317,6 +479,8 @@ async function start() {
  
     const db = client.db(process.env.DB_NAME)
     users = db.collection(process.env.DB_COLLECTION)
+
+    discover = db.collection('discover')
  
     // Routes registreren
 

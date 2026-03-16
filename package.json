@@ -12,6 +12,7 @@
   },
   "keywords": [],
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "dotenv": "^17.3.1",
     "ejs": "^4.0.1",
     "express": "^5.2.1",
@@ -20,7 +21,9 @@
     "listjs": "^0.1.1",
     "mongodb": "^7.1.0",
     "nodenv": "^0.1.0",
-    "socket.io": "^4.8.3"
+    "socket.io": "^4.8.3",
+    "validator": "^13.15.26",
+    "xss": "^1.0.15"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"
