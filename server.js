@@ -245,6 +245,7 @@ function registerGetRoutes() {
       res.redirect('/login')
     })
   })
+})
 }
 
 //route naar annabels pagina
