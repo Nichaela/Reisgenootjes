@@ -1,25 +1,10 @@
 
-.discover li{
-    height: 25vh;
+.discover {
+    width: 100%;
     display: grid;
-    grid-template-areas: 
-    "date persons"
-    "location location"
-    "title title";
+    gap: 2rem;
+}
 
-    background-color: pink;
-}
-.discover a p:nth-child(2){
-    grid-area: date;
-}
-.discover a ul{
-    grid-area: persons;
-}
-.discover a p:last-of-type{
-    grid-area: location;
-    color: green;
-}
-.discover a h2{
-    grid-area: title;
-    color: yellow;
+.discover a {
+    width: 100%;
 }
