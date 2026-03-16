@@ -18,3 +18,6 @@ DB_PASSWORD=
 DB_HOST= blabla.blalba.mongodb.net
 DB_NAME=sample_mflix
 DB_COLLECTION=users"
+
+
+Contributing + code of conduct
