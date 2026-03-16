@@ -292,7 +292,7 @@ function registerPostRoutes() {
     // password hashing
     const hashedPassword = await bcrypt.hash(password, 10)
         
-    await users.insertOne({
+    const result = await users.insertOne({
       name,
       lastName,
       email,
@@ -324,18 +324,18 @@ function registerPostRoutes() {
 
   //create-post formulier 
   app.post('/post', async (req, res) => {
+    if (!req.session.user) return res.redirect('/login')
     const { title, startDate, endDate, location, persons, discription, gender } = req.body;
-    
-    // Age komt als array van de browser, of als string als 1 item
+
     let age = req.body.age;
     if (!Array.isArray(age)) {
       age = age ? [age] : [];
     }
-
+    
     // Supplies als array van nieuwe regels
     const supplies = req.body.supplies ? req.body.supplies.split('\n') : [];
 
-    await discover.insertOne({
+    const result = await discover.insertOne({ 
       userId: new ObjectId(req.session.user._id), // koppeling aan gebruiker die ingelogd is
       title,
       startDate,
@@ -348,7 +348,7 @@ function registerPostRoutes() {
       gender
     })
 
-    return res.redirect('/post')
+    return res.redirect(`/post/${result.insertedId}`)
   })
 }
 
