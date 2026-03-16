@@ -170,9 +170,13 @@ function registerGetRoutes() {
   //
 
   // Matchen route
-  app.get('/matchen', (req, res) => {
-    res.render('pages/matchen', { user: req.session.user })
-  })
+  app.get('/matchen', async (req, res) => {
+  const post = await discover.findOne({});
+  const matchUser = await users.findOne({ _id: new ObjectId(post.userId) });
+  res.render('pages/matchen', { user: req.session.user, post: post, matchUser: matchUser })
+})
+
+
   //
 
     // profiel route

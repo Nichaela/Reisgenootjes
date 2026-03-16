@@ -4,6 +4,7 @@
   <%- include('../partials/head'); %>
   <link rel="stylesheet" href="css/matchen.css">
   <link rel="stylesheet" href="css/filter.css">
+  <link rel="stylesheet" href="style.css">
    <script defer src="javascript/filter.js"></script>
 </head>
 <body>
@@ -43,24 +44,18 @@
 
 <section>
   <h2>Interesse</h2>
-
-<ul class="hobbies">
-    <li class="hobby">Sport</li>
-    <li class="hobby">Reizen</li>
-    <li class="hobby">Muziek</li>
-    <li class="hobby">Hiken</li>
-</ul>
+   <ul class="hobbies">
+    <% matchUser.interests.split(',').forEach(interesse => { %>
+      <li class="hobby"><%= interesse %></li>
+    <% }) %>
+  </ul>
 </section>
 
 <section>
   <h2>Geplande trip</h2>
-  <article class="reisoproep">
-    <img src="img/test-cover.jpg" alt="cover dolemietenreis">
-    <span>20 apr – 26 apr</span>
-    <p>Italië</p>
-    <h3>Tocht door de Dolomieten</h3>
-    <button>→</button>
-  </article>
+   <a href="/post/<%= post._id %>">
+  <%- include('../partials/reisoproep', { post: post }) %>
+</a>
 </section>
 
 <section>
