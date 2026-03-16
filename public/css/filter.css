@@ -3,6 +3,30 @@
   top: 0;
 }
 
+/* Target het input element */
+#birthday {
+  width: 100%;
+  -webkit-appearance: none;
+  background: transparent;
+  margin-top: 2em;
+}
+
+#birthday::-webkit-slider-runnable-track {
+  height: .1em;
+  background: var(--clr-text);
+  border-radius: 1em;
+}
+
+#birthday::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 1.3em;
+  height: 1.3em;
+  background: var(--clr-primary);
+  border-radius: 50%;
+  margin-top: -.6em;
+}
+
+
 /* Filter knop */
 .toggleFilter {
   position: fixed;
@@ -117,6 +141,7 @@ h3 {
 
 /* Inputs onder hun label */
 .filter-menu input {
+  border: solid var(--clr-text) .05em;
   display: block;    
   width: 100%;           
   padding: 0.7em;

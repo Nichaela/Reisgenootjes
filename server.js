@@ -322,6 +322,51 @@ function registerPostRoutes() {
     return res.redirect('/discover')
   })
 
+  //Post
+  app.post('/post', (req, res) => {
+    const supplies = req.body.supplies.split('\n') //checken of dit werkt
+
+    res.redirect('/post')
+  })
+
+    //route naar filter menu match
+
+app.get('/filter', async (req, res) => {
+  try {
+    const db = client.db(process.env.DB_NAME);
+
+    const usersCollection = db.collection('users');
+    const discoverCollection = db.collection('discover');
+
+    // Alleen ophalen wanneer nodig
+    const myUsers = await usersCollection.find({}).toArray();
+    const myDiscover = await discoverCollection.find({}).toArray();
+
+    // Combineer als je wilt
+    const combinedData = [...myUsers, ...myDiscover];
+
+    res.render('pages/filter', { users: combinedData });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Fout bij ophalen data");
+  }
+})
+}
+
+//route naar filter op ontdek pagina
+
+app.get('/ontdekfilter', async (req, res) => {
+  try {
+    const myUsers = await users
+      .find({}) 
+      .toArray();
+
+    res.render('pages/ontdekfilter', { users: myUsers });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Fout bij ophalen data");
+  }
+})
   //create-post formulier 
   app.post('/post', async (req, res) => {
     if (!req.session.user) return res.redirect('/login')
