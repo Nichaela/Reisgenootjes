@@ -161,6 +161,15 @@ button {
 /* PARTIALS */
 
 /* reisoproep */
+.reizen {
+  width: 100%;
+  display: grid;
+  gap: 2rem;
+}
+
+.reizen a {
+  width: 100%;
+}
 .reisoproep {
   position: relative;
 }

@@ -176,8 +176,23 @@ function registerGetRoutes() {
   //
 
     // profiel route
-  app.get('/profiel', (req, res) => {
-    res.render('pages/profiel', { user: req.session.user })
+  app.get('/profiel', async (req, res) => {
+    if (!req.session.user) return res.redirect('/login')
+  
+    try {
+      const mijnPosts = await discover.find({ 
+        userId: new ObjectId(req.session.user._id) 
+      }).toArray()
+  
+      res.render('pages/profiel', { 
+        user: req.session.user,
+        posts: mijnPosts
+      })
+  
+    } catch (err) {
+      console.error(err)
+      res.status(500).send('Fout bij ophalen van profiel')
+    }
   })
   //
  
@@ -199,6 +214,20 @@ function registerGetRoutes() {
   })
 }
  
+    //route naar annabels pagina
+
+    app.get('/filter', async (req, res) => {
+      try {
+        const myUsers = await users
+          .find({}) // alleen jouw records
+          .toArray();
+    
+        res.render('pages/filter', { users: myUsers });
+      } catch (err) {
+        console.error(err);
+        res.status(500).send("Fout bij ophalen data");
+      }
+    })
 
 // ==========================================
 // 6. POST ROUTES (Data verwerken)
@@ -225,7 +254,16 @@ function registerPostRoutes() {
  
     req.session.user = {
       _id: user._id,
-      email: user.email
+      email: user.email,
+      name: user.name,
+      lastName: user.lastName,
+      username: user.username,
+      bio: user.bio,
+      profile: user.profile,
+      gender: user.gender,
+      birthday: user.birthday,
+      interests: user.interests,
+      opzoek: user.opzoek
     }
  
     return res.redirect('/discover')
@@ -243,11 +281,9 @@ function registerPostRoutes() {
     if (!validator.isEmail(email)) {
       return res.status(400).render('pages/register', { error: 'Ongeldig emailadres' })
     }
-
     if (!validator.isLength(password, { min: 8 })) {
       return res.status(400).render('pages/register', { error: 'Wachtwoord moet minimaal 8 tekens bevatten' })
     }
-
     const existingUser = await users.findOne({ email })
     if (existingUser) {
       return res.status(409).render('pages/register', { error: 'Email bestaat al' })
@@ -255,8 +291,8 @@ function registerPostRoutes() {
 
     // password hashing
     const hashedPassword = await bcrypt.hash(password, 10)
- 
-    await users.insertOne({
+        
+    const result = await users.insertOne({
       name,
       lastName,
       email,
@@ -274,24 +310,33 @@ function registerPostRoutes() {
       interests,
       opzoek
     })
+
+    // sessie opslaan na registratie
+    const nieuweUser = await users.findOne({ _id: result.insertedId })
+    req.session.user = {
+      _id: nieuweUser._id,
+      email: nieuweUser.email,
+      name: nieuweUser.name
+    }
  
     return res.redirect('/discover')
   })
 
   //create-post formulier 
   app.post('/post', async (req, res) => {
+    if (!req.session.user) return res.redirect('/login')
     const { title, startDate, endDate, location, persons, discription, gender } = req.body;
-    
-    // Age komt als array van de browser, of als string als 1 item
+
     let age = req.body.age;
     if (!Array.isArray(age)) {
       age = age ? [age] : [];
     }
-
+    
     // Supplies als array van nieuwe regels
     const supplies = req.body.supplies ? req.body.supplies.split('\n') : [];
 
-    await discover.insertOne({
+    const result = await discover.insertOne({ 
+      userId: new ObjectId(req.session.user._id), // koppeling aan gebruiker die ingelogd is
       title,
       startDate,
       endDate,
@@ -303,24 +348,10 @@ function registerPostRoutes() {
       gender
     })
 
-    return res.redirect('/post')
+    return res.redirect(`/post/${result.insertedId}`)
   })
 }
 
-    //route naar annabels pagina
-
-    app.get('/filter', async (req, res) => {
-      try {
-        const myUsers = await users
-          .find({}) // alleen jouw records
-          .toArray();
-    
-        res.render('pages/filter', { users: myUsers });
-      } catch (err) {
-        console.error(err);
-        res.status(500).send("Fout bij ophalen data");
-      }
-    })
 
 
 // ==========================================
