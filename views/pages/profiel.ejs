@@ -3,7 +3,7 @@
 
 <head>
     <%- include('../partials/head'); %>
-        <link rel="stylesheet" href="css/matchen.css">
+        <link rel="stylesheet" href="style.css"> 
         <link rel="stylesheet" href="css/profiel.css">
         <title>Profielpagina <%= user.name %></title>
 </head>
@@ -16,59 +16,34 @@
         <% if (user) { %>
             <p>Welkom <%= user.name %>
             </p>
-                <h1 class="underline">Welkom <%= user.name %></h1>
+
+                <h1 class="underline">Profiel</h1>
                 <section class="profile-pictures">
                     <h2>Gallerij</h2>
                     <img src="img/accounts/SophieBijZee.png" alt="Sophie bij zee">
                     <img src="img/accounts/SophieBijBerg.png" alt="Sophie kijkt naar een berg">
                     <img src="img/accounts/SophieBijWeiland.png" alt="een tentje in de bergen met uitzicht">
                 </section>
+
                 <section>
                   <!-- birthday naar age uitrekenen? -->
                     <h2><%= user.name %> • <%= user.birthday %></h2>
                     <div class="profile-info">
                         <ul>
-                            <li><%= user.gender %></li>
-                          <!-- locatie ophalen hoe? -->
+                            <li><img src="img/GenderFemale.svg"><%= user.gender %></li>
+                            <li><img src="img/location.svg">Nederland</li>
                             <li>Nederland</li>
                         </ul>
                     </div>
                 </section>
 
-                <section>
-                    <p>State • Opzoek naar reisgenootje</p>
-                    <h2>Bio</h2>
-                    <p>Hier komt een stukje tekst te staan wat meer verteld over het persoon zodat je een beter beeld
-                        krijgt met wie je op reis gaat</p>
-                </section>
-
-                <section>
+            <section>
+                    <h2>Interesses:</h2>
                     <ul class="hobbies">
-                        <li class="hobby">Sport</li>
-                        <li class="hobby">Reizen</li>
-                        <li class="hobby">Muziek</li>
-                        <li class="hobby">Hiken</li>
+                        <li class="hobby">Stedentrip</li>
+                        <li class="hobby">Duiken</li>
                     </ul>
-                </div>
             </section>
-
-            <section>
-            <!-- dit moet nog uit de db -->
-                <p>State • Opzoek naar reisgenootje</p>
-                <h2>Bio</h2>
-                <p><%= user.bio %></p>
-            </section>
-
-            <!-- dit moet nog uit de db -->
-            <section>
-                <ul class="hobbies">
-                    <li class="hobby">Sport</li>
-                    <li class="hobby">Reizen</li>
-                    <li class="hobby">Muziek</li>
-                    <li class="hobby">Hiken</li>
-                </ul>
-            </section>
-
 
             <h2>Planning</h2>
             <ul class="reizen">
