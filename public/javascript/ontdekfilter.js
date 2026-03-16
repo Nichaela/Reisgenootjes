@@ -20,23 +20,19 @@ let activeContinents = new Set();    // continent
 // =======================
 // Realtime slider update
 // =======================
-if (birthdaySlider && birthdayValue) {
+birthdayValue.textContent = birthdaySlider.value; // startwaarde laten zien
+birthdaySlider.addEventListener("input", () => {
+  birthdayValue.textContent = birthdaySlider.value; // realtime nummer updaten
+  filterItems(); // filter meteen updaten bij slider beweging
+});
 
-  birthdayValue.textContent = birthdaySlider.value; // startwaarde laten zien (wat tussen span staat)
-
-  birthdaySlider.addEventListener("input", () => {
-    birthdayValue.textContent = birthdaySlider.value; // realtime nummer updaten
-    filterItems(); // filter meteen updaten bij slider beweging
-  });
-
-}
 // =======================
 // Filter functie
 // =======================
 function filterItems() {
   const selectedDate = dateFilter.value; //datum wordt uit inputveld gehaald
-  const selectedDays = daysFilter ? (daysFilter.value ? parseInt(daysFilter.value) : null) : null; //maakt van het ingevoerde getal (string) een getal
-  const selectedAge = birthdaySlider ? parseInt(birthdaySlider.value) : null; // leeftijd uit slider
+  const selectedDays = daysFilter.value ? parseInt(daysFilter.value) : null; //maakt van het ingevoerde getal (string) een getal
+  const selectedAge = birthdaySlider.value ? parseInt(birthdaySlider.value) : null; // leeftijd uit slider
 
   items.forEach(item => {
     const gender = item.dataset.gender; //data uit html halen
@@ -121,10 +117,7 @@ continentButtons.forEach(btn => {
 // Datum & dagen filters
 // =======================
 dateFilter.addEventListener("change", filterItems); // er wordt opnieuw gefilterd als de datum wordt veranderd
-if (daysFilter) {
-  daysFilter.addEventListener("input", filterItems);
-} // er wordt opnieuw gefilterd als de dagen wordt veranderd
-
+daysFilter.addEventListener("input", filterItems); // er wordt opnieuw gefilterd als de dagen wordt veranderd
 
 
 // =======================

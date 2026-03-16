@@ -5,20 +5,25 @@
 
 /* Target het input element */
 #birthday {
-  width: 100%;       /* breedte van de slider */
-  height: 8px;        /* hoogte van de track */
-  background: var(--clr-surface);
-  border-radius: 5px;
-  -webkit-appearance: none; /* verwijder default styling voor Webkit */
+  width: 100%;
+  -webkit-appearance: none;
+  background: transparent;
+  margin-top: 2em;
+}
+
+#birthday::-webkit-slider-runnable-track {
+  height: .1em;
+  background: var(--clr-text);
+  border-radius: 1em;
 }
 
 #birthday::-webkit-slider-thumb {
   -webkit-appearance: none;
-  height: 2em;
-  width: 2em;
-  background: var(--gradient-primary);
+  width: 1.3em;
+  height: 1.3em;
+  background: var(--clr-primary);
   border-radius: 50%;
-  cursor: pointer;
+  margin-top: -.6em;
 }
 
 
@@ -136,6 +141,7 @@ h3 {
 
 /* Inputs onder hun label */
 .filter-menu input {
+  border: solid var(--clr-text) .05em;
   display: block;    
   width: 100%;           
   padding: 0.7em;

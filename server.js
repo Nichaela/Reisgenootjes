@@ -193,7 +193,7 @@ function registerPostRoutes() {
     res.redirect('/post')
   })
 
-    //route naar filter menu 
+    //route naar filter menu match
 
     app.get('/filter', async (req, res) => {
       try {
@@ -209,7 +209,7 @@ function registerPostRoutes() {
     })
 }
 
-//filter op ontdek pagina
+//route naar filter op ontdek pagina
 
 app.get('/ontdekfilter', async (req, res) => {
   try {
