@@ -11,7 +11,7 @@ const xss = require('xss')
 const validator = require('validator')
 const bcrypt = require('bcryptjs')
 
-const { MongoClient, ServerApiVersion } = require('mongodb')
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb')
 
 // ==========================================
 // 2. APP, SERVER, SOCKET.IO
@@ -95,6 +95,27 @@ function registerGetRoutes() {
   app.get('/register-success', (req, res) => {
     res.render('pages/register-success')
   })
+
+
+  app.get('/profile', async (req, res) => {
+    if (!req.session.user) return res.redirect('/login')
+    
+    try {
+      const { ObjectId } = require('mongodb')
+      const mijnReizen = await discover.find({ 
+        userId: new ObjectId(req.session.user._id) 
+      }).toArray()
+      
+      res.render('pages/profile', { 
+        user: req.session.user,
+        reizen: mijnReizen 
+      })
+    } catch (err) {
+      console.error(err)
+      res.status(500).send('Fout bij ophalen van jouw reizen')
+    }
+  })
+
  
   app.get('/dashboard', (req, res) => {
     if (!req.session.user) return res.redirect('/login')
@@ -121,8 +142,10 @@ function registerGetRoutes() {
   })
 
   app.get('/create-post', (req, res) => {
+    if (!req.session.user) return res.redirect('/welkom')  
     res.render('pages/create-post', { user: req.session.user })
   })
+
   app.get('/post', (req, res) => {
     res.render('pages/post', { user: req.session.user })
   })
@@ -130,30 +153,14 @@ function registerGetRoutes() {
   app.get('/post/:id', async (req, res) => {
     try {
       const postId = req.params.id;
-
       const post = await discover.findOne({ _id: new ObjectId(postId) });
 
       if (!post) {
         return res.status(404).send('Post niet gevonden');
       }
-  
-      // Eventueel: personenlijst (als je dat in je DB opslaat)
-      const joinedPersons = post.persons || [];
-  
-      // Stuur alles door naar EJS
-      res.render('pages/post', {
-        title: post.title,
-        startDate: post.startDate,
-        endDate: post.endDate,
-        location: post.location,
-        image: post.image || '/path/to/default.jpg', // als je images wilt
-        joinedPersons: joinedPersons,
-        gender: post.gender,
-        hobby: post.hobby || 'Geen hobby opgegeven',
-        age: post.age.join(', '), // zet array om naar string
-        discription: post.discription,
-        supplies: post.supplies
-      });
+
+      res.render('pages/post', { post });
+
     } catch (err) {
       console.error(err);
       res.status(500).send('Er ging iets mis bij het ophalen van de post');
