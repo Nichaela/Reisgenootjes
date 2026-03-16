@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../partials/head'); %>
+        <link rel="stylesheet" href="style.css"> 
+        <link rel="stylesheet" href="css/profiel.css">
+        <title>Profielpagina <%= user.name %></title>
+</head>
+
+<body>
+    <header>
+        <%- include('../partials/header'); %>
+    </header>
+    <main>
+        <% if (user) { %>
+            <p>Welkom <%= user.name %>
+            </p>
+
+                <h1 class="underline">Profiel</h1>
+                <section class="profile-pictures">
+                    <h2>Gallerij</h2>
+                    <img src="img/accounts/SophieBijZee.png" alt="Sophie bij zee">
+                    <img src="img/accounts/SophieBijBerg.png" alt="Sophie kijkt naar een berg">
+                    <img src="img/accounts/SophieBijWeiland.png" alt="een tentje in de bergen met uitzicht">
+                </section>
+
+                <section>
+                  <!-- birthday naar age uitrekenen? -->
+                    <h2><%= user.name %> • <%= user.birthday %></h2>
+                    <div class="profile-info">
+                        <ul>
+                            <li><img src="img/GenderFemale.svg"><%= user.gender %></li>
+                            <li><img src="img/location.svg">Nederland</li>
+                            <li>Nederland</li>
+                        </ul>
+                    </div>
+                </section>
+
+            <section>
+                    <h2>Interesses:</h2>
+                    <ul class="hobbies">
+                        <li class="hobby">Stedentrip</li>
+                        <li class="hobby">Duiken</li>
+                    </ul>
+            </section>
+
+            <h2>Planning</h2>
+            <ul class="reizen">
+                <% posts.forEach(post => { %>
+                <li>
+                    <a href="/post/<%= post._id %>">
+                    <!-- zonder de {post: post} krijg ik not defined -->
+                    <%- include('../partials/reisoproep', { post: post }) %>
+                    </a>
+                </li><% }) %>
+                </ul>
+            </section>
+        <% } %>
+    </main>
+
+    <footer>
+        <%- include('../partials/bottom-nav'); %>
+    </footer>
+</body>
+
+</html>

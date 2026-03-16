@@ -2,46 +2,23 @@
 <html lang="en">
 <head>
   <%- include('../partials/head'); %>
-  
+  <link rel="stylesheet" href="css/matchen.css">
 </head>
 <body>
   <main>
-
-    <% if (user) { %>
-    <p>Welkom <%= user.name %></p>
-    <% } %>
-
     <h1 class="underline" >Ontdek</h1>
     <!-- filterknop -->
-
     <!-- onderweg -->
     <!-- opzoek -->
 
-    <ul>
+    <ul class="reizen">
+      <% posts.forEach(post => { %>
       <li>
-        <a href="/discover/post">
-          <img src="/img/onderweg.png" alt="Onderweg" class="discover-img">
-          <p>datum</p>
-          <ul>
-            <li>
-              <!-- linken naar profiel -->
-              <a href="">
-                <img src="" alt="">
-              </a>
-            </li>
-            <li>
-              <a href="">
-                <img src="" alt="">
-              </a>
-            </li>
-          </ul>
-
-          <p>locatie</p>
-          <h2> titel </h2>
-
-          <!-- knopje met pijl -->
+        <a href="/post/<%= post._id %>">
+          <!-- zonder de {post: post} krijg ik not defined -->
+          <%- include('../partials/reisoproep', { post: post }) %>
         </a>
-      </li>
+      </li><% }) %>
     </ul>
 
 

@@ -1,0 +1,155 @@
+.filter-menu h2 {
+  position: absolute;
+  top: 0;
+}
+
+/* Target het input element */
+#birthday {
+  width: 100%;
+  -webkit-appearance: none;
+  background: transparent;
+  margin-top: 2em;
+}
+
+#birthday::-webkit-slider-runnable-track {
+  height: .1em;
+  background: var(--clr-text);
+  border-radius: 1em;
+}
+
+#birthday::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 1.3em;
+  height: 1.3em;
+  background: var(--clr-primary);
+  border-radius: 50%;
+  margin-top: -.6em;
+}
+
+
+/* Filter knop */
+.toggleFilter {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 0.5em 1em;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+  z-index: 2000;
+
+}
+
+/* Fullscreen menu */
+.filter-menu {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 100vw;       /* kan breder als je wilt */
+  height: 100vh;
+  background: white;
+  padding: 2em 2em; /* meer padding-top */
+  box-sizing: border-box;
+  z-index: 1000;
+
+  /* Animatie */
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+}
+
+.filter-menu ul {
+  list-style: none;
+}
+
+/* Menu zichtbaar als class show aanwezig is */
+.filter-menu.show {
+  transform: translateX(0);
+}
+
+/* Close knop linksboven */
+.close-menu {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+
+.close-menu img {
+  width: 30px;
+  height: auto;
+  margin-top: 1.5em;
+}
+
+/* Filter buttons styling */
+.filter-btn {
+  display: block;
+  margin: 0.5em 0;
+  padding: 0.3em .5em;
+  border: .05em solid var(--clr-text);
+  border-radius: 10em;
+  cursor: pointer;
+  font-size: 1em;
+  color: var(--clr-text);
+}
+
+.filter-btn.active {
+  background: var(--gradient-primary);
+  color: var(--clr-neutral);
+  border: none;
+}
+
+/* gender buttons */
+.genders {
+  display: flex;
+  flex-direction: column;
+  
+  margin-top: 5em;
+}
+
+
+.genders .buttons, .continents .buttons {
+  display: flex;
+  gap: .5em;
+  flex-wrap: wrap;         /* zodat knoppen op kleinere schermen netjes doorlopen */
+}
+
+.genders .buttons .filter-btn, .continents .buttons .filter-btn {
+  flex: 1 1 20%;           /* groeit en krimpt, minimum 30% breedte */
+  text-align: center;      /* knoppen tekst gecentreerd */
+  padding: 0.5em 1em;      /* behoud padding */
+  box-sizing: border-box;  /* zodat padding bij flex-breedte blijft */
+  max-width: 8em;
+}
+
+h3 {
+  font-size: 1em;
+  font-weight: 400;
+}
+
+
+/* Alle labels boven hun input plaatsen */
+.filter-menu label {
+  display: block;         /* Zorgt dat label op een nieuwe regel staat */
+  margin-top: 1em;        /* Ruimte boven label, voor overzicht */
+  margin-bottom: 0.5em;   /* Ruimte tussen label en input */
+  font-weight: 400;       /* Optioneel: iets opvallender */
+  font-size: 1em;
+}
+
+/* Inputs onder hun label */
+.filter-menu input {
+  border: solid var(--clr-text) .05em;
+  display: block;    
+  width: 100%;           
+  padding: 0.7em;
+  box-sizing: border-box;
+  margin-bottom: 1em;  
+  border-radius: .5em;
+  border: none;
+  background-color: var(--clr-surface);
+  color: var(--clr-input-text);
+  max-width: 30em;
+}

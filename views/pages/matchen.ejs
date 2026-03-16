@@ -2,33 +2,35 @@
 <html lang="en">
 <head>
   <%- include('../partials/head'); %>
+  <link rel="stylesheet" href="css/matchen.css">
+  <link rel="stylesheet" href="css/filter.css">
+   <script defer src="javascript/filter.js"></script>
 </head>
 <body>
   <header>
     <%- include('../partials/header'); %>
-    <link rel="stylesheet" href="css/matchen.css">
   </header>
 
   <main>
-
-  <% if (user) { %>
+   <% if (user) { %>
   <p>Welkom <%= user.name %></p>
-  <% } %>
+  <% } %> 
 
   <h1 class="underline" >Matchen</h1>
-  <!-- filterknop -->
-   <!-- like -->
-   <!-- Dislike -->
+  <%- include('../partials/filtermenu'); %>
+ 
+  
+  
 
    <section>
   <img src="img/accounts/MarkvanFlied.jpg" alt="Account foto">
   <div class="profile-info">
     <h2>Mark van Flied • 20</h2>
     <ul>
-      <li>man</li>
-      <li>55 km van jou vandaan</li>
-      <li>Reizen door Oosterijk</li>
-      <li>2 Gezamenlijke interesse</li>
+      <li><img src="img/matcheniconen/gendermale.svg">man</li>
+      <li><img src="img/matcheniconen/MapPin.svg">55 km van jou vandaan</li>
+      <li><img src="img/matcheniconen/waarreizen.svg">Reizen door Oosterijk</li>
+      <li><img src="img/matcheniconen/Smiley.svg"> Gezamenlijke interesse</li>
     </ul>
   </div>
 </section>
@@ -71,6 +73,11 @@
     <img src="img/accounts/markvoorkant.jpg" alt="mark van de voorkant">
     <img src="img/accounts/markwandelen.jpg" alt="mark die aan het wandelen is">
     <img src="img/accounts/tentje.jpg" alt="een tentje in de bergen met uitzicht">
+</section>
+
+<section>
+<button><img src="img/matcheniconen/kruis.svg" alt="Dislike"></button>
+<button><img src="img/matcheniconen/Heart.svg" alt="Like"></button>
 </section>
 
 
