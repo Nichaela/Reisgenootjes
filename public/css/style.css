@@ -166,3 +166,178 @@ button {
 .bottom-nav img {
   order: -1;
 }
+
+
+
+
+/* PARTIALS */
+
+/* reisoproep */
+.reizen {
+  width: 100%;
+  display: grid;
+  gap: 2rem;
+}
+
+.reizen a {
+  width: 100%;
+}
+.reisoproep {
+  position: relative;
+}
+.reisoproep::after {
+  position: absolute;
+  border-radius: 0.5rem;
+  inset: 0;
+  content: '';
+  background: var(--gradient-dark);
+  z-index: 1;
+  overflow: hidden;
+}
+.reisoproep>img {
+  height: 25vh;
+  width: 100%;
+  object-fit: cover;
+  border-radius: 0.5rem;
+  z-index: -1;
+  display: block;
+}
+.reisoproep span {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 2;
+  background: rgba(255,255,255,0.2);
+  backdrop-filter: blur(6px);
+  color: white;
+  font-size: 0.75rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: 5rem;
+}
+.reisoproep p {
+  position: absolute;
+  bottom: 2.5rem;
+  left: 0.75rem;
+  z-index: 2;
+  color: white;
+  font-size: 0.75rem;
+}
+.reisoproep h3 {
+  position: absolute;
+  bottom: 0.75rem;
+  left: 0.75rem;
+  z-index: 2;
+  color: white;
+  font-size: 1rem;
+  font-weight: 700;
+}
+.reisoproep button {
+  position: absolute;
+  bottom: 0.75rem;
+  right: 1rem;
+  z-index: 2;
+  background: white;
+  border: none;
+  border-radius: 50%;
+  width: 2rem;
+  height: 2rem;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+
+
+/* chatroom */
+/* source: https://medium.com/@basukori8463/build-a-real-time-chat-app-from-scratch-with-node-js-and-socket-io-9714b7076372 */
+.chat-container {
+  background: white;
+  border-radius: 0.625rem;
+  box-shadow: 0 0.625rem 1.875rem rgba(0, 0, 0, 0.3);
+  width: 25rem;
+  height: 37.5rem;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.chat-header {
+  background: #4a5568;
+  color: white;
+  padding: 1.25rem;
+  text-align: center;
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+#messages {
+  flex: 1;
+  padding: 1.25rem;
+  overflow-y: auto;
+  background: #f8f9fa;
+}
+
+.message {
+  margin-bottom: 0.9375rem;
+  padding: 0.625rem 0.9375rem;
+  background: #e3f2fd;
+  border-radius: 1.125rem;
+  max-width: 80%;
+  word-wrap: break-word;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(1.25rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.input-container {
+  display: flex;
+  padding: 1.25rem;
+  background: white;
+  border-top: 0.125rem solid #e0e0e0;
+}
+
+#messageInput {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 0.125rem solid #e0e0e0;
+  border-radius: 1.5625rem;
+  outline: none;
+  font-size: 0.875rem;
+  transition: border-color 0.3s;
+}
+
+#messageInput:focus {
+  border-color: #667eea;
+}
+
+#sendButton {
+  margin-left: 0.625rem;
+  padding: 0.75rem 1.25rem; 
+  background: #667eea;
+  color: var(--clr-neutral);
+  border: none;
+  border-radius: 1.5625rem;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s;
+}
+
+#sendButton:hover {
+  background: #5a6fd8;
+}
+
+.typing-indicator {
+  font-style: italic;
+  color: #666;
+  padding: 0.3125rem 0.9375rem;
+  font-size: 0.9rem;
+}
