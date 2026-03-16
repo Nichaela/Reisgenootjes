@@ -162,9 +162,15 @@ function registerGetRoutes() {
     
   //
 
-  // hier is Stiene nu mee bezig
+  // Matchen route
   app.get('/matchen', (req, res) => {
     res.render('pages/matchen', { user: req.session.user })
+  })
+  //
+
+    // profiel route
+  app.get('/profiel', (req, res) => {
+    res.render('pages/profiel', { user: req.session.user })
   })
   //
  
