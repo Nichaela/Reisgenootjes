@@ -3,9 +3,9 @@
 
 <head>
     <%- include('../partials/head'); %>
-         <link rel="stylesheet" href="style.css">
+        <link rel="stylesheet" href="css/matchen.css">
         <link rel="stylesheet" href="css/profiel.css">
-        <title>Profielpagina</title>
+        <title>Profielpagina <%= user.name %></title>
 </head>
 
 <body>
@@ -16,9 +16,7 @@
         <% if (user) { %>
             <p>Welkom <%= user.name %>
             </p>
-            <% } %>
-
-                <h1 class="underline">Matchen</h1>
+                <h1 class="underline">Welkom <%= user.name %></h1>
                 <section class="profile-pictures">
                     <h2>Gallerij</h2>
                     <img src="img/accounts/SophieBijZee.png" alt="Sophie bij zee">
@@ -26,10 +24,12 @@
                     <img src="img/accounts/SophieBijWeiland.png" alt="een tentje in de bergen met uitzicht">
                 </section>
                 <section>
-                    <h2>Sophie van Dam • 23</h2>
+                  <!-- birthday naar age uitrekenen? -->
+                    <h2><%= user.name %> • <%= user.birthday %></h2>
                     <div class="profile-info">
                         <ul>
-                            <li>Vrouw</li>
+                            <li><%= user.gender %></li>
+                          <!-- locatie ophalen hoe? -->
                             <li>Nederland</li>
                         </ul>
                     </div>
@@ -49,20 +49,44 @@
                         <li class="hobby">Muziek</li>
                         <li class="hobby">Hiken</li>
                     </ul>
-                </section>
+                </div>
+            </section>
+
+            <section>
+            <!-- dit moet nog uit de db -->
+                <p>State • Opzoek naar reisgenootje</p>
+                <h2>Bio</h2>
+                <p><%= user.bio %></p>
+            </section>
+
+            <!-- dit moet nog uit de db -->
+            <section>
+                <ul class="hobbies">
+                    <li class="hobby">Sport</li>
+                    <li class="hobby">Reizen</li>
+                    <li class="hobby">Muziek</li>
+                    <li class="hobby">Hiken</li>
+                </ul>
+            </section>
 
 
-                <h2>Planning</h2>
-                <article class="reisoproep">
-                    <img src="img/test-cover.jpg" alt="cover dolemietenreis">
-                    <span>20 apr – 26 apr</span>
-                    <p>Italië</p>
-                    <h3>Tocht door de Dolomieten</h3>
-                    <button>→</button>
-                </article>
-                </section>
-
+            <h2>Planning</h2>
+            <ul class="discover">
+                <% posts.forEach(post => { %>
+                <li>
+                    <a href="/post/<%= post._id %>">
+                    <!-- zonder de {post: post} krijg ik not defined -->
+                    <%- include('../partials/reisoproep', { post: post }) %>
+                    </a>
+                </li><% }) %>
+                </ul>
+            </section>
+        <% } %>
     </main>
+
+    <footer>
+        <%- include('../partials/bottom-nav'); %>
+    </footer>
 </body>
 
 </html>
