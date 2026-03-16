@@ -299,7 +299,6 @@ function registerPostRoutes() {
       interests: user.interests,
       opzoek: user.opzoek
     }
-
     return res.redirect('/discover')
   })
 
