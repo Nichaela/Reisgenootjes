@@ -298,7 +298,6 @@ function registerPostRoutes() {
  
     return res.redirect('/discover')
   })
-})
  
  
   // Register
@@ -426,7 +425,7 @@ app.get('/ontdekfilter', async (req, res) => {
 
     return res.redirect(`/post/${result.insertedId}`)
   })
-}
+
 
 
 
