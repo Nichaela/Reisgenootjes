@@ -14,20 +14,19 @@
 
   </header>
 
-  <ul class="all">
-    <% users.forEach(user => { %>
-      <li 
-        data-gender="<%= user.gender %>" 
-        data-date="<%= user.date %>" 
-        data-days="<%= user.days %>" 
-        data-continent="<%= user.continent %>" 
-        data-birthday="<%= user.birthday %>">
-        
-        <%= user.name %>
-  
-      </li>
-    <% }) %>
-  </ul>
+ <!-- Lijst met gebruikers -->
+<ul class="all">
+  <% users.forEach(user => { %>
+    <li
+      data-gender="<%= user.gender %>"
+      data-continent="<%= user.location %>"
+      data-date="<%= user.startDate %>"
+      data-birthday="<%= user.birthday %>"
+    >
+      <%= user.name %>
+    </li>
+  <% }) %>
+</ul>
 
   <script defer src="javascript/filter.js"></script>
 

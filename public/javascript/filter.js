@@ -22,7 +22,7 @@ let activeContinents = new Set();    // continent
 // =======================
 if (birthdaySlider && birthdayValue) {
 
-  birthdayValue.textContent = birthdaySlider.value; // startwaarde laten zien (wat tussen span staat)
+  birthdayValue.textContent = birthdaySlider.value; // startwaarde laten zien
 
   birthdaySlider.addEventListener("input", () => {
     birthdayValue.textContent = birthdaySlider.value; // realtime nummer updaten
@@ -34,35 +34,40 @@ if (birthdaySlider && birthdayValue) {
 // Filter functie
 // =======================
 function filterItems() {
-  const selectedDate = dateFilter.value; //datum wordt uit inputveld gehaald
-  const selectedDays = daysFilter ? (daysFilter.value ? parseInt(daysFilter.value) : null) : null; //maakt van het ingevoerde getal (string) een getal
-  const selectedAge = birthdaySlider ? parseInt(birthdaySlider.value) : null; // leeftijd uit slider
+  const selectedDate = dateFilter.value;
+  const selectedAge = birthdaySlider ? parseInt(birthdaySlider.value) : null;
 
   items.forEach(item => {
-    const gender = item.dataset.gender; //data uit html halen
-    const continent = item.dataset.continent; 
+    const gender = item.dataset.gender;
+    const continent = item.dataset.continent;
     const date = item.dataset.date;
-    const days = parseInt(item.dataset.days); //hetzelfde, maar omzetten string naar getal
+    const itemBirthday = item.dataset.birthday;
+    const age = calculateAge(itemBirthday);
 
-    const itemBirthday = item.dataset.birthday; // birthday van item
-    const age = calculateAge(itemBirthday); // bereken leeftijd
+    let showItem = true;
 
-    let showItem = true; //standaard = item laten zien, kan later veranderen naar false
+    // Gender filter
+    if (activeFilters.size > 0 && !activeFilters.has(gender)) showItem = false;
 
-    if (activeFilters.size > 0 && !activeFilters.has(gender)) showItem = false; //als er een filter is geselecteerd EN het item hoort niet bij het filter = verberg item
+    // Continent filter
     if (activeContinents.size > 0 && !activeContinents.has(continent)) showItem = false;
-    if (selectedDate && date !== selectedDate) showItem = false; //als een datum is gekozen EN datum van item is anders = verberg item
-    if (selectedDays !== null && days < selectedDays) showItem = false; //als er datum is gekozen EN item heeft minder dagen = verberg item
-    
-    const ageMargin = 5; // marge van 10 jaar
+
+    // Datum filter (alleen vanaf geselecteerde datum)
+    if (selectedDate) {
+      const selected = new Date(selectedDate);
+      const itemDate = new Date(date);
+      if (itemDate < selected) showItem = false;
+    }
+
+    // Leeftijd filter
+    const ageMargin = 5;
     if (selectedAge !== null && (age < selectedAge - ageMargin || age > selectedAge + ageMargin)) {
       showItem = false;
-    } //controle of er leeftijd is ingevuld EN komt de leeftijd van item overeen met ingoerde leeftijd
+    }
 
-    item.style.display = showItem ? "block" : "none"; //bij showitem -> display block & bij else -> display none
+    item.style.display = showItem ? "block" : "none";
   });
 }
-
 // =======================
 // Open/close menu
 // =======================
@@ -121,10 +126,7 @@ continentButtons.forEach(btn => {
 // Datum & dagen filters
 // =======================
 dateFilter.addEventListener("change", filterItems); // er wordt opnieuw gefilterd als de datum wordt veranderd
-if (daysFilter) {
-  daysFilter.addEventListener("input", filterItems);
-} // er wordt opnieuw gefilterd als de dagen wordt veranderd
-
+daysFilter.addEventListener("input", filterItems); // er wordt opnieuw gefilterd als de dagen wordt veranderd
 
 
 // =======================
