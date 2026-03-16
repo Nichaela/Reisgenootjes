@@ -7,11 +7,15 @@ const express = require('express')
 const session = require('express-session')
 const http = require('http')
 const socketIo = require('socket.io')
+
 const xss = require('xss')
 const validator = require('validator')
 const bcrypt = require('bcryptjs')
 
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb')
+
+const nodemailer = require('nodemailer')
+const crypto = require('crypto')
 
 // ==========================================
 // 2. APP, SERVER, SOCKET.IO
@@ -40,7 +44,7 @@ io.engine.use(sessionMiddleware)
 
 // Construct URL used to connect to database from info in the .env file
 const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}/${process.env.DB_NAME}?retryWrites=true&w=majority`
- 
+
 // Create a MongoClient
 const client = new MongoClient(uri, {
   serverApi: {
@@ -49,11 +53,11 @@ const client = new MongoClient(uri, {
     deprecationErrors: true,
   },
 })
- 
+
 // database collections
 let users
 let discover;
- 
+
 // ==========================================
 // 4. MIDDLEWARE (Algemeen)
 // ==========================================
@@ -71,13 +75,13 @@ app.use((req, res, next) => {
   }
   next()
 })
- 
+
 // ==========================================
 // 5. ROUTES (GET - Pagina's bekijken)
 // ==========================================
- 
+
 function registerGetRoutes() {
- 
+
   app.get('/', (req, res) => {
     res.render('pages/index', { data: null })
   })
@@ -85,16 +89,16 @@ function registerGetRoutes() {
   app.get('/welkom', (req, res) => {
     res.render('pages/welkom', { error: null })
   })
- 
+
   // hier is Roos nu mee bezig
   app.get('/login', (req, res) => {
     res.render('pages/login', { error: null })
   })
-  
+
   app.get('/register', (req, res) => {
     res.render('pages/register', { error: null })
   })
- 
+
   app.get('/register-success', (req, res) => {
     res.render('pages/register-success')
   })
@@ -102,16 +106,16 @@ function registerGetRoutes() {
 
   app.get('/profile', async (req, res) => {
     if (!req.session.user) return res.redirect('/login')
-    
+
     try {
       const { ObjectId } = require('mongodb')
-      const mijnReizen = await discover.find({ 
-        userId: new ObjectId(req.session.user._id) 
+      const mijnReizen = await discover.find({
+        userId: new ObjectId(req.session.user._id)
       }).toArray()
-      
-      res.render('pages/profile', { 
+
+      res.render('pages/profile', {
         user: req.session.user,
-        reizen: mijnReizen 
+        reizen: mijnReizen
       })
     } catch (err) {
       console.error(err)
@@ -119,7 +123,7 @@ function registerGetRoutes() {
     }
   })
 
- 
+
   app.get('/dashboard', (req, res) => {
     if (!req.session.user) return res.redirect('/login')
     res.render('pages/dashboard', { user: req.session.user })
@@ -130,8 +134,8 @@ function registerGetRoutes() {
   app.get('/discover', async (req, res) => {
     try {
       const posts = await discover.find({}).toArray(); // alle posts ophalen
-  
-      res.render('pages/discover', { 
+
+      res.render('pages/discover', {
         user: req.session.user,
         posts: posts
       });
@@ -145,7 +149,7 @@ function registerGetRoutes() {
   })
 
   app.get('/create-post', (req, res) => {
-    if (!req.session.user) return res.redirect('/welkom')  
+    if (!req.session.user) return res.redirect('/welkom')
     res.render('pages/create-post', { user: req.session.user })
   })
 
@@ -169,7 +173,7 @@ function registerGetRoutes() {
       res.status(500).send('Er ging iets mis bij het ophalen van de post');
     }
   });
-    
+
   //
 
   // Matchen route
@@ -178,20 +182,20 @@ function registerGetRoutes() {
   })
   //
 
-    // profiel route
+  // profiel route
   app.get('/profiel', async (req, res) => {
     if (!req.session.user) return res.redirect('/login')
-  
+
     try {
-      const mijnPosts = await discover.find({ 
-        userId: new ObjectId(req.session.user._id) 
+      const mijnPosts = await discover.find({
+        userId: new ObjectId(req.session.user._id)
       }).toArray()
-  
-      res.render('pages/profiel', { 
+
+      res.render('pages/profiel', {
         user: req.session.user,
         posts: mijnPosts
       })
-  
+
     } catch (err) {
       console.error(err)
       res.status(500).send('Fout bij ophalen van profiel')
@@ -235,29 +239,28 @@ function registerGetRoutes() {
       name: chatPartner.name
     }
   })
-})
-  
+
   app.get('/logout', (req, res) => {
     req.session.destroy(() => {
       res.redirect('/login')
     })
   })
 }
- 
-    //route naar annabels pagina
 
-    app.get('/filter', async (req, res) => {
-      try {
-        const myUsers = await users
-          .find({}) // alleen jouw records
-          .toArray();
-    
-        res.render('pages/filter', { users: myUsers });
-      } catch (err) {
-        console.error(err);
-        res.status(500).send("Fout bij ophalen data");
-      }
-    })
+//route naar annabels pagina
+
+app.get('/filter', async (req, res) => {
+  try {
+    const myUsers = await users
+      .find({}) // alleen jouw records
+      .toArray();
+
+    res.render('pages/filter', { users: myUsers });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Fout bij ophalen data");
+  }
+})
 
 // ==========================================
 // 6. POST ROUTES (Data verwerken)
@@ -276,12 +279,12 @@ function registerPostRoutes() {
     if (!user) {
       return res.status(401).render('pages/login', { error: 'Onbekende gebruiker' })
     }
- 
+
     const passwordMatch = await bcrypt.compare(password, user.password)
     if (!passwordMatch) {
       return res.status(401).render('pages/login', { error: 'Ongeldig wachtwoord' })
     }
- 
+
     req.session.user = {
       _id: user._id,
       email: user.email,
@@ -295,19 +298,23 @@ function registerPostRoutes() {
       interests: user.interests,
       opzoek: user.opzoek
     }
- 
+
     return res.redirect('/discover')
   })
-})
- 
- 
+
+  // wachtwoord resetten
+  app.get('/forgot-password', (req, res) => {
+    res.render('pages/forgot-password', { error: null, success: null })
+  })
+
+
   // Register
   app.post('/register', async (req, res) => {
     const { name, lastName, email, password, username, birthday,
       tel, gender, profile, image1, image2, image3, status,
       bio, interests, opzoek
     } = req.body
- 
+
     // validator checks
     if (!validator.isEmail(email)) {
       return res.status(400).render('pages/register', { error: 'Ongeldig emailadres' })
@@ -322,7 +329,7 @@ function registerPostRoutes() {
 
     // password hashing
     const hashedPassword = await bcrypt.hash(password, 10)
-        
+
     const result = await users.insertOne({
       name,
       lastName,
@@ -349,7 +356,7 @@ function registerPostRoutes() {
       email: nieuweUser.email,
       name: nieuweUser.name
     }
- 
+
     return res.redirect('/discover')
   })
 
@@ -360,28 +367,28 @@ function registerPostRoutes() {
     res.redirect('/post')
   })
 
-    //route naar filter menu match
+  //route naar filter menu match
 
-app.get('/filter', async (req, res) => {
-  try {
-    const db = client.db(process.env.DB_NAME);
+  app.get('/filter', async (req, res) => {
+    try {
+      const db = client.db(process.env.DB_NAME);
 
-    const usersCollection = db.collection('users');
-    const discoverCollection = db.collection('discover');
+      const usersCollection = db.collection('users');
+      const discoverCollection = db.collection('discover');
 
-    // Alleen ophalen wanneer nodig
-    const myUsers = await usersCollection.find({}).toArray();
-    const myDiscover = await discoverCollection.find({}).toArray();
+      // Alleen ophalen wanneer nodig
+      const myUsers = await usersCollection.find({}).toArray();
+      const myDiscover = await discoverCollection.find({}).toArray();
 
-    // Combineer als je wilt
-    const combinedData = [...myUsers, ...myDiscover];
+      // Combineer als je wilt
+      const combinedData = [...myUsers, ...myDiscover];
 
-    res.render('pages/filter', { users: combinedData });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Fout bij ophalen data");
-  }
-})
+      res.render('pages/filter', { users: combinedData });
+    } catch (err) {
+      console.error(err);
+      res.status(500).send("Fout bij ophalen data");
+    }
+  })
 }
 
 //route naar filter op ontdek pagina
@@ -389,7 +396,7 @@ app.get('/filter', async (req, res) => {
 app.get('/ontdekfilter', async (req, res) => {
   try {
     const myUsers = await users
-      .find({}) 
+      .find({})
       .toArray();
 
     res.render('pages/ontdekfilter', { users: myUsers });
@@ -398,35 +405,34 @@ app.get('/ontdekfilter', async (req, res) => {
     res.status(500).send("Fout bij ophalen data");
   }
 })
-  //create-post formulier 
-  app.post('/post', async (req, res) => {
-    if (!req.session.user) return res.redirect('/login')
-    const { title, startDate, endDate, location, persons, discription, gender } = req.body;
+//create-post formulier 
+app.post('/post', async (req, res) => {
+  if (!req.session.user) return res.redirect('/login')
+  const { title, startDate, endDate, location, persons, discription, gender } = req.body;
 
-    let age = req.body.age;
-    if (!Array.isArray(age)) {
-      age = age ? [age] : [];
-    }
-    
-    // Supplies als array van nieuwe regels
-    const supplies = req.body.supplies ? req.body.supplies.split('\n') : [];
+  let age = req.body.age;
+  if (!Array.isArray(age)) {
+    age = age ? [age] : [];
+  }
 
-    const result = await discover.insertOne({ 
-      userId: new ObjectId(req.session.user._id), // koppeling aan gebruiker die ingelogd is
-      title,
-      startDate,
-      endDate,
-      location,
-      persons,
-      discription,
-      supplies,
-      age,
-      gender
-    })
+  // Supplies als array van nieuwe regels
+  const supplies = req.body.supplies ? req.body.supplies.split('\n') : [];
 
-    return res.redirect(`/post/${result.insertedId}`)
+  const result = await discover.insertOne({
+    userId: new ObjectId(req.session.user._id), // koppeling aan gebruiker die ingelogd is
+    title,
+    startDate,
+    endDate,
+    location,
+    persons,
+    discription,
+    supplies,
+    age,
+    gender
   })
-}
+
+  return res.redirect(`/post/${result.insertedId}`)
+})
 
 
 
@@ -489,57 +495,61 @@ function registerSocketHandlers() {
     })
   })
 }
- 
+
+// Middleware to handle not found errors - error 404
+
+    
+    
  
 // ==========================================
 // 8. ERROR HANDLING & SERVER START
 // ==========================================
- 
+
 function registerErrorHandlers() {
   // Middleware to handle not found errors - error 404
-    app.use((req, res) => {
-      if (req.url === '/.well-known/appspecific/com.chrome.devtools.json') {
-        return res.sendStatus(204)
-      }
-      console.error('404 error at URL: ' + req.url)
-       res.status(404).render('pages/errorstate', {
-    status: 404,
-    message: 'Pagina niet gevonden'
-  })
+  app.use((req, res) => {
+    if (req.url === '/.well-known/appspecific/com.chrome.devtools.json') {
+      return res.sendStatus(204)
+    }
+    console.error('404 error at URL: ' + req.url)
+    res.status(404).render('pages/errorstate', {
+      status: 404,
+      message: 'Pagina niet gevonden'
     })
- 
+  })
 
- // error handler
-app.use(function (err, req, res) {
-  console.error(err.stack)
-  res.status(500).send('500: server error')
-})
+
+  // error handler
+  app.use(function (err, req, res) {
+    console.error(err.stack)
+    res.status(500).send('500: server error')
+  })
 }
 
 async function start() {
   try {
     await client.connect()
     console.log('Database connection established')
- 
+
     const db = client.db(process.env.DB_NAME)
     users = db.collection(process.env.DB_COLLECTION)
 
     discover = db.collection('discover')
- 
+
     // Routes registreren
 
     registerGetRoutes()
     registerPostRoutes()
     registerSocketHandlers()
     registerErrorHandlers()
- 
+
     // Server starten
 
     const port = process.env.PORT || 3000
     server.listen(port, () => {
       console.log(`Server draait op poort ${port}`)
     })
- 
+
   } catch (err) {
     console.log('Database connection error:', err)
     console.log('For uri -', uri)
