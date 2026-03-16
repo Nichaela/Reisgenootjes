@@ -9,14 +9,15 @@
     flex-direction: row;
    }
 }
+
 .chat-info {
     display: flex;
     flex-direction: column;
 }
 
 .profile-pic-wrapper { 
-    width: 150px;
-    height: 150px;
+    width: 100px;
+    height: 100px;
     border-radius: 100%; 
     overflow: hidden; 
     display: flex; 
@@ -41,6 +42,7 @@
     flex-direction: column;
     overflow: hidden;
 }
+
 .chat-header {
     background: #4a5568;
     color: white;
@@ -49,12 +51,14 @@
     font-size: 1.2em;
     font-weight: bold;
 }
+
 #messages {
     flex: 1;
     padding: 20px;
     overflow-y: auto;
     background: #f8f9fa;
 }
+
 .message {
     margin-bottom: 15px;
     padding: 10px 15px;
@@ -64,6 +68,7 @@
     word-wrap: break-word;
     animation: slideIn 0.3s ease-out;
 }
+
 @keyframes slideIn {
     from {
         opacity: 0;
@@ -74,12 +79,14 @@
         transform: translateY(0);
     }
 }
+
 .input-container {
     display: flex;
     padding: 20px;
     background: white;
     border-top: 1px solid #e0e0e0;
 }
+
 #messageInput {
     flex: 1;
     padding: 12px 16px;
@@ -89,9 +96,11 @@
     font-size: 14px;
     transition: border-color 0.3s;
 }
+
 #messageInput:focus {
     border-color: #667eea;
 }
+
 #sendButton {
     margin-left: 10px;
     padding: 12px 20px;
@@ -103,9 +112,11 @@
     font-weight: bold;
     transition: background 0.3s;
 }
+
 #sendButton:hover {
     background: #5a6fd8;
 }
+
 .typing-indicator {
     font-style: italic;
     color: #666;
