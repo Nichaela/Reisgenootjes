@@ -3,231 +3,242 @@
 
 <head>
   <%- include('../partials/head'); %>
-
+  <link rel="stylesheet" href="css/form.css">
 </head>
 
 <body>
-  <header>
-    <%- include('../partials/header'); %>
-      <link rel="stylesheet" href="css/form.css">
-  </header>
 
   <main>
+
+    <!-- from van alle pagina's -->
+    <form method="POST" action="/register" class="multi-step-form">
+      <h1 class="underline">Maak jou profiel</h1>
+      <section class="form-step form-active"> <!-- eerste deel -->
+
+        <a href="welkom" class="back-button">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M27.7501 16C27.7501 16.1989 27.6711 16.3896 27.5304 16.5303C27.3898 16.671 27.199 16.75 27.0001 16.75H6.81132L14.5301 24.47C14.6038 24.5386 14.6629 24.6214 14.7039 24.7134C14.7448 24.8054 14.7669 24.9047 14.7687 25.0054C14.7704 25.1062 14.7519 25.2062 14.7142 25.2996C14.6765 25.393 14.6203 25.4778 14.5491 25.549C14.4779 25.6202 14.3931 25.6764 14.2997 25.7141C14.2063 25.7518 14.1063 25.7703 14.0056 25.7686C13.9048 25.7668 13.8055 25.7447 13.7135 25.7038C13.6215 25.6628 13.5387 25.6037 13.4701 25.53L4.47007 16.53C4.32962 16.3893 4.25073 16.1987 4.25073 16C4.25073 15.8012 4.32962 15.6106 4.47007 15.47L13.4701 6.46997C13.6122 6.33749 13.8003 6.26537 13.9946 6.26879C14.1889 6.27222 14.3743 6.35093 14.5117 6.48835C14.6491 6.62576 14.7278 6.81114 14.7312 7.00545C14.7347 7.19975 14.6626 7.38779 14.5301 7.52997L6.81132 15.25H27.0001C27.199 15.25 27.3898 15.329 27.5304 15.4696C27.6711 15.6103 27.7501 15.8011 27.7501 16Z"
+              fill="#154159" />
+          </svg>
+        </a>
+
+        <div class="voortgangsbalk">
+          <div class="voortgangsbalk-active"></div>
+          <div class="voortgangsbalk-inactive"></div>
+          <div class="voortgangsbalk-inactive"></div>
+          <div class="voortgangsbalk-inactive"></div>
+        </div>
+
+        <p>Hier iets van tekst nog</p>
+        <h2>Account aanmaken</h2>
+
+
+        <label for="name">Voornaam</label>
+        <input type="text" id="name" name="name" required>
+
+        <label for="lastName">Achternaam:</label>
+        <input type="text" id="lastName" name="lastName" required>
+
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required>
+
+        <label for="password">Wachtwoord</label>
+        <input type="password" id="password" name="password" required>
+
+        <label for="confirmPassword">Herhaal wachtwoord</label>
+        <input type="password" id="confirmPassword" name="confirmPassword" required>
+
+        <button type="button" class="gradient-btn" data-next>Volgende</button>
+
+      </section>
+      <section class="form-step"> <!--tweede deel-->
+
+        <button type="button" data-prev>
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M27.7501 16C27.7501 16.1989 27.6711 16.3896 27.5304 16.5303C27.3898 16.671 27.199 16.75 27.0001 16.75H6.81132L14.5301 24.47C14.6038 24.5386 14.6629 24.6214 14.7039 24.7134C14.7448 24.8054 14.7669 24.9047 14.7687 25.0054C14.7704 25.1062 14.7519 25.2062 14.7142 25.2996C14.6765 25.393 14.6203 25.4778 14.5491 25.549C14.4779 25.6202 14.3931 25.6764 14.2997 25.7141C14.2063 25.7518 14.1063 25.7703 14.0056 25.7686C13.9048 25.7668 13.8055 25.7447 13.7135 25.7038C13.6215 25.6628 13.5387 25.6037 13.4701 25.53L4.47007 16.53C4.32962 16.3893 4.25073 16.1987 4.25073 16C4.25073 15.8012 4.32962 15.6106 4.47007 15.47L13.4701 6.46997C13.6122 6.33749 13.8003 6.26537 13.9946 6.26879C14.1889 6.27222 14.3743 6.35093 14.5117 6.48835C14.6491 6.62576 14.7278 6.81114 14.7312 7.00545C14.7347 7.19975 14.6626 7.38779 14.5301 7.52997L6.81132 15.25H27.0001C27.199 15.25 27.3898 15.329 27.5304 15.4696C27.6711 15.6103 27.7501 15.8011 27.7501 16Z"
+              fill="#154159" />
+          </svg>
+        </button>
+
+        <div class="voortgangsbalk">
+          <div class="voortgangsbalk-active"></div>
+          <div class="voortgangsbalk-active"></div>
+          <div class="voortgangsbalk-inactive"></div>
+          <div class="voortgangsbalk-inactive"></div>
+        </div>
+
+        <p>Hier iets van tekst nog</p>
+        <h2>Persoonlijke gegevens</h2>
+
+        <label for="username">Naam</label>
+        <input type="text" id="username" name="username" required>
+
+        <label for="birthday">Verjaardag</label>
+        <input type="date" name="birthday" id="birthday" required>
+
+        <label for="tel">Telefoon</label>
+        <input type="tel" id="tel" name="tel">
+
+        <label for="gender">Gender</label>
+        <select name="gender" id="gender" required>
+          <option value="">Kies je gender</option>
+          <option value="man">Man</option>
+          <option value="vrouw">Vrouw</option>
+          <option value="anders">Anders</option>
+        </select>
+
+        <button type="button" class="gradient-btn" data-next>Volgende</button>
+      </section>
+
+      <section class="form-step"> <!--derde deel-->
+
+        <button type="button" data-prev>
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M27.7501 16C27.7501 16.1989 27.6711 16.3896 27.5304 16.5303C27.3898 16.671 27.199 16.75 27.0001 16.75H6.81132L14.5301 24.47C14.6038 24.5386 14.6629 24.6214 14.7039 24.7134C14.7448 24.8054 14.7669 24.9047 14.7687 25.0054C14.7704 25.1062 14.7519 25.2062 14.7142 25.2996C14.6765 25.393 14.6203 25.4778 14.5491 25.549C14.4779 25.6202 14.3931 25.6764 14.2997 25.7141C14.2063 25.7518 14.1063 25.7703 14.0056 25.7686C13.9048 25.7668 13.8055 25.7447 13.7135 25.7038C13.6215 25.6628 13.5387 25.6037 13.4701 25.53L4.47007 16.53C4.32962 16.3893 4.25073 16.1987 4.25073 16C4.25073 15.8012 4.32962 15.6106 4.47007 15.47L13.4701 6.46997C13.6122 6.33749 13.8003 6.26537 13.9946 6.26879C14.1889 6.27222 14.3743 6.35093 14.5117 6.48835C14.6491 6.62576 14.7278 6.81114 14.7312 7.00545C14.7347 7.19975 14.6626 7.38779 14.5301 7.52997L6.81132 15.25H27.0001C27.199 15.25 27.3898 15.329 27.5304 15.4696C27.6711 15.6103 27.7501 15.8011 27.7501 16Z"
+              fill="#154159" />
+          </svg>
+        </button>
+
+        <div class="voortgangsbalk">
+          <div class="voortgangsbalk-active"></div>
+          <div class="voortgangsbalk-active"></div>
+          <div class="voortgangsbalk-active"></div>
+          <div class="voortgangsbalk-inactive"></div>
+        </div>
+
+        <p>Hier iets van tekst nog</p>
+        <h2>Profiel</h2>
+
+        <input type="file" name="profile" accept="image/*">
+        <input type="file" name="image1" accept="image/*">
+        <input type="file" name="image2" accept="image/*">
+        <input type="file" name="image3" accept="image/*">
+
+        <label for="status">Status</label>
+        <select name="status" id="status" required>
+          <option value="">Kies je status</option>
+          <option value="Student">Opzoek naar reisgenootje</option>
+          <option value="Werkend">Niet opzoek</option>
+        </select>
+
+        <label for="Bio">Bio</label>
+        <input type="text" name="bio" id="bio">
+
+        <label for="opzoek">Opzoek naar</label>
+        <input type="text" name="opzoek" id="opzoek">
+
+        <button type="button" class="gradient-btn" data-next>Volgende</button>
+      </section>
+
+      <section class="form-step"> <!--vierde deel-->
+
+        <button type="button" data-prev>
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M27.7501 16C27.7501 16.1989 27.6711 16.3896 27.5304 16.5303C27.3898 16.671 27.199 16.75 27.0001 16.75H6.81132L14.5301 24.47C14.6038 24.5386 14.6629 24.6214 14.7039 24.7134C14.7448 24.8054 14.7669 24.9047 14.7687 25.0054C14.7704 25.1062 14.7519 25.2062 14.7142 25.2996C14.6765 25.393 14.6203 25.4778 14.5491 25.549C14.4779 25.6202 14.3931 25.6764 14.2997 25.7141C14.2063 25.7518 14.1063 25.7703 14.0056 25.7686C13.9048 25.7668 13.8055 25.7447 13.7135 25.7038C13.6215 25.6628 13.5387 25.6037 13.4701 25.53L4.47007 16.53C4.32962 16.3893 4.25073 16.1987 4.25073 16C4.25073 15.8012 4.32962 15.6106 4.47007 15.47L13.4701 6.46997C13.6122 6.33749 13.8003 6.26537 13.9946 6.26879C14.1889 6.27222 14.3743 6.35093 14.5117 6.48835C14.6491 6.62576 14.7278 6.81114 14.7312 7.00545C14.7347 7.19975 14.6626 7.38779 14.5301 7.52997L6.81132 15.25H27.0001C27.199 15.25 27.3898 15.329 27.5304 15.4696C27.6711 15.6103 27.7501 15.8011 27.7501 16Z"
+              fill="#154159" />
+          </svg>
+        </button>
+
+        <div class="voortgangsbalk">
+          <div class="voortgangsbalk-active"></div>
+          <div class="voortgangsbalk-active"></div>
+          <div class="voortgangsbalk-active"></div>
+          <div class="voortgangsbalk-active"></div>
+        </div>
+
+        <p>Welke manieren van reizen spreken jou aan?</p>
+        <p>Selecteer 5 onderwerpen</p>
+
+        <div class="options">
+          <label class="option">
+            <input type="checkbox" name="interests" value="Backpacken">
+            <span>Backpacken</span>
+          </label>
+
+          <label class="option">
+            <input type="checkbox" name="interests" value="Kanoën">
+            <span>Kanoën</span>
+          </label>
+
+          <label class="option">
+            <input type="checkbox" name="interests" value="Zeilen">
+            <span>Zeilen</span>
+          </label>
+
+          <label class="option">
+            <input type="checkbox" name="interests" value="Auto">
+            <span>Auto</span>
+          </label>
+
+          <label class="option">
+            <input type="checkbox" name="interests" value="Trein">
+            <span>Trein</span>
+          </label>
+
+          <label class="option">
+            <input type="checkbox" name="interests" value="Huttentocht">
+            <span>Huttentocht</span>
+          </label>
+
+          <label class="option">
+            <input type="checkbox" name="interests" value="Kamperen">
+            <span>Kamperen</span>
+          </label>
+
+          <label class="option">
+            <input type="checkbox" name="interests" value="Stedentrip">
+            <span>Stedentrip</span>
+          </label>
+
+          <label class="option">
+            <input type="checkbox" name="interests" value="Liften">
+            <span>Liften</span>
+          </label>
+
+          <label class="option">
+            <input type="checkbox" name="interests" value="Fietsen">
+            <span>Fietsen</span>
+          </label>
+
+          <label class="option">
+            <input type="checkbox" name="interests" value="Camper">
+            <span>Camper</span>
+          </label>
+
+          <label class="option">
+            <input type="checkbox" name="interests" value="Roadtrip">
+            <span>Roadtrip</span>
+          </label>
+
+          <label class="option">
+            <input type="checkbox" name="interests" value="Duiken">
+            <span>Duiken</span>
+          </label>
+
+          <label class="option">
+            <input type="checkbox" name="interests" value="Hiken">
+            <span>Hiken</span>
+          </label>
+
+          <label class="option">
+            <input type="checkbox" name="interests" value="Zuipen">
+            <span>Zuipen</span>
+          </label>
+        </div>
+
+        <input class="gradient-btn" type="submit" value="Profiel aanmaken">
+      </section>
+    </form>
+
     <% if (error) { %>
       <p class="error">
         <%= error %>
       </p>
-      <% } %>
-
-        <!-- from van alle pagina's -->
-        <form method="POST" action="/register" class="multi-step-form">
-          <h1 class="underline">Maak jou profiel</h1>
-          <section class="form-step form-active"> <!-- eerste deel -->
-
-            <div class="voortgangsbalk">
-              <div class="voortgangsbalk-active"></div>
-              <div class="voortgangsbalk-inactive"></div>
-              <div class="voortgangsbalk-inactive"></div>
-              <div class="voortgangsbalk-inactive"></div>
-            </div>
-
-            <p>Hier iets van tekst nog</p>
-            <h2>Account aanmaken</h2>
-
-
-            <label for="name">Voornaam</label>
-            <input type="text" id="name" name="name" required>
-
-            <label for="lastName">Achternaam:</label>
-            <input type="text" id="lastName" name="lastName" required>
-
-            <label for="email">Email</label>
-            <input type="email" id="email" name="email" required>
-
-            <label for="password">Wachtwoord</label>
-            <input type="password" id="password" name="password" required>
-
-            <label for="confirmPassword">Herhaal wachtwoord</label>
-            <input type="password" id="confirmPassword" name="confirmPassword" required>
-
-            <button type="button" class="gradient-btn" data-next>Volgende</button>
-
-          </section>
-          <section class="form-step"> <!--tweede deel-->
-
-            <button type="button" data-prev>
-              <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M27.7501 16C27.7501 16.1989 27.6711 16.3896 27.5304 16.5303C27.3898 16.671 27.199 16.75 27.0001 16.75H6.81132L14.5301 24.47C14.6038 24.5386 14.6629 24.6214 14.7039 24.7134C14.7448 24.8054 14.7669 24.9047 14.7687 25.0054C14.7704 25.1062 14.7519 25.2062 14.7142 25.2996C14.6765 25.393 14.6203 25.4778 14.5491 25.549C14.4779 25.6202 14.3931 25.6764 14.2997 25.7141C14.2063 25.7518 14.1063 25.7703 14.0056 25.7686C13.9048 25.7668 13.8055 25.7447 13.7135 25.7038C13.6215 25.6628 13.5387 25.6037 13.4701 25.53L4.47007 16.53C4.32962 16.3893 4.25073 16.1987 4.25073 16C4.25073 15.8012 4.32962 15.6106 4.47007 15.47L13.4701 6.46997C13.6122 6.33749 13.8003 6.26537 13.9946 6.26879C14.1889 6.27222 14.3743 6.35093 14.5117 6.48835C14.6491 6.62576 14.7278 6.81114 14.7312 7.00545C14.7347 7.19975 14.6626 7.38779 14.5301 7.52997L6.81132 15.25H27.0001C27.199 15.25 27.3898 15.329 27.5304 15.4696C27.6711 15.6103 27.7501 15.8011 27.7501 16Z" fill="#154159"/>
-              </svg>
-            </button>
-
-            <div class="voortgangsbalk">
-              <div class="voortgangsbalk-active"></div>
-              <div class="voortgangsbalk-active"></div>
-              <div class="voortgangsbalk-inactive"></div>
-              <div class="voortgangsbalk-inactive"></div>
-            </div>
-
-            <p>Hier iets van tekst nog</p>
-            <h2>Persoonlijke gegevens</h2>
-
-            <label for="username">Naam</label>
-            <input type="text" id="username" name="username" required>
-
-            <label for="birthday">Verjaardag</label>
-            <input type="date" name="birthday" id="birthday" required>
-
-            <label for="tel">Telefoon</label>
-            <input type="tel" id="tel" name="tel">
-
-            <label for="gender">Gender</label>
-            <select name="gender" id="gender" required>
-              <option value="">Kies je gender</option>
-              <option value="man">Man</option>
-              <option value="vrouw">Vrouw</option>
-              <option value="anders">Anders</option>
-            </select>
-
-            <button type="button" class="gradient-btn" data-next>Volgende</button>
-          </section>
-
-          <section class="form-step"> <!--derde deel-->
-
-            <button type="button" data-prev>
-              <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M27.7501 16C27.7501 16.1989 27.6711 16.3896 27.5304 16.5303C27.3898 16.671 27.199 16.75 27.0001 16.75H6.81132L14.5301 24.47C14.6038 24.5386 14.6629 24.6214 14.7039 24.7134C14.7448 24.8054 14.7669 24.9047 14.7687 25.0054C14.7704 25.1062 14.7519 25.2062 14.7142 25.2996C14.6765 25.393 14.6203 25.4778 14.5491 25.549C14.4779 25.6202 14.3931 25.6764 14.2997 25.7141C14.2063 25.7518 14.1063 25.7703 14.0056 25.7686C13.9048 25.7668 13.8055 25.7447 13.7135 25.7038C13.6215 25.6628 13.5387 25.6037 13.4701 25.53L4.47007 16.53C4.32962 16.3893 4.25073 16.1987 4.25073 16C4.25073 15.8012 4.32962 15.6106 4.47007 15.47L13.4701 6.46997C13.6122 6.33749 13.8003 6.26537 13.9946 6.26879C14.1889 6.27222 14.3743 6.35093 14.5117 6.48835C14.6491 6.62576 14.7278 6.81114 14.7312 7.00545C14.7347 7.19975 14.6626 7.38779 14.5301 7.52997L6.81132 15.25H27.0001C27.199 15.25 27.3898 15.329 27.5304 15.4696C27.6711 15.6103 27.7501 15.8011 27.7501 16Z" fill="#154159"/>
-              </svg>
-            </button>
-
-            <div class="voortgangsbalk">
-              <div class="voortgangsbalk-active"></div>
-              <div class="voortgangsbalk-active"></div>
-              <div class="voortgangsbalk-active"></div>
-              <div class="voortgangsbalk-inactive"></div>
-            </div>
-
-            <p>Hier iets van tekst nog</p>
-            <h2>Profiel</h2>
-
-            <input type="file" name="profile" accept="image/*">
-            <input type="file" name="image1" accept="image/*">
-            <input type="file" name="image2" accept="image/*">
-            <input type="file" name="image3" accept="image/*">
-
-            <label for="status">Status</label>
-            <select name="status" id="status" required>
-              <option value="">Kies je status</option>
-              <option value="Student">Opzoek naar reisgenootje</option>
-              <option value="Werkend">Niet opzoek</option>
-            </select>
-            
-            <label for="Bio">Bio</label>
-            <input type="text" name="bio" id="bio">
-
-            <label for="opzoek">Opzoek naar</label>
-            <input type="text" name="opzoek" id="opzoek">
-
-            <button type="button" class="gradient-btn" data-next>Volgende</button>
-          </section>
-
-          <section class="form-step"> <!--vierde deel-->
-
-            <button type="button" data-prev>
-              <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M27.7501 16C27.7501 16.1989 27.6711 16.3896 27.5304 16.5303C27.3898 16.671 27.199 16.75 27.0001 16.75H6.81132L14.5301 24.47C14.6038 24.5386 14.6629 24.6214 14.7039 24.7134C14.7448 24.8054 14.7669 24.9047 14.7687 25.0054C14.7704 25.1062 14.7519 25.2062 14.7142 25.2996C14.6765 25.393 14.6203 25.4778 14.5491 25.549C14.4779 25.6202 14.3931 25.6764 14.2997 25.7141C14.2063 25.7518 14.1063 25.7703 14.0056 25.7686C13.9048 25.7668 13.8055 25.7447 13.7135 25.7038C13.6215 25.6628 13.5387 25.6037 13.4701 25.53L4.47007 16.53C4.32962 16.3893 4.25073 16.1987 4.25073 16C4.25073 15.8012 4.32962 15.6106 4.47007 15.47L13.4701 6.46997C13.6122 6.33749 13.8003 6.26537 13.9946 6.26879C14.1889 6.27222 14.3743 6.35093 14.5117 6.48835C14.6491 6.62576 14.7278 6.81114 14.7312 7.00545C14.7347 7.19975 14.6626 7.38779 14.5301 7.52997L6.81132 15.25H27.0001C27.199 15.25 27.3898 15.329 27.5304 15.4696C27.6711 15.6103 27.7501 15.8011 27.7501 16Z" fill="#154159"/>
-              </svg>
-            </button>
-
-            <div class="voortgangsbalk">
-              <div class="voortgangsbalk-active"></div>
-              <div class="voortgangsbalk-active"></div>
-              <div class="voortgangsbalk-active"></div>
-              <div class="voortgangsbalk-active"></div>
-            </div>
-
-            <p>Welke manieren van reizen spreken jou aan?</p>
-            <p>Selecteer 5 onderwerpen</p>
-
-            <div class="options">
-              <label class="option">
-                <input type="checkbox" name="interests" value="Backpacken">
-                <span>Backpacken</span>
-              </label>
-
-              <label class="option">
-                <input type="checkbox" name="interests" value="Kanoën">
-                <span>Kanoën</span>
-              </label>
-
-              <label class="option">
-                <input type="checkbox" name="interests" value="Zeilen">
-                <span>Zeilen</span>
-              </label>
-
-              <label class="option">
-                <input type="checkbox" name="interests" value="Auto">
-                <span>Auto</span>
-              </label>
-
-              <label class="option">
-                <input type="checkbox" name="interests" value="Trein">
-                <span>Trein</span>
-              </label>
-
-              <label class="option">
-                <input type="checkbox" name="interests" value="Huttentocht">
-                <span>Huttentocht</span>
-              </label>
-
-              <label class="option">
-                <input type="checkbox" name="interests" value="Kamperen">
-                <span>Kamperen</span>
-              </label>
-
-              <label class="option">
-                <input type="checkbox" name="interests" value="Stedentrip">
-                <span>Stedentrip</span>
-              </label>
-
-              <label class="option">
-                <input type="checkbox" name="interests" value="Liften">
-                <span>Liften</span>
-              </label>
-
-              <label class="option">
-                <input type="checkbox" name="interests" value="Fietsen">
-                <span>Fietsen</span>
-              </label>
-
-              <label class="option">
-                <input type="checkbox" name="interests" value="Camper">
-                <span>Camper</span>
-              </label>
-
-              <label class="option">
-                <input type="checkbox" name="interests" value="Roadtrip">
-                <span>Roadtrip</span>
-              </label>
-
-              <label class="option">
-                <input type="checkbox" name="interests" value="Duiken">
-                <span>Duiken</span>
-              </label>
-
-              <label class="option">
-                <input type="checkbox" name="interests" value="Hiken">
-                <span>Hiken</span>
-              </label>
-
-              <label class="option">
-                <input type="checkbox" name="interests" value="Zuipen">
-                <span>Zuipen</span>
-              </label>
-            </div>
-
-            <input class="gradient-btn" type="submit" value="Profiel aanmaken">
-          </section>
-        </form>
+    <% } %>
 
   </main>
   <footer>
