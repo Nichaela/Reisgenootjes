@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <%- include('../partials/head'); %>
- <link rel="stylesheet" href="css/chatroom.css">
+ <link rel="stylesheet" href="/css/chatroom.css">
 </head>
 <body>
   <header>
@@ -17,6 +17,7 @@
             💬 Real-Time Chat
         </div>
         <div id="messages"></div>
+        <input type="hidden" id="chatPartnerId" value="<%= chatPartner._id %>">
         <div id="typingIndicator" class="typing-indicator"></div>
         <div class="input-container">
             <input id="messageInput" type="text" placeholder="Type your message..." autocomplete="off">

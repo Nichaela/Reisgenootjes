@@ -8,7 +8,7 @@ const session = require('express-session')
 const http = require('http')
 const socketIo = require('socket.io')
 
-const { MongoClient, ServerApiVersion } = require('mongodb')
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb')
 
 // ==========================================
 // 2. APP, SERVER, SOCKET.IO
@@ -111,15 +111,42 @@ function registerGetRoutes() {
   //
  
    // Chatroom paginas Nicha
-  app.get('/chatroom', (req, res) => {
-    // if (!req.session.user) return res.redirect('/login')
-    res.render('pages/chatroom', { user: req.session.user })
+  app.get('/chatroom', async (req, res) => {
+    if (!req.session.user) return res.redirect('/login')
+
+    const allUsers = await users.find().toArray()
+    const otherUsers = allUsers.filter(otherUser =>
+      otherUser._id.toString() !== req.session.user._id.toString()
+    )
+
+    res.render('pages/chatroom', {
+      user: req.session.user,
+      users: otherUsers
+    })
   })
 
-  app.get('/chat-channel', (req, res) => {
-    // if (!req.session.user) return res.redirect('/login')
-    res.render('pages/chat-channel', { user: req.session.user })
+  // route voor een privéchat met 1 specifieke gebruiker
+  app.get('/chat-channel/:userId', async (req, res) => {
+  if (!req.session.user) return res.redirect('/login')
+
+  const chatPartnerId = req.params.userId
+  const chatPartner = await users.findOne({ _id: new ObjectId(chatPartnerId) })
+
+  if (!chatPartner) {
+    return res.status(404).render('pages/errorstate', {
+      status: 404,
+      message: 'Gebruiker niet gevonden'
+    })
+  }
+
+  res.render('pages/chat-channel', {
+    user: req.session.user,
+    chatPartner: {
+      _id: chatPartner._id.toString(),
+      name: chatPartner.name
+    }
   })
+})
   
   app.get('/logout', (req, res) => {
     req.session.destroy(() => {
@@ -218,20 +245,16 @@ function registerSocketHandlers() {
   io.on('connection', (socket) => {
     console.log('session user:', socket.request.session.user)
     const user = socket.request.session.user
+
     if (!user) {
       return socket.disconnect()
     }
 
     socket.join(user._id.toString())
-    socket.emit('private message', {
-    fromName: 'Server test',
-    text: 'Dit zie alleen jij',
-    timestamp: new Date().toISOString()
-  })
+
     connectedUsers++
     console.log(`🎉 A user connected: ${socket.id} Total users: ${connectedUsers}`)
 
-    // Notify others that someone joined
     socket.broadcast.emit(
       'user notification',
       `${user.name} joined the chat! (${connectedUsers} users online)`
@@ -242,7 +265,16 @@ function registerSocketHandlers() {
       io.emit('chat message', msg)
     })
 
-    // Typing indicators
+    socket.on('private message', ({ toUserId, text }) => {
+      if (!toUserId || !text) return
+
+      io.to(toUserId).emit('private message', {
+        fromName: user.name,
+        text: text,
+        timestamp: new Date().toISOString()
+      })
+    })
+
     socket.on('typing', () => {
       socket.broadcast.emit('typing')
     })
@@ -320,5 +352,5 @@ async function start() {
     process.exit(1)
   }
 }
- 
+
 start()

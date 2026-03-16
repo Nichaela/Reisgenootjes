@@ -3,8 +3,11 @@ const messages = document.getElementById('messages');
 const messageInput = document.getElementById('messageInput');
 const sendButton = document.getElementById('sendButton');
 const typingIndicator = document.getElementById('typingIndicator');
+const chatPartnerInput = document.getElementById('chatPartnerId');
+
 let typingTimer;
 let isTyping = false;
+let toUserId = chatPartnerInput ? chatPartnerInput.value : null;
 
 // Stop meteen als dit geen chatpagina is
 if (!messages || !messageInput || !sendButton || !typingIndicator) {
@@ -12,8 +15,13 @@ if (!messages || !messageInput || !sendButton || !typingIndicator) {
 } else {
     function sendMessage() {
         const message = messageInput.value.trim();
+
         if (message) {
-            socket.emit('chat message', message);
+            socket.emit('private message', {
+                toUserId: toUserId,
+                text: message
+            });
+
             messageInput.value = '';
             socket.emit('stop typing');
             isTyping = false;
@@ -53,6 +61,7 @@ if (!messages || !messageInput || !sendButton || !typingIndicator) {
         messages.appendChild(messageElement);
         messages.scrollTop = messages.scrollHeight;
     });
+    
 
     socket.on('user notification', (notification) => {
         const notificationElement = document.createElement('div');
