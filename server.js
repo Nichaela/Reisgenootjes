@@ -23,17 +23,20 @@ const io = socketIo(server)
 // ==========================================
 // 3. CONFIGURATIE & DATABASE
 // ==========================================
+// source: https://socket.io/how-to/use-with-express-session
+const sessionMiddleware = session({
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+})
+
 app
-  .use(express.urlencoded({ extended: true })) // parse form data
-  .use(express.static('public')) // serve static files
-  .set('view engine', 'ejs') // EJS templating
-  .use(
-    session({
-      secret: process.env.SESSION_SECRET,
-      resave: false,
-      saveUninitialized: false,
-    })
-  )
+  .use(express.urlencoded({ extended: true }))
+  .use(express.static('public'))
+  .set('view engine', 'ejs')
+  .use(sessionMiddleware)
+
+io.engine.use(sessionMiddleware)
 
 // Construct URL used to connect to database from info in the .env file
 const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}/${process.env.DB_NAME}?retryWrites=true&w=majority`
@@ -197,15 +200,42 @@ function registerGetRoutes() {
   //
  
    // Chatroom paginas Nicha
-  app.get('/chatroom', (req, res) => {
+  app.get('/chatroom', async (req, res) => {
     if (!req.session.user) return res.redirect('/login')
-    res.render('pages/chatroom', { user: req.session.user })
+
+    const allUsers = await users.find().toArray()
+    const otherUsers = allUsers.filter(otherUser =>
+      otherUser._id.toString() !== req.session.user._id.toString()
+    )
+
+    res.render('pages/chatroom', {
+      user: req.session.user,
+      users: otherUsers
+    })
   })
 
-  app.get('/chat-channel', (req, res) => {
-    if (!req.session.user) return res.redirect('/login')
-    res.render('pages/chat-channel', { user: req.session.user })
+  // route voor een privéchat met 1 specifieke gebruiker
+  app.get('/chat-channel/:userId', async (req, res) => {
+  if (!req.session.user) return res.redirect('/login')
+
+  const chatPartnerId = req.params.userId
+  const chatPartner = await users.findOne({ _id: new ObjectId(chatPartnerId) })
+
+  if (!chatPartner) {
+    return res.status(404).render('pages/errorstate', {
+      status: 404,
+      message: 'Gebruiker niet gevonden'
+    })
+  }
+
+  res.render('pages/chat-channel', {
+    user: req.session.user,
+    chatPartner: {
+      _id: chatPartner._id.toString(),
+      name: chatPartner.name
+    }
   })
+})
   
   app.get('/logout', (req, res) => {
     req.session.destroy(() => {
@@ -268,6 +298,7 @@ function registerPostRoutes() {
  
     return res.redirect('/discover')
   })
+})
  
  
   // Register
@@ -407,13 +438,21 @@ let connectedUsers = 0
 
 function registerSocketHandlers() {
   io.on('connection', (socket) => {
+    console.log('session user:', socket.request.session.user)
+    const user = socket.request.session.user
+
+    if (!user) {
+      return socket.disconnect()
+    }
+
+    socket.join(user._id.toString())
+
     connectedUsers++
     console.log(`🎉 A user connected: ${socket.id} Total users: ${connectedUsers}`)
 
-    // Notify others that someone joined
     socket.broadcast.emit(
       'user notification',
-      `Someone joined the chat! (${connectedUsers} users online)`
+      `${user.name} joined the chat! (${connectedUsers} users online)`
     )
 
     socket.on('chat message', (msg) => {
@@ -421,7 +460,16 @@ function registerSocketHandlers() {
       io.emit('chat message', msg)
     })
 
-    // Typing indicators
+    socket.on('private message', ({ toUserId, text }) => {
+      if (!toUserId || !text) return
+
+      io.to(toUserId).emit('private message', {
+        fromName: user.name,
+        text: text,
+        timestamp: new Date().toISOString()
+      })
+    })
+
     socket.on('typing', () => {
       socket.broadcast.emit('typing')
     })
@@ -436,15 +484,11 @@ function registerSocketHandlers() {
 
       socket.broadcast.emit(
         'user notification',
-        `Someone left the chat. (${connectedUsers} users online)`
+        `${user.name} left the chat. (${connectedUsers} users online)`
       )
     })
   })
 }
-
-// Middleware to handle not found errors - error 404
-
- 
  
  
 // ==========================================
@@ -502,5 +546,5 @@ async function start() {
     process.exit(1)
   }
 }
- 
+
 start()

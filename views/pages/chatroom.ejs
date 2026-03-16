@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <%- include('../partials/head'); %>
+  <link rel="stylesheet" href="/css/chatroom.css">
 </head>
 <body>
   <header>
@@ -13,6 +14,12 @@
     <atricle>
       <h2>Nieuwe match</h2>  
       <!-- Deze worden alleen laten zien als ze bestaan! zet in if else aansporing om naar Match te gaan! -->
+      <% users.forEach(otherUser => { %>
+        <a href="/chat-channel/<%= otherUser._id %>">
+          <%= otherUser.name %>
+        </a>
+      <% }) %>
+      
       <!-- <section>
         <h3>Naam</h3>
         <p>Laatst bericht met deze user</p>
@@ -30,15 +37,24 @@
 
     <!-- horizontale lijst met profiel fotos -->
     <h2>Recente gesprekken</h2>
-    
-  <% if (user) { %>
-  <p>Welkom <%= user.name %></p>
-  <% } %>
-
-  
-
-
-
+     <ul class="chat-list">
+      <% users.forEach(otherUser => { %>
+        <li class="chat-list-item">
+          <a href="/chat-channel/<%= otherUser._id %>">
+            <!-- <img src="<%= otherUser.profilePicture %>" alt="<%= otherUser.name %>" class="chat-profile-pic"> -->
+            <div class="profile-pic-wrapper">
+              <img src="/img/accounts/MarkvanFlied.jpg" class="profile-pic" alt="">
+            </div>
+            <div class="chat-info">
+              <%= otherUser.name %>
+              <div class="last-chat">
+                <%= otherUser.lastMessage ? otherUser.lastMessage : 'Nog geen berichten' %>
+              </div>
+             </div>
+          </a>
+        </li>
+      <% }) %>
+      </ul>
 
   </main>
   
