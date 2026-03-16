@@ -3,9 +3,11 @@
     <% if (!user) { %>
       <li><a href="/login">Login</a></li>
     <% } else { %>
-      <li><a href="/logout">Logout</a></li>
+      <li>
+        <form action="/logout" method="POST" style="display:inline;">
+          <button type="submit">Logout</button>
+        </form>
+      </li>
     <% } %>
-    
   </ul>
-
 </nav>

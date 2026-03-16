@@ -10,7 +10,7 @@
   </header>
   <main>
     <% if (user) { %>
-    <h1 class="underline"><%= user.name %> u chat met ... </h1>
+    <h1 class="underline"> <%= user.name %> u chat met <span id="chatPartnerName"><%= chatPartner.name %></span></h1>
     <% } %>
     <div class="chat-container">
         <div class="chat-header">
