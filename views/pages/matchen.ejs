@@ -26,9 +26,9 @@
    <section>
   <img src="img/accounts/MarkvanFlied.jpg" alt="Account foto">
   <div class="profile-info">
-    <h2>Mark van Flied • 20</h2>
+   <h2><%= matchUser.name %> • <%= age %></h2>
     <ul>
-      <li><img src="img/matcheniconen/gendermale.svg">man</li>
+      <li><img src="img/matcheniconen/gendermale.svg"><%= matchUser.gender %></li>
       <li><img src="img/matcheniconen/MapPin.svg">55 km van jou vandaan</li>
       <li><img src="img/matcheniconen/waarreizen.svg">Reizen door Oosterijk</li>
       <li><img src="img/matcheniconen/Smiley.svg"> Gezamenlijke interesse</li>
@@ -39,7 +39,7 @@
 <section>
     <p>State • Opzoek naar reisgenootje</p>
     <h2>Bio</h2>
-    <p>Hier komt een stukje tekst te staan wat meer verteld over het persoon zodat je een beter beeld krijgt met wie je op reis gaat</p>
+    <p><%= matchUser.bio %></p>
 </section>
 
 <section>
@@ -60,7 +60,7 @@
 
 <section>
     <h2>Op zoek naar:</h2>
-    <p>Hier komt een stukje tekst te staan wat de persoon zoekt in een reisgenootje, stel dat deze reis het niet word kan je alsnog een reis met die persoon plannen of matchen voor een gesprek.</p>
+  <p><%= matchUser.opzoek %></p>
 </section>
 
 <section>

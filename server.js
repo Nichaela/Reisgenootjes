@@ -36,8 +36,7 @@ app
   )
 
 // Construct URL used to connect to database from info in the .env file
-const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}/${process.env.DB_NAME}?retryWrites=true&w=majority`
- 
+const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}/?retryWrites=true&w=majority`
 // Create a MongoClient
 const client = new MongoClient(uri, {
   serverApi: {
@@ -173,8 +172,15 @@ function registerGetRoutes() {
   app.get('/matchen', async (req, res) => {
   const post = await discover.findOne({});
   const matchUser = await users.findOne({ _id: new ObjectId(post.userId) });
-  res.render('pages/matchen', { user: req.session.user, post: post, matchUser: matchUser })
+    const today = new Date();
+  const birthDate = new Date(matchUser.birthday);
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const month = today.getMonth() - birthDate.getMonth();
+  if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) age--;
+
+  res.render('pages/matchen', { user: req.session.user, post: post, matchUser: matchUser, age: age })
 })
+
 
 
   //
@@ -187,7 +193,7 @@ function registerGetRoutes() {
       const mijnPosts = await discover.find({ 
         userId: new ObjectId(req.session.user._id) 
       }).toArray()
-  
+
       res.render('pages/profiel', { 
         user: req.session.user,
         posts: mijnPosts
@@ -199,7 +205,9 @@ function registerGetRoutes() {
     }
   })
   //
- 
+
+  
+  
    // Chatroom paginas Nicha
   app.get('/chatroom', (req, res) => {
     if (!req.session.user) return res.redirect('/login')
