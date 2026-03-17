@@ -84,7 +84,7 @@
 }
 
 /* Filter buttons styling */
-.filter-btn {
+.filter-btn{
   display: block;
   margin: 0.5em 0;
   padding: 0.3em .5em;
@@ -108,7 +108,6 @@
   
   margin-top: 5em;
 }
-
 
 .genders .buttons, .continents .buttons {
   display: flex;
@@ -152,4 +151,19 @@ h3 {
   background-color: var(--clr-surface);
   color: var(--clr-input-text);
   max-width: 30em;
+}
+
+.reset-filters {
+  justify-self: center;
+
+  display: block;
+  margin: 0.5em 0;
+  padding: 0.5em .8em;
+  border-radius: 10em;
+  cursor: pointer;
+  font-size: 1em;
+  color: var(--clr-neutral);
+  background: var(--gradient-primary);
+
+  margin-top: 3em;
 }
