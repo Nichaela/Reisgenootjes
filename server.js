@@ -340,31 +340,36 @@ function registerPostRoutes() {
 
   //create-post formulier 
   app.post('/post', async (req, res) => {
-    if (!req.session.user) return res.redirect('/login')
-    const { title, startDate, endDate, location, persons, discription, gender } = req.body;
+    try {
+      if (!req.session.user) return res.redirect('/login')
 
-    let age = req.body.age;
-    if (!Array.isArray(age)) {
-      age = age ? [age] : [];
-    }
-    
-    // Supplies als array van nieuwe regels
-    const supplies = req.body.supplies ? req.body.supplies.split('\n') : [];
+      const { title, startDate, endDate, location, continent, persons, discription, gender } = req.body
 
-    const result = await discover.insertOne({ 
-      userId: new ObjectId(req.session.user._id), // koppeling aan gebruiker die ingelogd is
-      title,
-      startDate,
-      endDate,
-      location,
-      persons,
-      discription,
-      supplies,
-      age,
-      gender
-    })
+      let age = req.body.age
+      if (!Array.isArray(age)) {
+        age = age ? [age] : []
+      }
+      
+      // Supplies als array van nieuwe regels
+      const supplies = req.body.supplies
+        ? req.body.supplies.split('\n').map(item => item.trim()).filter(Boolean)
+        : []
 
-    return res.redirect(`/post/${result.insertedId}`)
+      const result = await discover.insertOne({
+        userId: new ObjectId(req.session.user._id), // koppeling aan gebruiker die ingelogd is
+        title,
+        startDate,
+        endDate,
+        location,
+        continent,
+        persons,
+        discription,
+        supplies,
+        age,
+        gender
+      })
+
+      return res.redirect(`/post/${result.insertedId}`)
   })
 }
 

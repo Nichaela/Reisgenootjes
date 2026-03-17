@@ -110,6 +110,7 @@ input.gradient-btn {
 .options {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: var(--space-gap-xs);
   margin: var(--space-gap-xs) 0;
 }
