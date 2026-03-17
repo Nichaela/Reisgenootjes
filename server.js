@@ -36,8 +36,7 @@ app
   )
 
 // Construct URL used to connect to database from info in the .env file
-const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}/${process.env.DB_NAME}?retryWrites=true&w=majority`
- 
+const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}/?retryWrites=true&w=majority`
 // Create a MongoClient
 const client = new MongoClient(uri, {
   serverApi: {
@@ -170,32 +169,49 @@ function registerGetRoutes() {
   //
 
   // Matchen route
-  app.get('/matchen', (req, res) => {
-    res.render('pages/matchen', { user: req.session.user })
-  })
-  //
+  app.get('/matchen', async (req, res) => {
+  const post = await discover.findOne({});
+  const matchUser = await users.findOne({ _id: new ObjectId(post.userId) });
+    const today = new Date();
+  const birthDate = new Date(matchUser.birthday);
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const month = today.getMonth() - birthDate.getMonth();
+  if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) age--;
 
-    // profiel route
+  res.render('pages/matchen', { user: req.session.user, post: post, matchUser: matchUser, age: age })
+})
+
+
+
+  //Profiel
   app.get('/profiel', async (req, res) => {
-    if (!req.session.user) return res.redirect('/login')
+  if (!req.session.user) return res.redirect('/login')
+
+  try {
+    const mijnPosts = await discover.find({ 
+      userId: new ObjectId(req.session.user._id) 
+    }).toArray()
+
+    const today = new Date();
+    const birthDate = new Date(req.session.user.birthday);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const month = today.getMonth() - birthDate.getMonth();
+    if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) age--;
+
+    res.render('pages/profiel', { 
+      user: req.session.user,
+      posts: mijnPosts,
+      age: age
+    })
+
+  } catch (err) {
+    console.error(err)
+    res.status(500).send('Fout bij ophalen van profiel')
+  }
+})
+
   
-    try {
-      const mijnPosts = await discover.find({ 
-        userId: new ObjectId(req.session.user._id) 
-      }).toArray()
   
-      res.render('pages/profiel', { 
-        user: req.session.user,
-        posts: mijnPosts
-      })
-  
-    } catch (err) {
-      console.error(err)
-      res.status(500).send('Fout bij ophalen van profiel')
-    }
-  })
-  //
- 
    // Chatroom paginas Nicha
   app.get('/chatroom', (req, res) => {
     if (!req.session.user) return res.redirect('/login')
@@ -253,7 +269,7 @@ function registerPostRoutes() {
  
     return res.redirect('/discover')
   })
- 
+}
  
   // Register
   app.post('/register', async (req, res) => {
@@ -305,13 +321,6 @@ function registerPostRoutes() {
     }
  
     return res.redirect('/discover')
-  })
-
-  //Post
-  app.post('/post', (req, res) => {
-    const supplies = req.body.supplies.split('\n') //checken of dit werkt
-
-    res.redirect('/post')
   })
 
 
@@ -374,32 +383,40 @@ app.get('/ontdekfilter', async (req, res) => {
 
   //create-post formulier 
   app.post('/post', async (req, res) => {
-    if (!req.session.user) return res.redirect('/login')
-    const { title, startDate, endDate, location, persons, discription, gender } = req.body;
+    try {
+      if (!req.session.user) return res.redirect('/login')
 
-    let age = req.body.age;
-    if (!Array.isArray(age)) {
-      age = age ? [age] : [];
+      const { title, startDate, endDate, location, continent, persons, discription, gender } = req.body
+
+      let age = req.body.age
+      if (!Array.isArray(age)) {
+        age = age ? [age] : []
+      }
+      
+      // Supplies als array van nieuwe regels
+      const supplies = req.body.supplies
+        ? req.body.supplies.split('\n').map(item => item.trim()).filter(Boolean)
+        : []
+
+      const result = await discover.insertOne({
+        userId: new ObjectId(req.session.user._id), // koppeling aan gebruiker die ingelogd is
+        title,
+        startDate,
+        endDate,
+        location,
+        continent,
+        persons: Number(persons),
+        discription,
+        supplies,
+        age,
+        gender
+      })
+
+      return res.redirect(`/post/${result.insertedId}`)
+  }   catch (err) {
+      console.error(err)
+      res.status(500).send('Er ging iets mis bij het aanmaken van de post')
     }
-    
-    // Supplies als array van nieuwe regels
-    const supplies = req.body.supplies ? req.body.supplies.split('\n') : [];
-
-
-    const result = await discover.insertOne({ 
-      userId: new ObjectId(req.session.user._id), // koppeling aan gebruiker die ingelogd is
-      title,
-      startDate,
-      endDate,
-      location,
-      persons,
-      discription,
-      supplies,
-      age,
-      gender
-    })
-
-    return res.redirect(`/post/${result.insertedId}`)
   })
 
 

@@ -1,20 +1,25 @@
 /* forms */
 .voortgangsbalk {
   display: flex;
-  gap: 10px;
+  gap: var(--space-gap-xs);
 }
 
 .voortgangsbalk div {
-  height: 5px;
+  height: .3rem;
   width: 100%;
-  border-radius: 5px;
+  border-radius: var(--border-radius);
 }
 
-.voortgangsbalk-active {background-color: var(--clr-primary);}
-.voortgangsbalk-inactive {background-color: var(--clr-surface);}
+.voortgangsbalk-active {
+  background-color: var(--clr-primary);
+}
+
+.voortgangsbalk-inactive {
+  background-color: var(--clr-surface);
+}
 
 .multi-step-form {
-    height: 80vh;
+  height: 80vh;
 }
 
 form {
@@ -24,11 +29,11 @@ form {
   position: relative;
 }
 
-.form-step > a,
-  .form-step > button[data-prev] {
-    position: absolute;
-    top: 0;
-    right: 0;
+.form-step>a,
+.form-step>button[data-prev] {
+  position: absolute;
+  top: 0;
+  right: 0;
 }
 
 form div {
@@ -40,59 +45,74 @@ form input.gradient-btn {
 }
 
 label {
-    display: block;
-    margin-top: var(--space-gap-s);
+  display: block;
+  margin-top: var(--space-gap-s);
 }
 
-input, textarea, select {
-    background: var(--clr-surface);
-    border: none;
-    border-radius: 5px;
-    min-height: 2rem;
-    color: var(--clr-input-text);
-    width: 100%;
-    padding: var(--space-gap-xs);
- }
+input,
+textarea,
+select {
+  background: var(--clr-surface);
+  color: var(--clr-input-text);
+  
+  border: none;
+  border-radius: var(--border-radius);
+  
+  min-height: var(--space-gap);
+  width: 100%;
+  padding: var(--space-gap-xs);
+}
 
- textarea {
-    height: fit-content;
-    resize: none;
-  }
+textarea {
+  height: fit-content;
+  resize: none;
+}
 
- /* multipage form */
-  .form-step {
-    display: none;
-  }
-  .form-step.form-active {
-    display: block;
-  }
-  form h1 {
-    width: fit-content;
-  }
-  form p:first-of-type {
-    font-family: 'indie-flower';
-    color: var(--clr-primary);
-    font-size: 1.5rem;
-    text-align: center;
-    margin-top: 2rem;
-  }
-  form h2 {
-    font-weight: normal;
-    text-align: center;
-    margin-bottom: var(--space-gap);
-  }
-  form button[data-next], input.gradient-btn {
-    position: absolute;
-    right: 0;
-    bottom: var(--space-gap-s);
-  }
+/* multipage form */
+.form-step {
+  display: none;
+}
+
+.form-step.form-active {
+  display: block;
+}
+
+form h1 {
+  width: fit-content;
+}
+
+form p:first-of-type {
+  font-family: 'indie-flower';
+  font-size: 1.1rem;
+  text-align: center;
+
+  color: var(--clr-primary);
+
+  margin-top: var(--space-gap);
+}
+
+form h2 {
+  font-weight: 300;
+  text-align: center;
+  font-size: 1.1rem;
+
+  margin-bottom: var(--space-gap);
+}
+
+form button[data-next],
+input.gradient-btn {
+  position: absolute;
+  right: 0;
+  bottom: var(--space-gap-s);
+}
 
 /* checkboxes voor aanmeldform */
 .options {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  margin: 10px 0;
+  justify-content: center;
+  gap: var(--space-gap-xs);
+  margin: var(--space-gap-xs) 0;
 }
 
 .option input {
@@ -100,7 +120,7 @@ input, textarea, select {
 }
 
 .option span {
-  padding: 10px 20px;
+  padding: var(--space-gap-xs) var(--space-side-s);
   border: .05rem solid var(--clr-text);
   border-radius: 5rem;
   cursor: pointer;
@@ -117,14 +137,40 @@ input, textarea, select {
 a {
   color: var(--clr-text);
 
-    text-decoration: underline;
-    text-decoration-color: var(--clr-primary);
-    text-decoration-thickness: .125rem;
-    text-underline-offset: .2rem;
+  text-decoration: underline;
+  text-decoration-color: var(--clr-primary);
+  text-decoration-thickness: .125rem;
+  text-underline-offset: .2rem;
 }
 
 /* disabled button form*/
 button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.inlogform {
+  height: 80vh;
+}
+
+.login a.ww {
+  display: block;
+  margin-top: var(--space-gap);
+
+  text-align: center;
+  font-weight: 200;
+}
+
+.back-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.login div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  margin-top: var(--space-gap);
 }
