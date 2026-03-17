@@ -49,7 +49,7 @@ const client = new MongoClient(uri, {
  
 // database collections
 let users
-let discover;
+let discover
  
 // ==========================================
 // 4. MIDDLEWARE (Algemeen)
@@ -214,21 +214,6 @@ function registerGetRoutes() {
   })
 }
  
-    //route naar annabels pagina
-
-    app.get('/filter', async (req, res) => {
-      try {
-        const myUsers = await users
-          .find({}) // alleen jouw records
-          .toArray();
-    
-        res.render('pages/filter', { users: myUsers });
-      } catch (err) {
-        console.error(err);
-        res.status(500).send("Fout bij ophalen data");
-      }
-    })
-
 // ==========================================
 // 6. POST ROUTES (Data verwerken)
 // ==========================================
@@ -329,7 +314,10 @@ function registerPostRoutes() {
     res.redirect('/post')
   })
 
-    //route naar filter menu match
+
+
+
+    //Huidge route naar filter menu + werkende continent filter
 
 app.get('/filter', async (req, res) => {
   try {
@@ -338,20 +326,35 @@ app.get('/filter', async (req, res) => {
     const usersCollection = db.collection('users');
     const discoverCollection = db.collection('discover');
 
-    // Alleen ophalen wanneer nodig
-    const myUsers = await usersCollection.find({}).toArray();
-    const myDiscover = await discoverCollection.find({}).toArray();
+    const reizen = await discoverCollection.find({}).toArray();
 
-    // Combineer als je wilt
-    const combinedData = [...myUsers, ...myDiscover];
+    const resultaat = [];
 
-    res.render('pages/filter', { users: combinedData });
+    for (const reis of reizen) {
+
+      const user = await usersCollection.findOne({
+        _id: reis.userId
+      });
+
+      resultaat.push({
+        reis: reis,
+        user: user
+      });
+
+    }
+
+    res.render('pages/filter', {
+      reizen: resultaat
+    });
+
   } catch (err) {
     console.error(err);
     res.status(500).send("Fout bij ophalen data");
   }
-})
+});
 }
+
+
 
 //route naar filter op ontdek pagina
 
@@ -367,6 +370,8 @@ app.get('/ontdekfilter', async (req, res) => {
     res.status(500).send("Fout bij ophalen data");
   }
 })
+
+
   //create-post formulier 
   app.post('/post', async (req, res) => {
     if (!req.session.user) return res.redirect('/login')
@@ -379,6 +384,7 @@ app.get('/ontdekfilter', async (req, res) => {
     
     // Supplies als array van nieuwe regels
     const supplies = req.body.supplies ? req.body.supplies.split('\n') : [];
+
 
     const result = await discover.insertOne({ 
       userId: new ObjectId(req.session.user._id), // koppeling aan gebruiker die ingelogd is
@@ -395,7 +401,6 @@ app.get('/ontdekfilter', async (req, res) => {
 
     return res.redirect(`/post/${result.insertedId}`)
   })
-}
 
 
 
