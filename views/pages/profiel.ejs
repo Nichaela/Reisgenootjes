@@ -5,6 +5,7 @@
     <%- include('../partials/head'); %>
         <link rel="stylesheet" href="style.css">
         <link rel="stylesheet" href="css/profiel.css">
+        <script defer src="javascript/filter.js"></script>
         <title>Profielpagina <%= user.name %>
         </title>
 </head>
@@ -24,9 +25,8 @@
             </section>
 
             <section>
-                <!-- birthday naar age uitrekenen? -->
                 <h2>
-                    <%= user.name %> • <%= user.birthday %>
+                    <%= user.name %> • <%= age %>
                 </h2>
                 <div class="profile-info">
                     <ul>
@@ -34,7 +34,6 @@
                             <%= user.gender %>
                         </li>
                         <li><img src="img/location.svg">Nederland</li>
-                        <li>Nederland</li>
                     </ul>
                 </div>
             </section>
@@ -42,8 +41,11 @@
             <section>
                 <h2>Interesses:</h2>
                 <ul class="hobbies">
-                    <li class="hobby">Stedentrip</li>
-                    <li class="hobby">Duiken</li>
+                    <% user.interests.split(',').forEach(interesse=> { %>
+                        <li class="hobby">
+                            <%= interesse %>
+                        </li>
+                        <% }) %>
                 </ul>
             </section>
 
