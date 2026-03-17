@@ -1,3 +1,6 @@
+// =======================
+// IMPORTS
+// =======================
 require('dotenv').config()
 
 const express = require('express')
@@ -14,10 +17,16 @@ const nodemailer = require('nodemailer')
 
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb')
 
+// =======================
+// APP, SERVER SOCKET.IO
+// =======================
 const app = express()
 const server = http.createServer(app)
 const io = socketIo(server)
 
+// =======================
+// CONFIGURATIE & DATABASE
+// =======================
 app.use(express.urlencoded({ extended: true }))
 app.use(express.static('public'))
 app.set('view engine', 'ejs')
@@ -43,12 +52,15 @@ const client = new MongoClient(uri, {
 let users
 let discover
 
-// Middleware
+// =======================
+// MIDDELWARE (ALGEMEEN)
+// =======================
 app.use((req, res, next) => {
   res.locals.user = req.session.user || null
   next()
 })
 
+// xss sanitizing middleware
 app.use((req, res, next) => {
   if (req.body) {
     for (let key in req.body) {
@@ -123,7 +135,7 @@ function registerGetRoutes() {
   })
 
   app.get('/create-post', (req, res) => {
-    if (!req.session.user) return res.redirect('/login')
+    if (!req.session.user) return res.redirect('/welkom')
     res.render('pages/create-post')
   })
 
