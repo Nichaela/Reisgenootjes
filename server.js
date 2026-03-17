@@ -330,13 +330,13 @@ app.get('/filter', async (req, res) => {
 
     const resultaat = [];
 
-    for (const reis of reizen) {
+    for (const reis of reizen) { //voor elke reis in de lijst reizen doe dit:
 
       const user = await usersCollection.findOne({
-        _id: reis.userId
+        _id: reis.userId //vind een reis 
       });
 
-      resultaat.push({
+      resultaat.push({ //pusht deze data in die lege array genaamd resultaat
         reis: reis,
         user: user
       });
@@ -344,7 +344,7 @@ app.get('/filter', async (req, res) => {
     }
 
     res.render('pages/filter', {
-      reizen: resultaat
+      reizen: resultaat //reizen = de array van de collection en resultaat is de array die ik heb gemaakt
     });
 
   } catch (err) {
