@@ -361,7 +361,7 @@ app.get('/filter', async (req, res) => {
     res.status(500).send("Fout bij ophalen data");
   }
 });
-}
+
 
 
 
