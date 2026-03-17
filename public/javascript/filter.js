@@ -151,3 +151,32 @@ function calculateAge(birthday) { // hier staat eigenlijk: calculateAge("12-02-2
 
   return age; // geeft berekende leeftijd terug
 }
+
+
+// =======================
+// Reset filters
+// =======================
+
+const resetButton = document.querySelector(".reset-filters");
+
+resetButton.addEventListener("click", () => {
+  // 1. Alle actieve buttons verwijderen
+  activeFilters.clear();
+  activeContinents.clear();
+
+  document.querySelectorAll(".filter-btn").forEach(btn => {
+    btn.classList.remove("active");
+  });
+
+  // 2. Datum resetten
+  if (dateFilter) dateFilter.value = "";
+
+  // 3. Leeftijd slider resetten
+  if (birthdaySlider) {
+    birthdaySlider.value = birthdaySlider.min;
+    birthdayValue.textContent = birthdaySlider.min;
+  }
+
+  // 4. Alles weer zichtbaar maken
+  filterItems();
+});
