@@ -284,7 +284,7 @@ function registerPostRoutes() {
  
     return res.redirect('/discover')
   })
- 
+}
  
   // Register
   app.post('/register', async (req, res) => {
@@ -362,7 +362,7 @@ function registerPostRoutes() {
         endDate,
         location,
         continent,
-        persons,
+        persons: Number(persons),
         discription,
         supplies,
         age,
@@ -370,8 +370,11 @@ function registerPostRoutes() {
       })
 
       return res.redirect(`/post/${result.insertedId}`)
+  }   catch (err) {
+      console.error(err)
+      res.status(500).send('Er ging iets mis bij het aanmaken van de post')
+    }
   })
-}
 
 
 
