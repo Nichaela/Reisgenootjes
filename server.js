@@ -397,7 +397,7 @@ function registerPostRoutes() {
     try {
       if (!req.session.user) return res.redirect('/login')
 
-      const { title, startDate, endDate, location, persons, discription, gender } = req.body
+      const { title, startDate, endDate, location, continent, persons, discription, gender } = req.body
 
       let age = req.body.age
       if (!Array.isArray(age)) {
@@ -414,6 +414,7 @@ function registerPostRoutes() {
         startDate,
         endDate,
         location,
+        continent,
         persons,
         discription,
         supplies,
