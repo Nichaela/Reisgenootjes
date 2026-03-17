@@ -1,6 +1,3 @@
-// ==========================================
-// 1. IMPORTS (Packages)
-// ==========================================
 require('dotenv').config()
 
 const express = require('express')
@@ -12,40 +9,29 @@ const xss = require('xss')
 const validator = require('validator')
 const bcrypt = require('bcryptjs')
 
+const crypto = require('crypto')
+const nodemailer = require('nodemailer')
+
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb')
 
-const nodemailer = require('nodemailer')
-const crypto = require('crypto')
-
-// ==========================================
-// 2. APP, SERVER, SOCKET.IO
-// ==========================================
 const app = express()
 const server = http.createServer(app)
 const io = socketIo(server)
 
-// ==========================================
-// 3. CONFIGURATIE & DATABASE
-// ==========================================
-// source: https://socket.io/how-to/use-with-express-session
-const sessionMiddleware = session({
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: false,
-})
+app.use(express.urlencoded({ extended: true }))
+app.use(express.static('public'))
+app.set('view engine', 'ejs')
 
-app
-  .use(express.urlencoded({ extended: true }))
-  .use(express.static('public'))
-  .set('view engine', 'ejs')
-  .use(sessionMiddleware)
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+  })
+)
 
-io.engine.use(sessionMiddleware)
+const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}/?retryWrites=true&w=majority`
 
-// Construct URL used to connect to database from info in the .env file
-const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}/${process.env.DB_NAME}?retryWrites=true&w=majority`
-
-// Create a MongoClient
 const client = new MongoClient(uri, {
   serverApi: {
     version: ServerApiVersion.v1,
@@ -54,19 +40,15 @@ const client = new MongoClient(uri, {
   },
 })
 
-// database collections
 let users
-let discover;
+let discover
 
-// ==========================================
-// 4. MIDDLEWARE (Algemeen)
-// ==========================================
+// Middleware
 app.use((req, res, next) => {
   res.locals.user = req.session.user || null
   next()
 })
 
-// XSS sanitizing middleware
 app.use((req, res, next) => {
   if (req.body) {
     for (let key in req.body) {
@@ -76,21 +58,15 @@ app.use((req, res, next) => {
   next()
 })
 
-// ==========================================
-// 5. ROUTES (GET - Pagina's bekijken)
-// ==========================================
+// =======================
+// GET ROUTES
+// =======================
 
 function registerGetRoutes() {
-
   app.get('/', (req, res) => {
-    res.render('pages/index', { data: null })
+    res.render('pages/index')
   })
 
-  app.get('/welkom', (req, res) => {
-    res.render('pages/welkom', { error: null })
-  })
-
-  // hier is Roos nu mee bezig
   app.get('/login', (req, res) => {
     res.render('pages/login', { error: null })
   })
@@ -99,161 +75,84 @@ function registerGetRoutes() {
     res.render('pages/register', { error: null })
   })
 
-  app.get('/register-success', (req, res) => {
-    res.render('pages/register-success')
-  })
+  app.get('/discover', async (req, res) => {
+    try {
+      const posts = await discover.find({}).toArray()
 
-   // wachtwoord resetten
-   app.get('/forgot-password', (req, res) => {
-    res.render('pages/forgot-password', { error: null, success: null })
-  })
-
-  // wachtwoord resetten token
-  app.get('/reset-password/:token', async (req, res) => {
-    const user = await users.findOne({
-      resetToken: req.params.token,
-      resetTokenExpiry: { $gt: Date.now() }
-    })
-  
-    if (!user) {
-      return res.send('Link is ongeldig of verlopen')
+      res.render('pages/discover', {
+        user: req.session.user,
+        posts,
+      })
+    } catch (err) {
+      console.error(err)
+      res.status(500).send('Fout bij laden discover')
     }
-  
-    res.render('pages/reset-password', { token: req.params.token })
   })
 
   app.get('/profile', async (req, res) => {
     if (!req.session.user) return res.redirect('/login')
 
     try {
-      const { ObjectId } = require('mongodb')
-      const mijnReizen = await discover.find({
-        userId: new ObjectId(req.session.user._id)
+      const mijnPosts = await discover.find({
+        userId: new ObjectId(req.session.user._id),
       }).toArray()
 
       res.render('pages/profile', {
         user: req.session.user,
-        reizen: mijnReizen
+        posts: mijnPosts,
       })
     } catch (err) {
       console.error(err)
-      res.status(500).send('Fout bij ophalen van jouw reizen')
+      res.status(500).send('Fout profiel')
     }
-  })
-
-
-  app.get('/dashboard', (req, res) => {
-    if (!req.session.user) return res.redirect('/login')
-    res.render('pages/dashboard', { user: req.session.user })
-  })
-
-
-  // hier is laura nu mee bezig
-  app.get('/discover', async (req, res) => {
-    try {
-      const posts = await discover.find({}).toArray(); // alle posts ophalen
-
-      res.render('pages/discover', {
-        user: req.session.user,
-        posts: posts
-      });
-    } catch (err) {
-      console.error(err);
-      res.status(500).send('Er ging iets mis bij het laden van posts');
-    }
-  });
-  app.get('/discover', (req, res) => {
-    res.render('pages/discover', { user: req.session.user })
-  })
-
-  app.get('/create-post', (req, res) => {
-    if (!req.session.user) return res.redirect('/welkom')
-    res.render('pages/create-post', { user: req.session.user })
-  })
-
-  app.get('/post', (req, res) => {
-    res.render('pages/post', { user: req.session.user })
   })
 
   app.get('/post/:id', async (req, res) => {
     try {
-      const postId = req.params.id;
-      const post = await discover.findOne({ _id: new ObjectId(postId) });
-
-      if (!post) {
-        return res.status(404).send('Post niet gevonden');
-      }
-
-      res.render('pages/post', { post });
-
-    } catch (err) {
-      console.error(err);
-      res.status(500).send('Er ging iets mis bij het ophalen van de post');
-    }
-  });
-
-  //
-
-  // Matchen route
-  app.get('/matchen', (req, res) => {
-    res.render('pages/matchen', { user: req.session.user })
-  })
-  //
-
-  // profiel route
-  app.get('/profiel', async (req, res) => {
-    if (!req.session.user) return res.redirect('/login')
-
-    try {
-      const mijnPosts = await discover.find({
-        userId: new ObjectId(req.session.user._id)
-      }).toArray()
-
-      res.render('pages/profiel', {
-        user: req.session.user,
-        posts: mijnPosts
+      const post = await discover.findOne({
+        _id: new ObjectId(req.params.id),
       })
 
+      if (!post) return res.status(404).send('Post niet gevonden')
+
+      res.render('pages/post', { post })
     } catch (err) {
       console.error(err)
-      res.status(500).send('Fout bij ophalen van profiel')
+      res.status(500).send('Fout post laden')
     }
   })
- 
-   // Chatroom paginas Nicha
-  app.get('/chatroom', async (req, res) => {
+
+  app.get('/create-post', (req, res) => {
     if (!req.session.user) return res.redirect('/login')
-
-    const allUsers = await users.find().toArray()
-    const otherUsers = allUsers.filter(otherUser =>
-      otherUser._id.toString() !== req.session.user._id.toString()
-    )
-
-    res.render('pages/chatroom', {
-      user: req.session.user,
-      users: otherUsers
-    })
+    res.render('pages/create-post')
   })
 
-  // route voor een privéchat met 1 specifieke gebruiker
-  app.get('/chat-channel/:userId', async (req, res) => {
-  if (!req.session.user) return res.redirect('/login')
+  app.get('/chatroom', (req, res) => {
+    if (!req.session.user) return res.redirect('/login')
+    res.render('pages/chatroom')
+  })
 
-  const chatPartnerId = req.params.userId
-  const chatPartner = await users.findOne({ _id: new ObjectId(chatPartnerId) })
+  app.get('/filter', async (req, res) => {
+    try {
+      const reizen = await discover.find({}).toArray()
 
-  if (!chatPartner) {
-    return res.status(404).render('pages/errorstate', {
-      status: 404,
-      message: 'Gebruiker niet gevonden'
-    })
-  }
+      const resultaat = []
 
-  res.render('pages/chat-channel', {
-    user: req.session.user,
-    chatPartner: {
-      _id: chatPartner._id.toString(),
-      name: chatPartner.name
+      for (const reis of reizen) {
+        const user = await users.findOne({ _id: reis.userId })
+
+        resultaat.push({
+          reis,
+          user,
+        })
+      }
+
+      res.render('pages/filter', {
+        reizen: resultaat,
+      })
+    } catch (err) {
+      console.error(err)
+      res.status(500).send('Fout filter')
     }
   })
 
@@ -262,389 +161,168 @@ function registerGetRoutes() {
       res.redirect('/login')
     })
   })
-})
 }
 
-//route naar annabels pagina
+// =======================
+// POST ROUTES
+// =======================
 
-app.get('/filter', async (req, res) => {
-  try {
-    const myUsers = await users
-      .find({}) // alleen jouw records
-      .toArray();
-
-    res.render('pages/filter', { users: myUsers });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Fout bij ophalen data");
-  }
-})
-
-//route naar filter menu match
-
-app.get('/filter', async (req, res) => {
-  try {
-    const db = client.db(process.env.DB_NAME);
-
-    const usersCollection = db.collection('users');
-    const discoverCollection = db.collection('discover');
-
-    // Alleen ophalen wanneer nodig
-    const myUsers = await usersCollection.find({}).toArray();
-    const myDiscover = await discoverCollection.find({}).toArray();
-
-    // Combineer als je wilt
-    const combinedData = [...myUsers, ...myDiscover];
-
-    res.render('pages/filter', { users: combinedData });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Fout bij ophalen data");
-  }
-})
-
-//route naar filter op ontdek pagina
-
-app.get('/ontdekfilter', async (req, res) => {
-try {
-  const myUsers = await users
-    .find({})
-    .toArray();
-
-  res.render('pages/ontdekfilter', { users: myUsers });
-} catch (err) {
-  console.error(err);
-  res.status(500).send("Fout bij ophalen data");
-}
-})
-
-// ==========================================
-// 6. POST ROUTES (Data verwerken)
-// ==========================================
 function registerPostRoutes() {
-  // Login
+  app.post('/register', async (req, res) => {
+    try {
+      const { name, email, password } = req.body
+
+      if (!validator.isEmail(email)) {
+        return res.render('pages/register', {
+          error: 'Ongeldig emailadres',
+        })
+      }
+
+      const existingUser = await users.findOne({ email })
+
+      if (existingUser) {
+        return res.render('pages/register', {
+          error: 'Email bestaat al',
+        })
+      }
+
+      const hashedPassword = await bcrypt.hash(password, 10)
+
+      const result = await users.insertOne({
+        name,
+        email,
+        password: hashedPassword,
+      })
+
+      req.session.user = {
+        _id: result.insertedId,
+        name,
+        email,
+      }
+
+      res.redirect('/discover')
+    } catch (err) {
+      console.error(err)
+      res.status(500).send('Register error')
+    }
+  })
+
   app.post('/login', async (req, res) => {
     const { email, password } = req.body
 
-    // validator checks
-    if (!validator.isEmail(email)) {
-      return res.status(400).render('pages/login', { error: 'Ongeldig emailadres' })
-    }
-
-    const user = await users.findOne({ email: email })
-    if (!user) {
-      return res.status(401).render('pages/login', { error: 'Onbekende gebruiker' })
-    }
-
-    const passwordMatch = await bcrypt.compare(password, user.password)
-    if (!passwordMatch) {
-      return res.status(401).render('pages/login', { error: 'Ongeldig wachtwoord' })
-    }
-
-    req.session.user = {
-      _id: user._id,
-      email: user.email,
-      name: user.name,
-      lastName: user.lastName,
-      username: user.username,
-      bio: user.bio,
-      profile: user.profile,
-      gender: user.gender,
-      birthday: user.birthday,
-      interests: user.interests,
-      opzoek: user.opzoek
-    }
-
-    return res.redirect('/discover')
-  })
-
-  // wachtwoord resetten
-  app.post('/forgot-password', async (req, res) => {
-    const email = req.body.email
-  
-    // Validator check
-    if (!validator.isEmail(email)) {
-      return res.render('pages/forgot-password', { error: 'Ongeldig emailadres', success: null })
-    }
-  
     const user = await users.findOne({ email })
+
     if (!user) {
-      return res.render('pages/forgot-password', { error: 'Email niet gevonden', success: null })
+      return res.render('pages/login', {
+        error: 'Onbekende gebruiker',
+      })
     }
-  
-    // Maak een reset token en expiry
-    const resetToken = crypto.randomBytes(32).toString('hex')
-    const resetTokenExpiry = Date.now() + 3600000 // 1 uur geldig
-  
-    await users.updateOne(
-      { _id: user._id },
-      { $set: { resetToken, resetTokenExpiry } }
-    )
-  
-    // Verstuur email met link
-    const transporter = nodemailer.createTransport({
-      service: 'Gmail', // of andere mailprovider
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-      }
-    })
-  
-    const resetLink = `${req.protocol}://${req.get('host')}/reset-password/${resetToken}`
-  
-    await transporter.sendMail({
-      from: process.env.EMAIL_USER,
-      to: email,
-      subject: 'Reset je wachtwoord',
-      html: `<p>Klik op deze link om je wachtwoord te resetten: <a href="${resetLink}">${resetLink}</a></p>`
-    })
-  
-    res.render('pages/forgot-password', { error: null, success: 'Reset link is verstuurd!' })
+
+    const match = await bcrypt.compare(password, user.password)
+
+    if (!match) {
+      return res.render('pages/login', {
+        error: 'Verkeerd wachtwoord',
+      })
+    }
+
+    req.session.user = user
+
+    res.redirect('/discover')
   })
 
-  // reset wachtwoord
-  app.post('/reset-password', async (req, res) => {
-    const { token, password } = req.body
-  
-    const user = await users.findOne({
-      resetToken: token,
-      resetTokenExpiry: { $gt: Date.now() }
-    })
-  
-    if (!user) {
-      return res.send('Link is ongeldig of verlopen')
+  app.post('/post', async (req, res) => {
+    try {
+      if (!req.session.user) return res.redirect('/login')
+
+      const {
+        title,
+        startDate,
+        endDate,
+        location,
+        continent,
+        persons,
+        discription,
+      } = req.body
+
+      const result = await discover.insertOne({
+        userId: new ObjectId(req.session.user._id),
+        title,
+        startDate,
+        endDate,
+        location,
+        continent,
+        persons: Number(persons),
+        discription,
+      })
+
+      res.redirect(`/post/${result.insertedId}`)
+    } catch (err) {
+      console.error(err)
+      res.status(500).send('Post error')
     }
-  
-    if (!validator.isLength(password, { min: 8 })) {
-      return res.send('Wachtwoord moet minimaal 8 tekens zijn')
-    }
-  
-    const hashedPassword = await bcrypt.hash(password, 10)
-  
-    await users.updateOne(
-      { _id: user._id },
-      {
-        $set: { password: hashedPassword },
-        $unset: {
-          resetToken: "",
-          resetTokenExpiry: ""
-        }
-      }
-    )
-  
-    res.send('Wachtwoord succesvol gereset! Je kunt nu inloggen.')
-  })
-
-
-  // Register
-  app.post('/register', async (req, res) => {
-    const { name, lastName, email, password, username, birthday,
-      tel, gender, profile, image1, image2, image3, status,
-      bio, interests, opzoek
-    } = req.body
-
-    // validator checks
-    if (!validator.isEmail(email)) {
-      return res.status(400).render('pages/register', { error: 'Ongeldig emailadres' })
-    }
-    if (!validator.isLength(password, { min: 8 })) {
-      return res.status(400).render('pages/register', { error: 'Wachtwoord moet minimaal 8 tekens bevatten' })
-    }
-    const existingUser = await users.findOne({ email })
-    if (existingUser) {
-      return res.status(409).render('pages/register', { error: 'Email bestaat al' })
-    }
-
-    // password hashing
-    const hashedPassword = await bcrypt.hash(password, 10)
-
-    const result = await users.insertOne({
-      name,
-      lastName,
-      email,
-      password: hashedPassword,
-      username,
-      birthday,
-      tel,
-      gender,
-      profile,
-      image1,
-      image2,
-      image3,
-      status,
-      bio,
-      interests,
-      opzoek
-    })
-
-    // sessie opslaan na registratie
-    const nieuweUser = await users.findOne({ _id: result.insertedId })
-    req.session.user = {
-      _id: nieuweUser._id,
-      email: nieuweUser.email,
-      name: nieuweUser.name
-    }
-
-    return res.redirect('/discover')
-  })
-
-  //Post
-  app.post('/post', (req, res) => {
-    const supplies = req.body.supplies.split('\n') //checken of dit werkt
-
-    res.redirect('/post')
   })
 }
 
-//create-post formulier 
-app.post('/post', async (req, res) => {
-  if (!req.session.user) return res.redirect('/login')
-  const { title, startDate, endDate, location, persons, discription, gender } = req.body;
-
-  let age = req.body.age;
-  if (!Array.isArray(age)) {
-    age = age ? [age] : [];
-  }
-
-  // Supplies als array van nieuwe regels
-  const supplies = req.body.supplies ? req.body.supplies.split('\n') : [];
-
-  const result = await discover.insertOne({
-    userId: new ObjectId(req.session.user._id), // koppeling aan gebruiker die ingelogd is
-    title,
-    startDate,
-    endDate,
-    location,
-    persons,
-    discription,
-    supplies,
-    age,
-    gender
-  })
-
-  return res.redirect(`/post/${result.insertedId}`)
-})
-
-
-
-// ==========================================
-// 7. SOCKET.IO (Chat events)
-// source: https://medium.com/@basukori8463/build-a-real-time-chat-app-from-scratch-with-node-js-and-socket-io-9714b7076372
-// ==========================================
-let connectedUsers = 0
+// =======================
+// SOCKET.IO
+// =======================
 
 function registerSocketHandlers() {
   io.on('connection', (socket) => {
-    console.log('session user:', socket.request.session.user)
-    const user = socket.request.session.user
-
-    if (!user) {
-      return socket.disconnect()
-    }
-
-    socket.join(user._id.toString())
-
-    connectedUsers++
-    console.log(`🎉 A user connected: ${socket.id} Total users: ${connectedUsers}`)
-
-    socket.broadcast.emit(
-      'user notification',
-      `${user.name} joined the chat! (${connectedUsers} users online)`
-    )
+    console.log('User connected:', socket.id)
 
     socket.on('chat message', (msg) => {
-      console.log('📨 Message received:', msg)
       io.emit('chat message', msg)
     })
 
-    socket.on('private message', ({ toUserId, text }) => {
-      if (!toUserId || !text) return
-
-      io.to(toUserId).emit('private message', {
-        fromName: user.name,
-        text: text,
-        timestamp: new Date().toISOString()
-      })
-    })
-
-    socket.on('typing', () => {
-      socket.broadcast.emit('typing')
-    })
-
-    socket.on('stop typing', () => {
-      socket.broadcast.emit('stop typing')
-    })
-
     socket.on('disconnect', () => {
-      connectedUsers--
-      console.log(`👋 A user disconnected: ${socket.id} Total users: ${connectedUsers}`)
-
-      socket.broadcast.emit(
-        'user notification',
-        `${user.name} left the chat. (${connectedUsers} users online)`
-      )
+      console.log('User disconnected')
     })
   })
 }
 
-// Middleware to handle not found errors - error 404
-
-    
-    
- 
-// ==========================================
-// 8. ERROR HANDLING & SERVER START
-// ==========================================
+// =======================
+// ERROR HANDLING
+// =======================
 
 function registerErrorHandlers() {
-  // Middleware to handle not found errors - error 404
   app.use((req, res) => {
-    if (req.url === '/.well-known/appspecific/com.chrome.devtools.json') {
-      return res.sendStatus(204)
-    }
-    console.error('404 error at URL: ' + req.url)
     res.status(404).render('pages/errorstate', {
       status: 404,
-      message: 'Pagina niet gevonden'
+      message: 'Pagina niet gevonden',
     })
   })
 
-
-  // error handler
-  app.use(function (err, req, res) {
+  app.use((err, req, res, next) => {
     console.error(err.stack)
-    res.status(500).send('500: server error')
+    res.status(500).send('500 server error')
   })
 }
+
+// =======================
+// START SERVER
+// =======================
 
 async function start() {
   try {
     await client.connect()
-    console.log('Database connection established')
 
     const db = client.db(process.env.DB_NAME)
+
     users = db.collection(process.env.DB_COLLECTION)
-
     discover = db.collection('discover')
-
-    // Routes registreren
 
     registerGetRoutes()
     registerPostRoutes()
     registerSocketHandlers()
     registerErrorHandlers()
 
-    // Server starten
-
-    const port = process.env.PORT || 3000
-    server.listen(port, () => {
-      console.log(`Server draait op poort ${port}`)
+    server.listen(process.env.PORT || 3000, () => {
+      console.log('Server draait')
     })
-
   } catch (err) {
-    console.log('Database connection error:', err)
-    console.log('For uri -', uri)
-    process.exit(1)
+    console.error(err)
   }
 }
 

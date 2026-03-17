@@ -29,21 +29,29 @@
     </section>
 
     <section>
-      <!-- dit aanpassen uit database maker gebuiker  -->
-        <p><%= post.gender %> | <%= post.age %> jaar</p>
+      <h2>Type reis</h2>
+      <p><%= post.gender %> | <%= post.age %> jaar</p>
 
-        <h2>Omschrijving</h2>
-        <p><%= post.discription %> </p>
+      <h2>Omschrijving</h2>
+      <p><%= post.discription %> </p>
 
-        <h2>De route</h2>
-        <!-- <img src="  " alt="route <%= post.title %>"> -->
+      <h2>De route</h2>
+      <!-- <img src="  " alt="route <%= post.title %>"> -->
 
-        <h2>Benodigdheden</h2>
-        <ul>
-          <% post.supplies.forEach(item => { %>
-            <li><%= post.item %></li>
-          <% }) %>
-        </ul>
+      <h2>Benodigdheden</h2>
+      <ul>
+        <% post.supplies.forEach(item => { %>
+          <li><%= post.item %></li>
+        <% }) %>
+      </ul>
+    </section>
+
+    <section class="profilecard">
+      <h2>Gepost door</h2>
+      <a href="/profiel/<%= post.user._id %>">
+        <img src="<%= post.user.profilePicture %>" alt="<%= post.user.name %>">
+        <p><%= post.user.name %></p>
+      </a>
     </section>
   </main>
 

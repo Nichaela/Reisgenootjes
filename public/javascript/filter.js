@@ -17,6 +17,9 @@ const birthdayValue = document.getElementById("birthdayValue");
 let activeFilters = new Set();       // gender
 let activeContinents = new Set();    // continent
 
+
+
+
 // =======================
 // Realtime slider update
 // =======================
@@ -30,12 +33,15 @@ if (birthdaySlider && birthdayValue) {
   });
 
 }
+
+
+
 // =======================
 // Filter functie
 // =======================
 function filterItems() {
-  const selectedDate = dateFilter.value;
-  const selectedAge = birthdaySlider ? parseInt(birthdaySlider.value) : null;
+  const selectedDate = dateFilter.value; //haalt data op uit input
+  const selectedAge = birthdaySlider ? parseInt(birthdaySlider.value) : null; 
 
   items.forEach(item => {
     const gender = item.dataset.gender;
@@ -126,7 +132,7 @@ continentButtons.forEach(btn => {
 // Datum & dagen filters
 // =======================
 dateFilter.addEventListener("change", filterItems); // er wordt opnieuw gefilterd als de datum wordt veranderd
-daysFilter.addEventListener("input", filterItems); // er wordt opnieuw gefilterd als de dagen wordt veranderd
+
 
 
 // =======================
