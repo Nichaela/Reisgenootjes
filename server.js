@@ -103,6 +103,24 @@ function registerGetRoutes() {
     res.render('pages/register-success')
   })
 
+   // wachtwoord resetten
+   app.get('/forgot-password', (req, res) => {
+    res.render('pages/forgot-password', { error: null, success: null })
+  })
+
+  // wachtwoord resetten token
+  app.get('/reset-password/:token', async (req, res) => {
+    const user = await users.findOne({
+      resetToken: req.params.token,
+      resetTokenExpiry: { $gt: Date.now() }
+    })
+  
+    if (!user) {
+      return res.send('Link is ongeldig of verlopen')
+    }
+  
+    res.render('pages/reset-password', { token: req.params.token })
+  })
 
   app.get('/profile', async (req, res) => {
     if (!req.session.user) return res.redirect('/login')
@@ -201,7 +219,6 @@ function registerGetRoutes() {
       res.status(500).send('Fout bij ophalen van profiel')
     }
   })
-  //
  
    // Chatroom paginas Nicha
   app.get('/chatroom', async (req, res) => {
@@ -263,6 +280,44 @@ app.get('/filter', async (req, res) => {
   }
 })
 
+//route naar filter menu match
+
+app.get('/filter', async (req, res) => {
+  try {
+    const db = client.db(process.env.DB_NAME);
+
+    const usersCollection = db.collection('users');
+    const discoverCollection = db.collection('discover');
+
+    // Alleen ophalen wanneer nodig
+    const myUsers = await usersCollection.find({}).toArray();
+    const myDiscover = await discoverCollection.find({}).toArray();
+
+    // Combineer als je wilt
+    const combinedData = [...myUsers, ...myDiscover];
+
+    res.render('pages/filter', { users: combinedData });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Fout bij ophalen data");
+  }
+})
+
+//route naar filter op ontdek pagina
+
+app.get('/ontdekfilter', async (req, res) => {
+try {
+  const myUsers = await users
+    .find({})
+    .toArray();
+
+  res.render('pages/ontdekfilter', { users: myUsers });
+} catch (err) {
+  console.error(err);
+  res.status(500).send("Fout bij ophalen data");
+}
+})
+
 // ==========================================
 // 6. POST ROUTES (Data verwerken)
 // ==========================================
@@ -304,8 +359,80 @@ function registerPostRoutes() {
   })
 
   // wachtwoord resetten
-  app.get('/forgot-password', (req, res) => {
-    res.render('pages/forgot-password', { error: null, success: null })
+  app.post('/forgot-password', async (req, res) => {
+    const email = req.body.email
+  
+    // Validator check
+    if (!validator.isEmail(email)) {
+      return res.render('pages/forgot-password', { error: 'Ongeldig emailadres', success: null })
+    }
+  
+    const user = await users.findOne({ email })
+    if (!user) {
+      return res.render('pages/forgot-password', { error: 'Email niet gevonden', success: null })
+    }
+  
+    // Maak een reset token en expiry
+    const resetToken = crypto.randomBytes(32).toString('hex')
+    const resetTokenExpiry = Date.now() + 3600000 // 1 uur geldig
+  
+    await users.updateOne(
+      { _id: user._id },
+      { $set: { resetToken, resetTokenExpiry } }
+    )
+  
+    // Verstuur email met link
+    const transporter = nodemailer.createTransport({
+      service: 'Gmail', // of andere mailprovider
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+      }
+    })
+  
+    const resetLink = `${req.protocol}://${req.get('host')}/reset-password/${resetToken}`
+  
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: 'Reset je wachtwoord',
+      html: `<p>Klik op deze link om je wachtwoord te resetten: <a href="${resetLink}">${resetLink}</a></p>`
+    })
+  
+    res.render('pages/forgot-password', { error: null, success: 'Reset link is verstuurd!' })
+  })
+
+  // reset wachtwoord
+  app.post('/reset-password', async (req, res) => {
+    const { token, password } = req.body
+  
+    const user = await users.findOne({
+      resetToken: token,
+      resetTokenExpiry: { $gt: Date.now() }
+    })
+  
+    if (!user) {
+      return res.send('Link is ongeldig of verlopen')
+    }
+  
+    if (!validator.isLength(password, { min: 8 })) {
+      return res.send('Wachtwoord moet minimaal 8 tekens zijn')
+    }
+  
+    const hashedPassword = await bcrypt.hash(password, 10)
+  
+    await users.updateOne(
+      { _id: user._id },
+      {
+        $set: { password: hashedPassword },
+        $unset: {
+          resetToken: "",
+          resetTokenExpiry: ""
+        }
+      }
+    )
+  
+    res.send('Wachtwoord succesvol gereset! Je kunt nu inloggen.')
   })
 
 
@@ -367,45 +494,8 @@ function registerPostRoutes() {
 
     res.redirect('/post')
   })
-
-  //route naar filter menu match
-
-  app.get('/filter', async (req, res) => {
-    try {
-      const db = client.db(process.env.DB_NAME);
-
-      const usersCollection = db.collection('users');
-      const discoverCollection = db.collection('discover');
-
-      // Alleen ophalen wanneer nodig
-      const myUsers = await usersCollection.find({}).toArray();
-      const myDiscover = await discoverCollection.find({}).toArray();
-
-      // Combineer als je wilt
-      const combinedData = [...myUsers, ...myDiscover];
-
-      res.render('pages/filter', { users: combinedData });
-    } catch (err) {
-      console.error(err);
-      res.status(500).send("Fout bij ophalen data");
-    }
-  })
 }
 
-//route naar filter op ontdek pagina
-
-app.get('/ontdekfilter', async (req, res) => {
-  try {
-    const myUsers = await users
-      .find({})
-      .toArray();
-
-    res.render('pages/ontdekfilter', { users: myUsers });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Fout bij ophalen data");
-  }
-})
 //create-post formulier 
 app.post('/post', async (req, res) => {
   if (!req.session.user) return res.redirect('/login')
