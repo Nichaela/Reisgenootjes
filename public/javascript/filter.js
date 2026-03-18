@@ -9,7 +9,6 @@ const closeButton = document.getElementById("closeMenu");
 const items = document.querySelectorAll(".all li");
 
 const dateFilter = document.getElementById("dateFilter");
-const daysFilter = document.getElementById("daysFilter");
 
 const birthdaySlider = document.getElementById("birthday");
 const birthdayValue = document.getElementById("birthdayValue");
