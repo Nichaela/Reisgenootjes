@@ -152,21 +152,20 @@ function registerGetRoutes() {
     if (!req.session.user) return res.redirect('/welkom')  
     res.render('pages/create-post', { user: req.session.user })
   })
-
   app.get('/post/:id', async (req, res) => {
     try {
-      const post = await discover.findOne({
-        _id: new ObjectId(req.params.id),
-      })
+      const post = await discover.findOne({ _id: new ObjectId(req.params.id) })
+      if (!post) return res.status(404).send('Post niet gevonden')
+  
+      const postUser = await users.findOne({ _id: new ObjectId(post.userId) })
+  
+      // haal alle mederezigers op
+      const reizigersIds = post.reizigers || []
+      const mederezigers = await users.find({ 
+        _id: { $in: reizigersIds.map(id => new ObjectId(id)) } 
+      }).toArray()
 
-      if (!post) {
-        return res.status(404).send('Post niet gevonden');
-      }
-
-      const postUser = await users.findOne({ _id: new ObjectId(post.userId) });
-
-      res.render('pages/post',{ post, postUser });
-
+      res.render('pages/post', { post, postUser, mederezigers, user: req.session.user || null })
     } catch (err) {
       console.error(err)
       res.status(500).send('Fout post laden')
@@ -211,35 +210,6 @@ app.get('/matchen', async (req, res) => {
   if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) age--;
 
   res.render('pages/matchen', { user: req.session.user, post: post, matchUser: matchUser, age: age })
-})
-
-app.post('/likes', async (req, res) => {
-  if (!req.session.user) return res.redirect('/login')
-
-  const matchedUserId = req.body.matchedUser;
-  const actie = req.body.actie;
-
-  // Voeg toe aan gezien in sessie
-  if (!req.session.gezien) req.session.gezien = [];
-  req.session.gezien.push(matchedUserId);
-
-  if (actie === 'like') {
-    // Sla like op in database bij de ingelogde gebruiker
-    await users.updateOne(
-      { _id: new ObjectId(req.session.user._id) },
-      { $addToSet: { likes: matchedUserId } }
-    )
-
-    // Check of de andere persoon jou ook al geliket heeft
-    const andereUser = await users.findOne({ _id: new ObjectId(matchedUserId) });
-    const matchId = req.session.user._id.toString();
-
-    if (andereUser.likes && andereUser.likes.includes(matchId)) {
-      return res.redirect('/chatroom')
-    }
-  }
-
-  res.redirect('/matchen')
 })
 
   app.get('/chatroom', (req, res) => {
@@ -447,7 +417,63 @@ function registerPostRoutes() {
       res.status(500).send('Er ging iets mis bij het aanmaken van de post')
     }
   })
+
+  // join reis
+  app.post('/post/:id/join', async (req, res) => {
+    if (!req.session.user) return res.redirect('/login')
+
+    const post = await discover.findOne({ _id: new ObjectId(req.params.id) })
+    if (!post) return res.status(404).send('Post niet gevonden')
+
+    const aantalReizigers = post.reizigers ? post.reizigers.length : 0
+
+    // check of de reis vol is
+    if (aantalReizigers >= post.persons) {
+      return res.status(403).send('Deze reis is vol')
+    }
+    
+    // check of user al meedoet
+    const alGejoint = post.reizigers && post.reizigers.some(id => id.toString() === req.session.user._id.toString())
+    if (alGejoint) return res.redirect(`/post/${req.params.id}`)
+
+    // voeg user toe aan reizigers array
+    await discover.updateOne(
+      { _id: new ObjectId(req.params.id) },
+      { $push: { reizigers: new ObjectId(req.session.user._id) } }
+    )
+
+    res.redirect(`/post/${req.params.id}`)
+  })
 }
+
+app.post('/likes', async (req, res) => {
+  if (!req.session.user) return res.redirect('/login')
+
+  const matchedUserId = req.body.matchedUser;
+  const actie = req.body.actie;
+
+  // Voeg toe aan gezien in sessie
+  if (!req.session.gezien) req.session.gezien = [];
+  req.session.gezien.push(matchedUserId);
+
+  if (actie === 'like') {
+    // Sla like op in database bij de ingelogde gebruiker
+    await users.updateOne(
+      { _id: new ObjectId(req.session.user._id) },
+      { $addToSet: { likes: matchedUserId } }
+    )
+
+    // Check of de andere persoon jou ook al geliket heeft
+    const andereUser = await users.findOne({ _id: new ObjectId(matchedUserId) });
+    const matchId = req.session.user._id.toString();
+
+    if (andereUser.likes && andereUser.likes.includes(matchId)) {
+      return res.redirect('/chatroom')
+    }
+  }
+
+  res.redirect('/matchen')
+})
 
 // =======================
 // SOCKET.IO
