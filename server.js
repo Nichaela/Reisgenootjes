@@ -107,7 +107,7 @@ function registerGetRoutes() {
     res.render('pages/register', { error: null })
   })
 
-  app.get('/profile', async (req, res) => {
+  app.get('/profiel', async (req, res) => {
     if (!req.session.user) return res.redirect('/login')
 
     try {
@@ -122,7 +122,7 @@ function registerGetRoutes() {
       const month = today.getMonth() - birthDate.getMonth();
       if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) age--;
 
-      res.render('pages/profile', {
+      res.render('pages/profiel', {
         user: req.session.user,
         posts: mijnPosts,
         age: age
@@ -197,12 +197,18 @@ app.get('/matchen', async (req, res) => {
     _id: { $nin: gezien.map(id => new ObjectId(id)) }
   });
 
- console.log('Post gevonden:', post?._id)
+  console.log('Post gevonden:', post?._id)
   console.log('Post userId:', post?.userId)
 
   if (!post) return res.render('pages/matchen', { user: req.session.user, post: null, matchUser: null, age: null })
 
   const matchUser = await users.findOne({ _id: new ObjectId(post.userId) });
+
+  if (!matchUser) {
+    if (!req.session.gezien) req.session.gezien = [];
+    req.session.gezien.push(post._id.toString());
+    return res.redirect('/matchen')
+  }
 
   const today = new Date();
   const birthDate = new Date(matchUser.birthday);
@@ -217,20 +223,18 @@ app.post('/likes', async (req, res) => {
   if (!req.session.user) return res.redirect('/login')
 
   const matchedUserId = req.body.matchedUser;
+  const postId = req.body.postId;
   const actie = req.body.actie;
 
-  // Voeg toe aan gezien in sessie
   if (!req.session.gezien) req.session.gezien = [];
-  req.session.gezien.push(matchedUserId);
+  req.session.gezien.push(postId);
 
   if (actie === 'like') {
-    // Sla like op in database bij de ingelogde gebruiker
     await users.updateOne(
       { _id: new ObjectId(req.session.user._id) },
       { $addToSet: { likes: matchedUserId } }
     )
 
-    // Check of de andere persoon jou ook al geliket heeft
     const andereUser = await users.findOne({ _id: new ObjectId(matchedUserId) });
     const matchId = req.session.user._id.toString();
 
@@ -241,28 +245,6 @@ app.post('/likes', async (req, res) => {
 
   res.redirect('/matchen')
 })
-
-
-
-  //Profiel
-  app.get('/profiel', async (req, res) => {
-  if (!req.session.user) return res.redirect('/login')
-
-  try {
-    const mijnPosts = await discover.find({ 
-      userId: new ObjectId(req.session.user._id) 
-    }).toArray()
-
-    const today = new Date();
-    const birthDate = new Date(matchUser.birthday);
-    const month = today.getMonth() - birthDate.getMonth();
-    let age = today.getFullYear() - birthDate.getFullYear();
-
-    if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) age--;
-
-    res.render('pages/matchen', { user: req.session.user, post: post, matchUser: matchUser, age: age })
-  })
-
   app.get('/chatroom', (req, res) => {
     if (!req.session.user) return res.redirect('/login')
     res.render('pages/chatroom', { user: req.session.user })
@@ -272,6 +254,11 @@ app.post('/likes', async (req, res) => {
     if (!req.session.user) return res.redirect('/login')
     res.render('pages/chat-channel', { user: req.session.user })
   })
+
+  app.get('/matchen/reset', (req, res) => {
+  req.session.gezien = [];
+  res.redirect('/matchen')
+})
 
   // route naar ontdek filter
   app.get('/ontdekfilter', async (req, res) => {
