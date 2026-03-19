@@ -103,6 +103,24 @@ function registerGetRoutes() {
     res.render('pages/login', { error: null })
   })
 
+  app.get('/forgot-password', (req, res) => {
+    res.render('pages/forgot-password', { error: null, success: null })
+  })
+
+  // wachtwoord resetten token
+  app.get('/reset-password/:token', async (req, res) => {
+    const user = await users.findOne({
+      resetToken: req.params.token,
+      resetTokenExpiry: { $gt: Date.now() }
+    })
+  
+    if (!user) {
+      return res.send('Link is ongeldig of verlopen')
+    }
+  
+    res.render('pages/reset-password', { token: req.params.token })
+  })
+
   app.get('/register', (req, res) => {
     res.render('pages/register', { error: null })
   })
@@ -172,6 +190,7 @@ function registerGetRoutes() {
     if (!req.session.user) return res.redirect('/welkom')
     res.render('pages/create-post', { user: req.session.user })
   })
+
   app.get('/post/:id', async (req, res) => {
     try {
       const post = await discover.findOne({
@@ -187,13 +206,13 @@ function registerGetRoutes() {
       res.render('pages/post', { post, postUser });
       const post = await discover.findOne({ _id: new ObjectId(req.params.id) })
       if (!post) return res.status(404).send('Post niet gevonden')
-  
+
       const postUser = await users.findOne({ _id: new ObjectId(post.userId) })
-  
+
       // haal alle mederezigers op
       const reizigersIds = post.reizigers || []
-      const mederezigers = await users.find({ 
-        _id: { $in: reizigersIds.map(id => new ObjectId(id)) } 
+      const mederezigers = await users.find({
+        _id: { $in: reizigersIds.map(id => new ObjectId(id)) }
       }).toArray()
 
       res.render('pages/post', { post, postUser, mederezigers, user: req.session.user || null })
@@ -203,36 +222,36 @@ function registerGetRoutes() {
     }
   })
 
-//   // Matchen route
-//   app.get('/matchen', async (req, res) => {
-//   const post = await discover.findOne({});
-//   const matchUser = await users.findOne({ _id: new ObjectId(post.userId) });
-//     const today = new Date();
-//   const birthDate = new Date(matchUser.birthday);
-//   let age = today.getFullYear() - birthDate.getFullYear();
-//   const month = today.getMonth() - birthDate.getMonth();
-//   if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) age--;
+  //   // Matchen route
+  //   app.get('/matchen', async (req, res) => {
+  //   const post = await discover.findOne({});
+  //   const matchUser = await users.findOne({ _id: new ObjectId(post.userId) });
+  //     const today = new Date();
+  //   const birthDate = new Date(matchUser.birthday);
+  //   let age = today.getFullYear() - birthDate.getFullYear();
+  //   const month = today.getMonth() - birthDate.getMonth();
+  //   if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) age--;
 
-//   res.render('pages/matchen', { user: req.session.user, post: post, matchUser: matchUser, age: age })
-// })
+  //   res.render('pages/matchen', { user: req.session.user, post: post, matchUser: matchUser, age: age })
+  // })
 
-app.get('/matchen', async (req, res) => {
-  if (!req.session.user) return res.redirect('/login')
+  app.get('/matchen', async (req, res) => {
+    if (!req.session.user) return res.redirect('/login')
 
-  const gezien = req.session.gezien || [];
-  console.log('Gezien:', gezien)
+    const gezien = req.session.gezien || [];
+    console.log('Gezien:', gezien)
 
-  const post = await discover.findOne({
-    userId: { $ne: new ObjectId(req.session.user._id) },
-    _id: { $nin: gezien.map(id => new ObjectId(id)) }
-  });
+    const post = await discover.findOne({
+      userId: { $ne: new ObjectId(req.session.user._id) },
+      _id: { $nin: gezien.map(id => new ObjectId(id)) }
+    });
 
-  console.log('Post gevonden:', post?._id)
-  console.log('Post userId:', post?.userId)
+    console.log('Post gevonden:', post?._id)
+    console.log('Post userId:', post?.userId)
 
-  if (!post) return res.render('pages/matchen', { user: req.session.user, post: null, matchUser: null, age: null })
+    if (!post) return res.render('pages/matchen', { user: req.session.user, post: null, matchUser: null, age: null })
 
-  const matchUser = await users.findOne({ _id: new ObjectId(post.userId) });
+    const matchUser = await users.findOne({ _id: new ObjectId(post.userId) });
 
   if (!matchUser) {
     if (!req.session.gezien) req.session.gezien = [];
@@ -246,8 +265,8 @@ app.get('/matchen', async (req, res) => {
   const month = today.getMonth() - birthDate.getMonth();
   if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) age--;
 
-  res.render('pages/matchen', { user: req.session.user, post: post, matchUser: matchUser, age: age })
-})
+    res.render('pages/matchen', { user: req.session.user, post: post, matchUser: matchUser, age: age })
+  })
 
 app.post('/likes', async (req, res) => {
   if (!req.session.user) return res.redirect('/login')
@@ -316,17 +335,48 @@ app.post('/likes', async (req, res) => {
   })
 
   app.get('/logout', (req, res) => {
-    req.session.destroy(() => {
+    req.session.destroy((err) => {
+      if (err) {
+        console.error(err)
+        return res.redirect('/discover')
+      }
+  
+      res.clearCookie('connect.sid')
       res.redirect('/welkom')
     })
   })
 }
+
+//Huidge route naar filter menu + werkende continent filter 
+app.get('/filter', async (req, res) => {
+  try {
+    const db = client.db(process.env.DB_NAME);
+    const usersCollection = db.collection('users');
+    const discoverCollection = db.collection('discover');
+    const reizen = await discoverCollection.find({}).toArray();
+    const resultaat = []; for (const reis of reizen) {
+
+      //voor elke reis in de lijst reizen doe dit: 
+      const user = await usersCollection.findOne({
+        _id: reis.userId //vind een reis 
+      })
+      resultaat.push({ //pusht deze data in die lege array genaamd resultaat 
+        reis: reis, user: user
+      })
+    }
+
+    res.render('pages/filter', {
+      reizen: resultaat //reizen = de array van de collection en resultaat is de array die ik heb gemaakt 
+    })
+  } catch (err) { console.error(err); res.status(500).send("Fout bij ophalen data"); }
+})
 
 app.get('/logout', (req, res) => {
   req.session.destroy(() => {
     res.redirect('/welkom')
   })
 })
+
 
 // =======================
 // POST ROUTES
@@ -367,6 +417,82 @@ function registerPostRoutes() {
     }
 
     return res.redirect('/discover')
+  })
+
+  app.post('/forgot-password', async (req, res) => {
+    const email = req.body.email
+  
+    // Validator check
+    if (!validator.isEmail(email)) {
+      return res.render('pages/forgot-password', { error: 'Ongeldig emailadres', success: null })
+    }
+  
+    const user = await users.findOne({ email })
+    if (!user) {
+      return res.render('pages/forgot-password', { error: 'Email niet gevonden', success: null })
+    }
+  
+    // Maak een reset token en expiry
+    const resetToken = crypto.randomBytes(32).toString('hex')
+    const resetTokenExpiry = Date.now() + 3600000 // 1 uur geldig
+  
+    await users.updateOne(
+      { _id: user._id },
+      { $set: { resetToken, resetTokenExpiry } }
+    )
+  
+    // Verstuur email met link
+    const transporter = nodemailer.createTransport({
+      service: 'Gmail', // of andere mailprovider
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+      }
+    })
+  
+    const resetLink = `${req.protocol}://${req.get('host')}/reset-password/${resetToken}`
+  
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: 'Reset je wachtwoord',
+      html: `<p>Klik op deze link om je wachtwoord te resetten: <a href="${resetLink}">${resetLink}</a></p>`
+    })
+  
+    res.render('pages/forgot-password', { error: null, success: 'Reset link is verstuurd!' })
+  })
+
+  // reset wachtwoord
+  app.post('/reset-password', async (req, res) => {
+    const { token, password } = req.body
+  
+    const user = await users.findOne({
+      resetToken: token,
+      resetTokenExpiry: { $gt: Date.now() }
+    })
+  
+    if (!user) {
+      return res.send('Link is ongeldig of verlopen')
+    }
+  
+    if (!validator.isLength(password, { min: 8 })) {
+      return res.send('Wachtwoord moet minimaal 8 tekens zijn')
+    }
+  
+    const hashedPassword = await bcrypt.hash(password, 10)
+  
+    await users.updateOne(
+      { _id: user._id },
+      {
+        $set: { password: hashedPassword },
+        $unset: {
+          resetToken: "",
+          resetTokenExpiry: ""
+        }
+      }
+    )
+  
+    res.send('Wachtwoord succesvol gereset! Je kunt nu inloggen.')
   })
 
   //register
@@ -475,7 +601,7 @@ function registerPostRoutes() {
     if (aantalReizigers >= post.persons) {
       return res.status(403).send('Deze reis is vol')
     }
-    
+
     // check of user al meedoet
     const alGejoint = post.reizigers && post.reizigers.some(id => id.toString() === req.session.user._id.toString())
     if (alGejoint) return res.redirect(`/post/${req.params.id}`)
