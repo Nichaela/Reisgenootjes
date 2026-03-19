@@ -126,7 +126,9 @@ continentButtons.forEach(btn => {
 // Datum & dagen filters
 // =======================
 dateFilter.addEventListener("change", filterItems); // er wordt opnieuw gefilterd als de datum wordt veranderd
-daysFilter.addEventListener("input", filterItems); // er wordt opnieuw gefilterd als de dagen wordt veranderd
+if (daysFilter) {
+  daysFilter.addEventListener("input", filterItems);
+}
 
 
 // =======================
