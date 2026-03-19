@@ -257,7 +257,6 @@ function registerGetRoutes() {
     })
   })
 
-
 // =======================
 // POST ROUTES
 // =======================
