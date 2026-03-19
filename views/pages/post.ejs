@@ -22,10 +22,11 @@
         </p>
         <h1><%= post.title %></h1>
         <p><%= post.startDate %> tot <%= post.endDate %></p>
-        
-        <!-- <img src="<%= post.image %>" alt="<%= post.title %>" class="hero-img"> -->
 
-
+        <% if (post.postCoverImg) { %>
+          <img src="/uploads/<%= post.postCoverImg %>" alt="<%= post.title %>" class="hero-img">
+        <% } %>
+  
     </section>
 
     <section>
@@ -46,12 +47,19 @@
       </ul>
     </section>
 
-    <section class="profilecard">
+    <section>
       <h2>Gepost door</h2>
-      <a href="/profiel/<%= post.user._id %>">
-        <img src="<%= post.user.profilePicture %>" alt="<%= post.user.name %>">
-        <p><%= post.user.name %></p>
-      </a>
+      <article class="profilecard">
+        <a href="/profiel/<%= post.userId %>">
+          <img src="<%= postUser.profilePicture %>" alt="<%= postUser.name %>">
+          <p><%= postUser.name %></p>
+          <p><%= postUser.gender %></p>
+          <p><%= postUser.birthday %></p>
+        </a>
+        <!-- deze moet naar de chat met deze persoon gaan -->
+        <a href="/chat" class="gradient-btn">Stuur <%= postUser.name %> een bericht</a>
+      </article>
+
     </section>
   </main>
 

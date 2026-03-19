@@ -18,6 +18,18 @@ const nodemailer = require('nodemailer')
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb')
 const { error } = require('console')
 
+const multer = require('multer')
+const path = require('path')
+const storage = multer.diskStorage({
+  destination: 'public/uploads/',
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname)
+    cb(null, Date.now() + ext)
+  }
+})
+const upload = multer({ storage: storage })
+
+
 // =======================
 // APP, SERVER SOCKET.IO
 // =======================
@@ -137,8 +149,8 @@ function registerGetRoutes() {
   })
 
   app.get('/create-post', (req, res) => {
-    if (!req.session.user) return res.redirect('/welkom')
-    res.render('pages/create-post')
+    if (!req.session.user) return res.redirect('/welkom')  
+    res.render('pages/create-post', { user: req.session.user })
   })
 
   app.get('/post/:id', async (req, res) => {
@@ -151,7 +163,9 @@ function registerGetRoutes() {
         return res.status(404).send('Post niet gevonden');
       }
 
-      res.render('pages/post', { post })
+      const postUser = await users.findOne({ _id: new ObjectId(post.userId) });
+
+      res.render('pages/post',{ post, postUser });
 
     } catch (err) {
       console.error(err)
@@ -337,12 +351,15 @@ function registerPostRoutes() {
     return res.redirect('/discover')
   })
 
-  app.post('/post', async (req, res) => {
+  //create-post formulier 
+  app.post('/post', upload.single('postCoverImg'), async (req, res) => {
     try {
       if (!req.session.user) return res.redirect('/login')
 
       const { title, startDate, endDate, location, continent, persons, discription, gender } = req.body
-
+      
+      const postCoverImg = req.file ? req.file.filename : null
+    
       let age = req.body.age
       if (!Array.isArray(age)) {
         age = age ? [age] : []
@@ -356,6 +373,7 @@ function registerPostRoutes() {
       const result = await discover.insertOne({
         userId: new ObjectId(req.session.user._id), // koppeling aan gebruiker die ingelogd is
         title,
+        postCoverImg,
         startDate,
         endDate,
         location,
