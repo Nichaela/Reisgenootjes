@@ -1,3 +1,5 @@
+
+
 <button id="toggleFilter" class="toggleFilter">
     <img src="img/filter-icon.svg" alt="Filter">
   </button>
@@ -8,12 +10,17 @@
       <img src="img/leftarrow.svg" alt="sluit menu">
     </button>
 
+    <div class="genders">
+      <h3>Gender</h3>
+      <div class="buttons">
+        <button class="filter-btn" data-gender="man">Man</button>
+        <button class="filter-btn" data-gender="vrouw">Vrouw</button>
+        <button class="filter-btn" data-gender="anders">Anders</button>
+      </div>
+    </div>
 
     <label>Datum vertrek</label>
     <input type="date" id="dateFilter">
-
-    <label>Aantal dagen</label>
-    <input type="number" id="daysFilter">
 
     <div class="continents">
       <h3>Continenten</h3>
@@ -26,5 +33,6 @@
       </div>
     </div>
 
+    <button class="reset-filters">Reset filters</button>
 
   </div>

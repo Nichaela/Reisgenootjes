@@ -4,6 +4,7 @@
   <%- include('../partials/head'); %>
   <link rel="stylesheet" href="css/matchen.css">
   <link rel="stylesheet" href="css/filter.css">
+  <link rel="stylesheet" href="css/style.css">
    <script defer src="javascript/filter.js"></script>
 </head>
 <body>
@@ -18,6 +19,10 @@
 
   <h1 class="underline" >Matchen</h1>
   <%- include('../partials/filtermenu'); %>
+  <% if (!matchUser) { %>
+  <p>Je hebt iedereen gezien!</p>
+  <a href="/matchen/reset">Opnieuw beginnen</a>
+<% } else { %>
  
   
   
@@ -25,9 +30,9 @@
    <section>
   <img src="img/accounts/MarkvanFlied.jpg" alt="Account foto">
   <div class="profile-info">
-    <h2>Mark van Flied • 20</h2>
+   <h2><%= matchUser.name %> • <%= age %></h2>
     <ul>
-      <li><img src="img/matcheniconen/gendermale.svg">man</li>
+      <li><img src="img/matcheniconen/gendermale.svg"><%= matchUser.gender %></li>
       <li><img src="img/matcheniconen/MapPin.svg">55 km van jou vandaan</li>
       <li><img src="img/matcheniconen/waarreizen.svg">Reizen door Oosterijk</li>
       <li><img src="img/matcheniconen/Smiley.svg"> Gezamenlijke interesse</li>
@@ -38,34 +43,28 @@
 <section>
     <p>State • Opzoek naar reisgenootje</p>
     <h2>Bio</h2>
-    <p>Hier komt een stukje tekst te staan wat meer verteld over het persoon zodat je een beter beeld krijgt met wie je op reis gaat</p>
+    <p><%= matchUser.bio %></p>
 </section>
 
 <section>
   <h2>Interesse</h2>
-
-<ul class="hobbies">
-    <li class="hobby">Sport</li>
-    <li class="hobby">Reizen</li>
-    <li class="hobby">Muziek</li>
-    <li class="hobby">Hiken</li>
-</ul>
+   <ul class="hobbies">
+    <% matchUser.interests.split(',').forEach(interesse => { %>
+      <li class="hobby"><%= interesse %></li>
+    <% }) %>
+  </ul>
 </section>
 
 <section>
   <h2>Geplande trip</h2>
-  <article class="reisoproep">
-    <img src="img/test-cover.jpg" alt="cover dolemietenreis">
-    <span>20 apr – 26 apr</span>
-    <p>Italië</p>
-    <h3>Tocht door de Dolomieten</h3>
-    <button>→</button>
-  </article>
+   <a href="/post/<%= post._id %>">
+  <%- include('../partials/reisoproep', { post: post }) %>
+</a>
 </section>
 
 <section>
     <h2>Op zoek naar:</h2>
-    <p>Hier komt een stukje tekst te staan wat de persoon zoekt in een reisgenootje, stel dat deze reis het niet word kan je alsnog een reis met die persoon plannen of matchen voor een gesprek.</p>
+  <p><%= matchUser.opzoek %></p>
 </section>
 
 <section>
@@ -76,11 +75,19 @@
 </section>
 
 <section>
-<button><img src="img/matcheniconen/kruis.svg" alt="Dislike"></button>
-<button><img src="img/matcheniconen/Heart.svg" alt="Like"></button>
+  <form action="/likes" method="POST">
+    <input type="hidden" name="postId" value="<%= post._id %>">
+<input type="hidden" name="matchedUser" value="<%= matchUser._id %>">
+    <button type="submit" name="actie" value="dislike">
+      <img src="img/matcheniconen/kruis.svg" alt="Dislike">
+    </button>
+    <button type="submit" name="actie" value="like">
+      <img src="img/matcheniconen/Heart.svg" alt="Like">
+    </button>
+  </form>
 </section>
 
-
+<% } %>
   </main>
   <%- include('../partials/bottom-nav'); %>
 </body>
