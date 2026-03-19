@@ -194,33 +194,66 @@ function registerGetRoutes() {
 //   res.render('pages/matchen', { user: req.session.user, post: post, matchUser: matchUser, age: age })
 // })
 
-  app.get('/matchen', async (req, res) => {
-    if (!req.session.user) return res.redirect('/login')
+app.get('/matchen', async (req, res) => {
+  if (!req.session.user) return res.redirect('/login')
 
-    const gezien = req.session.gezien || [];
-    console.log('Gezien:', gezien)
+  const gezien = req.session.gezien || [];
+  console.log('Gezien:', gezien)
 
-    const post = await discover.findOne({
-      userId: { $ne: new ObjectId(req.session.user._id) },
-      _id: { $nin: gezien.map(id => new ObjectId(id)) }
-    });
+  const post = await discover.findOne({
+    userId: { $ne: new ObjectId(req.session.user._id) },
+    _id: { $nin: gezien.map(id => new ObjectId(id)) }
+  });
 
   console.log('Post gevonden:', post?._id)
-    console.log('Post userId:', post?.userId)
+  console.log('Post userId:', post?.userId)
 
-    if (!post) return res.render('pages/matchen', { user: req.session.user, post: null, matchUser: null, age: null })
+  if (!post) return res.render('pages/matchen', { user: req.session.user, post: null, matchUser: null, age: null })
 
-    const matchUser = await users.findOne({ _id: new ObjectId(post.userId) });
+  const matchUser = await users.findOne({ _id: new ObjectId(post.userId) });
 
-    const today = new Date();
-    const birthDate = new Date(matchUser.birthday);
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const month = today.getMonth() - birthDate.getMonth();
-    if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) age--;
+  if (!matchUser) {
+    if (!req.session.gezien) req.session.gezien = [];
+    req.session.gezien.push(post._id.toString());
+    return res.redirect('/matchen')
+  }
 
-    res.render('pages/matchen', { user: req.session.user, post: post, matchUser: matchUser, age: age })
-  })
+  const today = new Date();
+  const birthDate = new Date(matchUser.birthday);
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const month = today.getMonth() - birthDate.getMonth();
+  if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) age--;
 
+  res.render('pages/matchen', { user: req.session.user, post: post, matchUser: matchUser, age: age })
+})
+
+app.post('/likes', async (req, res) => {
+  if (!req.session.user) return res.redirect('/login')
+
+  const matchedUserId = req.body.matchedUser;
+  const postId = req.body.postId;
+  const actie = req.body.actie;
+
+  if (!req.session.gezien) req.session.gezien = [];
+  req.session.gezien.push(postId);
+
+  if (actie === 'like') {
+    await users.updateOne(
+      { _id: new ObjectId(req.session.user._id) },
+      { $addToSet: { likes: matchedUserId } }
+    )
+
+    const andereUser = await users.findOne({ _id: new ObjectId(matchedUserId) });
+    const matchId = req.session.user._id.toString();
+
+    if (andereUser.likes && andereUser.likes.includes(matchId)) {
+      return res.redirect('/chatroom')
+    }
+  }
+
+  res.redirect('/matchen')
+})
+  
   app.get('/chatroom', (req, res) => {
     if (!req.session.user) return res.redirect('/login')
     res.render('pages/chatroom', { user: req.session.user })
@@ -230,6 +263,11 @@ function registerGetRoutes() {
     if (!req.session.user) return res.redirect('/login')
     res.render('pages/chat-channel', { user: req.session.user })
   })
+
+  app.get('/matchen/reset', (req, res) => {
+  req.session.gezien = [];
+  res.redirect('/matchen')
+})
 
   // route naar ontdek filter
   app.get('/ontdekfilter', async (req, res) => {
