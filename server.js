@@ -107,7 +107,7 @@ function registerGetRoutes() {
     res.render('pages/register', { error: null })
   })
 
-  app.get('/profile', async (req, res) => {
+  app.get('/profiel', async (req, res) => {
     if (!req.session.user) return res.redirect('/login')
 
     try {
@@ -122,7 +122,7 @@ function registerGetRoutes() {
       const month = today.getMonth() - birthDate.getMonth();
       if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) age--;
 
-      res.render('pages/profile', {
+      res.render('pages/profiel', {
         user: req.session.user,
         posts: mijnPosts,
         age: age
@@ -241,27 +241,6 @@ app.post('/likes', async (req, res) => {
 
   res.redirect('/matchen')
 })
-
-
-
-  //Profiel
-  app.get('/profiel', async (req, res) => {
-  if (!req.session.user) return res.redirect('/login')
-
-  try {
-    const mijnPosts = await discover.find({ 
-      userId: new ObjectId(req.session.user._id) 
-    }).toArray()
-
-    const today = new Date();
-    const birthDate = new Date(matchUser.birthday);
-    const month = today.getMonth() - birthDate.getMonth();
-    let age = today.getFullYear() - birthDate.getFullYear();
-
-    if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) age--;
-
-    res.render('pages/matchen', { user: req.session.user, post: post, matchUser: matchUser, age: age })
-  })
 
   app.get('/chatroom', (req, res) => {
     if (!req.session.user) return res.redirect('/login')
