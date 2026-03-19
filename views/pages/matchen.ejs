@@ -4,7 +4,7 @@
   <%- include('../partials/head'); %>
   <link rel="stylesheet" href="css/matchen.css">
   <link rel="stylesheet" href="css/filter.css">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="css/style.css">
    <script defer src="javascript/filter.js"></script>
 </head>
 <body>
@@ -71,8 +71,15 @@
 </section>
 
 <section>
-<button><img src="img/matcheniconen/kruis.svg" alt="Dislike"></button>
-<button><img src="img/matcheniconen/Heart.svg" alt="Like"></button>
+  <form action="/likes" method="POST">
+    <input type="hidden" name="matchedUser" value="<%= matchUser._id %>">
+    <button type="submit" name="actie" value="dislike">
+      <img src="img/matcheniconen/kruis.svg" alt="Dislike">
+    </button>
+    <button type="submit" name="actie" value="like">
+      <img src="img/matcheniconen/Heart.svg" alt="Like">
+    </button>
+  </form>
 </section>
 
 
