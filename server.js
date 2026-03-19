@@ -107,14 +107,23 @@ function registerGetRoutes() {
     res.render('pages/register', { error: null })
   })
 
-  app.get('/profiel', async (req, res) => {
+  app.get('/profile', async (req, res) => {
     if (!req.session.user) return res.redirect('/login')
 
     try {
       const { ObjectId } = require('mongodb')
+
+      // haal de gemaakte en gejoinde reizen van de gebruiker op
       const mijnPosts = await discover.find({
         userId: new ObjectId(req.session.user._id),
       }).toArray()
+      const gejoindePosts = await discover.find({
+        reizigers: new ObjectId(req.session.user._id)
+      }).toArray()
+      
+      const alleReizen = [...mijnPosts, ...gejoindePosts].sort((a, b) => 
+        new Date(a.startDate) - new Date(b.startDate)
+      )
 
       const today = new Date();
       const birthDate = new Date(req.session.user.birthday);
@@ -122,9 +131,9 @@ function registerGetRoutes() {
       const month = today.getMonth() - birthDate.getMonth();
       if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) age--;
 
-      res.render('pages/profiel', {
+      res.render('pages/profile', {
         user: req.session.user,
-        posts: mijnPosts,
+        alleReizen: alleReizen,
         age: age
       })
 
@@ -185,32 +194,32 @@ function registerGetRoutes() {
 //   res.render('pages/matchen', { user: req.session.user, post: post, matchUser: matchUser, age: age })
 // })
 
-app.get('/matchen', async (req, res) => {
-  if (!req.session.user) return res.redirect('/login')
+  app.get('/matchen', async (req, res) => {
+    if (!req.session.user) return res.redirect('/login')
 
-  const gezien = req.session.gezien || [];
-  console.log('Gezien:', gezien)
+    const gezien = req.session.gezien || [];
+    console.log('Gezien:', gezien)
 
-  const post = await discover.findOne({
-    userId: { $ne: new ObjectId(req.session.user._id) },
-    _id: { $nin: gezien.map(id => new ObjectId(id)) }
-  });
+    const post = await discover.findOne({
+      userId: { $ne: new ObjectId(req.session.user._id) },
+      _id: { $nin: gezien.map(id => new ObjectId(id)) }
+    });
 
- console.log('Post gevonden:', post?._id)
-  console.log('Post userId:', post?.userId)
+  console.log('Post gevonden:', post?._id)
+    console.log('Post userId:', post?.userId)
 
-  if (!post) return res.render('pages/matchen', { user: req.session.user, post: null, matchUser: null, age: null })
+    if (!post) return res.render('pages/matchen', { user: req.session.user, post: null, matchUser: null, age: null })
 
-  const matchUser = await users.findOne({ _id: new ObjectId(post.userId) });
+    const matchUser = await users.findOne({ _id: new ObjectId(post.userId) });
 
-  const today = new Date();
-  const birthDate = new Date(matchUser.birthday);
-  let age = today.getFullYear() - birthDate.getFullYear();
-  const month = today.getMonth() - birthDate.getMonth();
-  if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) age--;
+    const today = new Date();
+    const birthDate = new Date(matchUser.birthday);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const month = today.getMonth() - birthDate.getMonth();
+    if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) age--;
 
-  res.render('pages/matchen', { user: req.session.user, post: post, matchUser: matchUser, age: age })
-})
+    res.render('pages/matchen', { user: req.session.user, post: post, matchUser: matchUser, age: age })
+  })
 
   app.get('/chatroom', (req, res) => {
     if (!req.session.user) return res.redirect('/login')
