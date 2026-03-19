@@ -179,3 +179,4 @@ resetButton.addEventListener("click", () => {
   // 4. Alles weer zichtbaar maken
   filterItems();
 });
+

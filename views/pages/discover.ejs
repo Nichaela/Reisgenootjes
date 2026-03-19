@@ -10,7 +10,9 @@
     <!-- filterknop -->
     <!-- onderweg -->
     <!-- opzoek -->
-  
+
+    <%- include('../partials/zoekbalk') %>
+
     <ul class="reizen">
       <% posts.forEach(post => { %>
       <li>
@@ -21,11 +23,17 @@
       </li><% }) %>
     </ul>
 
+    <div id="noResults" style="display:none;">
+      <p>Geen resultaten gevonden</p>
+      <img src="/img/404.svg" alt="">
+    </div>
 
   </main>
 
   <footer>
     <%- include('../partials/bottom-nav'); %>
   </footer>
+
+  <script src="../script/form.js"></script>
 </body>
 </html>
