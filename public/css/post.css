@@ -90,9 +90,9 @@ h2 {
     margin-top: 2rem;
 }
 
-section:nth-child(2),section:nth-child(3)  {
+section:nth-child(2),main >section:nth-child(3)  {
     display: grid;
-    margin: var(--space-side);
+    margin: 0 var(--space-side);
 }
     section:nth-child(2) img {
         width: 100%;

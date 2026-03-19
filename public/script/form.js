@@ -23,25 +23,27 @@ document.querySelectorAll(".multi-step-form").forEach(form => {
       }
     })
 
-    // Password check op eerste stap
-    if (allValid && index === 0) {
-      const password = form.querySelector('input[name="password"]')
-      const confirmPassword = form.querySelector('input[name="confirmPassword"]')
+    // Password check alleen als de velden ook écht bestaan
+  if (allValid && index === 0) {
+    const password = form.querySelector('input[name="password"]')
+    const confirmPassword = form.querySelector('input[name="confirmPassword"]')
 
+    if (password && confirmPassword) { // ← null-check toegevoegd
       if (password.value.length < 8) {
         allValid = false
         password.setCustomValidity("Wachtwoord moet minimaal 8 tekens bevatten")
         password.reportValidity()
-        password.setCustomValidity("") // reset na tonen
+        password.setCustomValidity("")
       }
 
       if (password.value !== confirmPassword.value) {
         allValid = false
         confirmPassword.setCustomValidity("Wachtwoorden komen niet overeen")
         confirmPassword.reportValidity()
-        confirmPassword.setCustomValidity("") // reset
+        confirmPassword.setCustomValidity("")
       }
     }
+  }
 
     return allValid
   }
@@ -98,3 +100,34 @@ dropdowns.forEach(dropdown => {
     dropdown.classList.toggle('open')
   })
 })
+
+
+// ==========================================
+// ZOEKBALK (browsen door reizen)
+// ==========================================
+
+const searchInput = document.getElementById("searchInput");
+const reizen = document.querySelectorAll(".reizen li");
+const noResults = document.getElementById("noResults"); // het element voor de boodschap
+
+searchInput?.addEventListener("input", (event) => { // is er input door de gebruiker --> dan het volgende event
+  const zoekTerm = event.target.value.toLowerCase(); // gebruiker kan in zowel lower als uppercase typen
+  let anyResults = false; // houdt bij of er een match is
+
+  reizen.forEach(li => {
+    const titel = li.querySelector(".post-title")?.textContent.toLowerCase() || ""; // Haalt de titel op en maakt er kleinletters van OF lege string om fout te voorkomen
+    const locatie = li.querySelector(".post-location")?.textContent.toLowerCase() || "";
+
+    // als titel of locatie zoekterm bevat, toon item, anders verberg
+    if (titel.includes(zoekTerm) || locatie.includes(zoekTerm)) {
+      li.style.display = "block";
+      anyResults = true; // er is minstens één match
+    } else {
+      li.style.display = "none";
+    }
+  });
+
+  // als er geen resultaten zijn, laat boodschap zien, anders verberg
+  noResults.style.display = anyResults ? "none" : "block";
+});
+
