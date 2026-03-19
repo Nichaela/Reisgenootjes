@@ -16,7 +16,15 @@
         <div class="chat-header">
             💬 Real-Time Chat
         </div>
-        <div id="messages"></div>
+        <div id="messages">
+          <% if (conversationHistory && conversationHistory.length > 0) { %>
+            <% conversationHistory.forEach((msg) => { %>
+              <div class="message">
+                <%= msg.fromUserId === user._id.toString() ? 'Jij' : msg.fromName %>: <%= msg.text %>
+              </div>
+            <% }) %>
+          <% } %>
+        </div>
         <input type="hidden" id="chatPartnerId" value="<%= chatPartner._id %>">
         <div id="typingIndicator" class="typing-indicator"></div>
         <div class="input-container">
