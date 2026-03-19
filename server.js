@@ -172,6 +172,7 @@ function registerGetRoutes() {
     if (!req.session.user) return res.redirect('/welkom')
     res.render('pages/create-post', { user: req.session.user })
   })
+ 
   app.get('/post/:id', async (req, res) => {
     try {
       const post = await discover.findOne({
