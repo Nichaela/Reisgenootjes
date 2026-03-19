@@ -214,6 +214,8 @@ function registerGetRoutes() {
 
     try {
       const chatPartnerId = req.params.userId
+      const myUserId = req.session.user._id.toString()
+
       const chatPartner = await users.findOne({ _id: new ObjectId(chatPartnerId) })
 
       if (!chatPartner) {
@@ -223,12 +225,20 @@ function registerGetRoutes() {
         })
       }
 
+      const conversationId = getConversationRoom(myUserId, chatPartnerId)
+
+      const conversationHistory = await messages
+        .find({ conversationId })
+        .sort({ createdAt: 1 })
+        .toArray()
+
       res.render('pages/chat-channel', {
         user: req.session.user,
         chatPartner: {
           _id: chatPartner._id.toString(),
           name: chatPartner.name
-        }
+        },
+        conversationHistory
       })
     } catch (err) {
       console.error(err)
@@ -515,7 +525,6 @@ function registerSocketHandlers() {
         timestamp: new Date().toISOString(),
         fromSelf: true
       }
-      
 
       socket.emit('private message', payloadForSender)
       socket.to(roomName).emit('private message', payloadForReceiver)
