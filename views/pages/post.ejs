@@ -22,28 +22,44 @@
         </p>
         <h1><%= post.title %></h1>
         <p><%= post.startDate %> tot <%= post.endDate %></p>
-        
-        <!-- <img src="<%= post.image %>" alt="<%= post.title %>" class="hero-img"> -->
 
-
+        <% if (post.postCoverImg) { %>
+          <img src="/uploads/<%= post.postCoverImg %>" alt="<%= post.title %>" class="hero-img">
+        <% } %>
+  
     </section>
 
     <section>
-      <!-- dit aanpassen uit database maker gebuiker  -->
-        <p><%= post.gender %> | <%= post.age %> jaar</p>
+      <h2>Type reis</h2>
+      <p><%= post.gender %> | <%= post.age %> jaar</p>
 
-        <h2>Omschrijving</h2>
-        <p><%= post.discription %> </p>
+      <h2>Omschrijving</h2>
+      <p><%= post.discription %> </p>
 
-        <h2>De route</h2>
-        <!-- <img src="  " alt="route <%= post.title %>"> -->
+      <h2>De route</h2>
+      <!-- <img src="  " alt="route <%= post.title %>"> -->
 
-        <h2>Benodigdheden</h2>
-        <ul>
-          <% post.supplies.forEach(item => { %>
-            <li><%= post.item %></li>
-          <% }) %>
-        </ul>
+      <h2>Benodigdheden</h2>
+      <ul>
+        <% post.supplies.forEach(item => { %>
+          <li><%= post.item %></li>
+        <% }) %>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Gepost door</h2>
+      <article class="profilecard">
+        <a href="/profiel/<%= post.userId %>">
+          <img src="<%= postUser.profilePicture %>" alt="<%= postUser.name %>">
+          <p><%= postUser.name %></p>
+          <p><%= postUser.gender %></p>
+          <p><%= postUser.birthday %></p>
+        </a>
+        <!-- deze moet naar de chat met deze persoon gaan -->
+        <a href="/chat" class="gradient-btn">Stuur <%= postUser.name %> een bericht</a>
+      </article>
+
     </section>
   </main>
 

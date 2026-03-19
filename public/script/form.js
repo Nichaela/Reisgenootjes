@@ -1,4 +1,6 @@
-// multipage form verwijderen en tonen pages
+// ==========================================
+// MULTI-STEP FORM
+// ==========================================
 document.querySelectorAll(".multi-step-form").forEach(form => {
   const steps = form.querySelectorAll(".form-step")
   let currentStep = 0
@@ -6,53 +8,48 @@ document.querySelectorAll(".multi-step-form").forEach(form => {
   function showStep(index) {
     steps.forEach(step => step.classList.remove("form-active"))
     steps[index].classList.add("form-active")
-    updateNextButton(index)
   }
 
-  function updateNextButton(index) {
+  // Controleer of alle required inputs geldig zijn
+  function validateStep(index) {
     const step = steps[index]
-    const nextBtn = step.querySelector("[data-next]")
     const inputs = step.querySelectorAll("input[required], select[required], textarea[required]")
-  
-    if (!nextBtn) return
-  
-    let allFilled = true
-  
+    let allValid = true
+
     inputs.forEach(input => {
       if (!input.checkValidity()) {
-        allFilled = false
+        allValid = false
+        input.reportValidity() // browser toont foutmelding
       }
     })
-  
-    // wachtwoord check op eerste stap
-    if (allFilled && index === 0) {
-      const password = form.querySelector("#password")
-      const confirmPassword = form.querySelector("#confirmPassword")
-  
+
+    // Password check op eerste stap
+    if (allValid && index === 0) {
+      const password = form.querySelector('input[name="password"]')
+      const confirmPassword = form.querySelector('input[name="confirmPassword"]')
+
       if (password.value.length < 8) {
-        allFilled = false
+        allValid = false
+        password.setCustomValidity("Wachtwoord moet minimaal 8 tekens bevatten")
+        password.reportValidity()
+        password.setCustomValidity("") // reset na tonen
       }
-  
+
       if (password.value !== confirmPassword.value) {
-        allFilled = false
+        allValid = false
+        confirmPassword.setCustomValidity("Wachtwoorden komen niet overeen")
+        confirmPassword.reportValidity()
+        confirmPassword.setCustomValidity("") // reset
       }
     }
-  
-    nextBtn.disabled = !allFilled
+
+    return allValid
   }
 
-  // controle bij typen of selecteren
-  steps.forEach((step, index) => {
-    const inputs = step.querySelectorAll("input, select, textarea")
-    
-    inputs.forEach(input => {
-      input.addEventListener("input", () => updateNextButton(index))
-      input.addEventListener("change", () => updateNextButton(index))
-    })
-  })
-
+  // Volgende knop
   form.querySelectorAll("[data-next]").forEach(btn => {
     btn.addEventListener("click", () => {
+      if (!validateStep(currentStep)) return; // stop als niet geldig
       if (currentStep < steps.length - 1) {
         currentStep++
         showStep(currentStep)
@@ -60,6 +57,7 @@ document.querySelectorAll(".multi-step-form").forEach(form => {
     })
   })
 
+  // Vorige knop
   form.querySelectorAll("[data-prev]").forEach(btn => {
     btn.addEventListener("click", () => {
       if (currentStep > 0) {
@@ -72,24 +70,31 @@ document.querySelectorAll(".multi-step-form").forEach(form => {
   showStep(currentStep)
 })
 
-
-// Aanmeld form checkbox
+// ==========================================
+// CHECKBOX LIMIT (max 5 interesses)
+// ==========================================
 const checkboxes = document.querySelectorAll('input[name="interests"]')
-const max = 5;
+const max = 5
 
 checkboxes.forEach(box => {
   box.addEventListener('change', () => {
     const checked = document.querySelectorAll('input[name="interests"]:checked')
     if (checked.length > max) {
-      box.checked = false;
-      alert("Je mag maximaal 5 interesses kiezen.")
+      box.checked = false
+      alert(`Je mag maximaal ${max} interesses kiezen.`)
     }
-  });
+  })
 })
-// dropdown menu voor checkboxes (leeftijd)
-const dropdown = document.querySelector('.dropdown-checkbox')
-const button = dropdown.querySelector('button')
 
-button.addEventListener('click', () => {
-  dropdown.classList.toggle('open');
+// ==========================================
+// DROPDOWN MENU (leeftijd of opties)
+// ==========================================
+const dropdowns = document.querySelectorAll('.dropdown-checkbox')
+dropdowns.forEach(dropdown => {
+  const button = dropdown.querySelector('button')
+  if (!button) return
+
+  button.addEventListener('click', () => {
+    dropdown.classList.toggle('open')
+  })
 })

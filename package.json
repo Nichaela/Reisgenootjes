@@ -12,6 +12,7 @@
   },
   "keywords": [],
   "dependencies": {
+    "axios": "^1.13.6",
     "bcryptjs": "^3.0.3",
     "dotenv": "^17.3.1",
     "ejs": "^4.0.1",
@@ -19,6 +20,7 @@
     "express-session": "^1.19.0",
     "list.js": "^2.3.1",
     "mongodb": "^7.1.0",
+    "multer": "^2.1.1",
     "nodemailer": "^8.0.2",
     "nodenv": "^0.1.0",
     "object-assign": "^4.1.1",
