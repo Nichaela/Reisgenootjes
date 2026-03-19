@@ -100,3 +100,34 @@ dropdowns.forEach(dropdown => {
     dropdown.classList.toggle('open')
   })
 })
+
+
+// ==========================================
+// ZOEKBALK (browsen door reizen)
+// ==========================================
+
+const searchInput = document.getElementById("searchInput");
+const reizen = document.querySelectorAll(".reizen li");
+const noResults = document.getElementById("noResults"); // het element voor de boodschap
+
+searchInput?.addEventListener("input", (event) => { // is er input door de gebruiker --> dan het volgende event
+  const zoekTerm = event.target.value.toLowerCase(); // gebruiker kan in zowel lower als uppercase typen
+  let anyResults = false; // houdt bij of er een match is
+
+  reizen.forEach(li => {
+    const titel = li.querySelector(".post-title")?.textContent.toLowerCase() || ""; // Haalt de titel op en maakt er kleinletters van OF lege string om fout te voorkomen
+    const locatie = li.querySelector(".post-location")?.textContent.toLowerCase() || "";
+
+    // als titel of locatie zoekterm bevat, toon item, anders verberg
+    if (titel.includes(zoekTerm) || locatie.includes(zoekTerm)) {
+      li.style.display = "block";
+      anyResults = true; // er is minstens één match
+    } else {
+      li.style.display = "none";
+    }
+  });
+
+  // als er geen resultaten zijn, laat boodschap zien, anders verberg
+  noResults.style.display = anyResults ? "none" : "block";
+});
+

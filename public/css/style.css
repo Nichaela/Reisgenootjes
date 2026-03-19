@@ -165,11 +165,10 @@ button {
 
 .bottom-nav img {
   order: -1;
+  /* een idee voor de nav (zodat ze niet enorm worden bij vergroten scherm */
+  /* min-width: 2.5em;
+  max-width: 2.5em; */
 }
-
-
-
-
 
 
 /* reisoproep */
@@ -364,3 +363,37 @@ button {
   padding: 0.3125rem 0.9375rem;
   font-size: 0.9rem;
 }
+
+
+/* zoekbalk */
+
+.search input {
+  border:solid .1em var(--clr-text);
+  border-radius: 2em;
+  padding:7px 14px;
+  margin-bottom:10px;
+  width: 100%;
+}
+
+#searchInput::placeholder {
+  color: var(--clr-input-text);
+}
+
+.search input:focus {
+  outline:none;
+  border: solid .1em var(--clr-text);
+}
+
+#noResults {
+display: flex;
+flex-direction: column;
+align-items: center;
+text-align: center;
+margin-top: 12em;
+}
+
+#noResults p {
+  margin-bottom: 2em;
+  font-size: 1.2em;
+}
+
