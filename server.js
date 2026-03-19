@@ -145,7 +145,18 @@ function registerGetRoutes() {
 
   app.get('/discover', async (req, res) => {
     try {
-      const posts = await discover.find({}).toArray() // alle posts ophalen
+      const postsRaw = await discover.find({}).toArray() //haalt ALLES op uit discover collection
+
+      const posts = [] //lege array waar data ingaat
+
+      for (const post of postsRaw) { //voor elke post uit de hele discover collection
+        const user = await users.findOne({ _id: post.userId }) //zoekt gebruiker op
+
+        posts.push({ //voegt user toe aan de post uit de user collection
+          ...post, // de '...' haalt alle data uit de post (titel, location etc)
+          user
+        })
+      }
 
       res.render('pages/discover', {
         user: req.session.user,
@@ -158,11 +169,22 @@ function registerGetRoutes() {
   })
 
   app.get('/create-post', (req, res) => {
-    if (!req.session.user) return res.redirect('/welkom')  
+    if (!req.session.user) return res.redirect('/welkom')
     res.render('pages/create-post', { user: req.session.user })
   })
   app.get('/post/:id', async (req, res) => {
     try {
+      const post = await discover.findOne({
+        _id: new ObjectId(req.params.id),
+      })
+
+      if (!post) {
+        return res.status(404).send('Post niet gevonden');
+      }
+
+      const postUser = await users.findOne({ _id: new ObjectId(post.userId) });
+
+      res.render('pages/post', { post, postUser });
       const post = await discover.findOne({ _id: new ObjectId(req.params.id) })
       if (!post) return res.status(404).send('Post niet gevonden')
   
@@ -300,35 +322,11 @@ app.post('/likes', async (req, res) => {
   })
 }
 
-  //Huidge route naar filter menu + werkende continent filter 
-  app.get('/filter', async (req, res) => {
-    try {
-      const db = client.db(process.env.DB_NAME);
-      const usersCollection = db.collection('users');
-      const discoverCollection = db.collection('discover');
-      const reizen = await discoverCollection.find({}).toArray();
-      const resultaat = []; for (const reis of reizen) {
-
-        //voor elke reis in de lijst reizen doe dit: 
-        const user = await usersCollection.findOne({
-          _id: reis.userId //vind een reis 
-        })
-        resultaat.push({ //pusht deze data in die lege array genaamd resultaat 
-          reis: reis, user: user
-        })
-      }
-
-      res.render('pages/filter', {
-        reizen: resultaat //reizen = de array van de collection en resultaat is de array die ik heb gemaakt 
-      })
-    } catch (err) { console.error(err); res.status(500).send("Fout bij ophalen data"); }
+app.get('/logout', (req, res) => {
+  req.session.destroy(() => {
+    res.redirect('/welkom')
   })
-
-  app.get('/logout', (req, res) => {
-    req.session.destroy(() => {
-      res.redirect('/welkom')
-    })
-  })
+})
 
 // =======================
 // POST ROUTES
@@ -429,9 +427,9 @@ function registerPostRoutes() {
       if (!req.session.user) return res.redirect('/login')
 
       const { title, startDate, endDate, location, continent, persons, discription, gender } = req.body
-      
+
       const postCoverImg = req.file ? req.file.filename : null
-    
+
       let age = req.body.age
       if (!Array.isArray(age)) {
         age = age ? [age] : []
@@ -597,7 +595,7 @@ async function start() {
 
     const db = client.db(process.env.DB_NAME)
     users = db.collection(process.env.DB_COLLECTION)
-    
+
     discover = db.collection('discover')
 
     // routes registeren
@@ -611,7 +609,7 @@ async function start() {
     server.listen(port, () => {
       console.log(`Server draait op poort ${port}`)
     })
- 
+
   } catch (err) {
     console.log('Database connection error:', err)
     console.log('For uri -', uri)
