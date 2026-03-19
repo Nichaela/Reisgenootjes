@@ -1,6 +1,17 @@
 /* chatroom */
 /* source: https://medium.com/@basukori8463/build-a-real-time-chat-app-from-scratch-with-node-js-and-socket-io-9714b7076372 */
 
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 
 .chat-list-item  {
    margin-bottom: 2em;
@@ -53,31 +64,30 @@
 }
 
 #messages {
-    flex: 1;
     padding: 20px;
     overflow-y: auto;
     background: #f8f9fa;
 }
 
 .message {
+    display: flex;
     margin-bottom: 15px;
     padding: 10px 15px;
     background: #e3f2fd;
     border-radius: 18px;
-    max-width: 80%;
+    max-width: 60%;
     word-wrap: break-word;
     animation: slideIn 0.3s ease-out;
 }
 
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+.messageSent {
+    background: #bbdefb;
+    
+}
+
+.messageReceived {
+    background: #c8e6c9;
+    
 }
 
 .input-container {
