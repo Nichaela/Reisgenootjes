@@ -107,7 +107,7 @@ function registerGetRoutes() {
     res.render('pages/register', { error: null })
   })
 
-  app.get('/profile', async (req, res) => {
+  app.get('/profiel', async (req, res) => {
     if (!req.session.user) return res.redirect('/login')
 
     try {
@@ -122,7 +122,7 @@ function registerGetRoutes() {
       const month = today.getMonth() - birthDate.getMonth();
       if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) age--;
 
-      res.render('pages/profile', {
+      res.render('pages/profiel', {
         user: req.session.user,
         posts: mijnPosts,
         age: age
@@ -211,8 +211,6 @@ app.get('/matchen', async (req, res) => {
 
   res.render('pages/matchen', { user: req.session.user, post: post, matchUser: matchUser, age: age })
 })
-
-
 
   app.get('/chatroom', (req, res) => {
     if (!req.session.user) return res.redirect('/login')
