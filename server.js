@@ -130,9 +130,18 @@ function registerGetRoutes() {
 
     try {
       const { ObjectId } = require('mongodb')
+
+      // haal de gemaakte en gejoinde reizen van de gebruiker op
       const mijnPosts = await discover.find({
         userId: new ObjectId(req.session.user._id),
       }).toArray()
+      const gejoindePosts = await discover.find({
+        reizigers: new ObjectId(req.session.user._id)
+      }).toArray()
+      
+      const alleReizen = [...mijnPosts, ...gejoindePosts].sort((a, b) => 
+        new Date(a.startDate) - new Date(b.startDate)
+      )
 
       const today = new Date();
       const birthDate = new Date(req.session.user.birthday);
@@ -142,7 +151,7 @@ function registerGetRoutes() {
 
       res.render('pages/profile', {
         user: req.session.user,
-        posts: mijnPosts,
+        alleReizen: alleReizen,
         age: age
       })
 
@@ -154,7 +163,18 @@ function registerGetRoutes() {
 
   app.get('/discover', async (req, res) => {
     try {
-      const posts = await discover.find({}).toArray() // alle posts ophalen
+      const postsRaw = await discover.find({}).toArray() //haalt ALLES op uit discover collection
+
+      const posts = [] //lege array waar data ingaat
+
+      for (const post of postsRaw) { //voor elke post uit de hele discover collection
+        const user = await users.findOne({ _id: post.userId }) //zoekt gebruiker op
+
+        posts.push({ //voegt user toe aan de post uit de user collection
+          ...post, // de '...' haalt alle data uit de post (titel, location etc)
+          user
+        })
+      }
 
       res.render('pages/discover', {
         user: req.session.user,
@@ -173,6 +193,17 @@ function registerGetRoutes() {
 
   app.get('/post/:id', async (req, res) => {
     try {
+      const post = await discover.findOne({
+        _id: new ObjectId(req.params.id),
+      })
+
+      if (!post) {
+        return res.status(404).send('Post niet gevonden');
+      }
+
+      const postUser = await users.findOne({ _id: new ObjectId(post.userId) });
+
+      res.render('pages/post', { post, postUser });
       const post = await discover.findOne({ _id: new ObjectId(req.params.id) })
       if (!post) return res.status(404).send('Post niet gevonden')
 
@@ -222,15 +253,48 @@ function registerGetRoutes() {
 
     const matchUser = await users.findOne({ _id: new ObjectId(post.userId) });
 
-    const today = new Date();
-    const birthDate = new Date(matchUser.birthday);
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const month = today.getMonth() - birthDate.getMonth();
-    if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) age--;
+  if (!matchUser) {
+    if (!req.session.gezien) req.session.gezien = [];
+    req.session.gezien.push(post._id.toString());
+    return res.redirect('/matchen')
+  }
+
+  const today = new Date();
+  const birthDate = new Date(matchUser.birthday);
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const month = today.getMonth() - birthDate.getMonth();
+  if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) age--;
 
     res.render('pages/matchen', { user: req.session.user, post: post, matchUser: matchUser, age: age })
   })
 
+app.post('/likes', async (req, res) => {
+  if (!req.session.user) return res.redirect('/login')
+
+  const matchedUserId = req.body.matchedUser;
+  const postId = req.body.postId;
+  const actie = req.body.actie;
+
+  if (!req.session.gezien) req.session.gezien = [];
+  req.session.gezien.push(postId);
+
+  if (actie === 'like') {
+    await users.updateOne(
+      { _id: new ObjectId(req.session.user._id) },
+      { $addToSet: { likes: matchedUserId } }
+    )
+
+    const andereUser = await users.findOne({ _id: new ObjectId(matchedUserId) });
+    const matchId = req.session.user._id.toString();
+
+    if (andereUser.likes && andereUser.likes.includes(matchId)) {
+      return res.redirect('/chatroom')
+    }
+  }
+
+  res.redirect('/matchen')
+})
+  
   app.get('/chatroom', (req, res) => {
     if (!req.session.user) return res.redirect('/login')
     res.render('pages/chatroom', { user: req.session.user })
@@ -240,6 +304,11 @@ function registerGetRoutes() {
     if (!req.session.user) return res.redirect('/login')
     res.render('pages/chat-channel', { user: req.session.user })
   })
+
+  app.get('/matchen/reset', (req, res) => {
+  req.session.gezien = [];
+  res.redirect('/matchen')
+})
 
   // route naar ontdek filter
   app.get('/ontdekfilter', async (req, res) => {

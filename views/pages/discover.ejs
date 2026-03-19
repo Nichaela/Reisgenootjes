@@ -11,24 +11,44 @@
     <!-- onderweg -->
     <!-- opzoek -->
 
+    <%- include('../partials/ontdekfiltermenu') %>
+
+    <%- include('../partials/zoekbalk') %>
+
+
+
     <ul class="reizen">
       <% posts.forEach(post => { %>
-      <li>
-        <a href="/post/<%= post._id %>">
-          <!-- zonder de {post: post} krijg ik not defined -->
-          <%- include('../partials/reisoproep', { post: post }) %>
-        </a>
-      </li><% }) %>
+        <li
+          data-gender="<%= post.gender %>"
+          data-date="<%= post.startDate %>"
+          data-continent="<%= post.continent %>"
+          data-birthday="<%= post.user.birthday %>"
+        >
+          <a href="/post/<%= post._id %>">
+            <%- include('../partials/reisoproep', { post: post }) %>
+          </a>
+        </li>
+      <% }) %>
     </ul>
 
 
+   
 
 
+    <!-- zoekbalk -->
+
+    <div id="noResults" style="display:none;">
+      <p>Geen resultaten gevonden</p>
+      <img src="/img/404.svg" alt="">
+    </div>
 
   </main>
 
   <footer>
     <%- include('../partials/bottom-nav'); %>
   </footer>
+
+  <script src="../script/form.js"></script>
 </body>
 </html>
