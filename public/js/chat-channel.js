@@ -4,83 +4,94 @@ const messageInput = document.getElementById('messageInput');
 const sendButton = document.getElementById('sendButton');
 const typingIndicator = document.getElementById('typingIndicator');
 const chatPartnerInput = document.getElementById('chatPartnerId');
+const chatPartnerNameElement = document.getElementById('chatPartnerName');
 
 let typingTimer;
 let isTyping = false;
 let toUserId = chatPartnerInput ? chatPartnerInput.value : null;
+let otherUserName = chatPartnerNameElement ? chatPartnerNameElement.textContent.trim() : '';
 
-// Stop meteen als dit geen chatpagina is
-if (!messages || !messageInput || !sendButton || !typingIndicator) {
-    console.log('Geen chatpagina, chat JS wordt overgeslagen');
+if (!messages || !messageInput || !sendButton || !typingIndicator || !toUserId) {
+  console.log('Geen chatpagina, chat JS wordt overgeslagen');
 } else {
-    function sendMessage() {
-        const message = messageInput.value.trim();
+  socket.emit('join private chat', {
+    otherUserId: toUserId,
+    otherUserName: otherUserName
+  });
 
-        if (message) {
-            socket.emit('private message', {
-                toUserId: toUserId,
-                text: message
-            });
+  window.addEventListener('beforeunload', () => {
+    socket.emit('leave private chat', { otherUserId: toUserId });
+  });
 
-            messageInput.value = '';
-            socket.emit('stop typing');
-            isTyping = false;
-        }
+  function addMessage(text, type = 'message') {
+    const messageElement = document.createElement('div');
+    messageElement.classList.add(type);
+    messageElement.textContent = text;
+    messages.appendChild(messageElement);
+    messages.scrollTop = messages.scrollHeight;
+  }
+
+  function sendMessage() {
+    const message = messageInput.value.trim();
+    if (!message) return;
+
+    socket.emit('private message', {
+      toUserId,
+      text: message
+    });
+
+    messageInput.value = '';
+    socket.emit('stop typing', { toUserId });
+    isTyping = false;
+  }
+
+  sendButton.addEventListener('click', sendMessage);
+
+  messageInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      sendMessage();
+      return;
     }
 
-    sendButton.addEventListener('click', sendMessage);
+    if (!isTyping) {
+      socket.emit('typing', { toUserId });
+      isTyping = true;
+    }
 
-    messageInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            sendMessage();
-        } else {
-            if (!isTyping) {
-                socket.emit('typing');
-                isTyping = true;
-            }
-            clearTimeout(typingTimer);
-            typingTimer = setTimeout(() => {
-                socket.emit('stop typing');
-                isTyping = false;
-            }, 1000);
-        }
-    });
+    clearTimeout(typingTimer);
+    typingTimer = setTimeout(() => {
+      socket.emit('stop typing', { toUserId });
+      isTyping = false;
+    }, 1000);
+  });
 
-    socket.on('private message', (msg) => {
-        const messageElement = document.createElement('div');
-        messageElement.classList.add('message');
-        messageElement.textContent = `${msg.fromName}: ${msg.text}`;
-        messages.appendChild(messageElement);
-        messages.scrollTop = messages.scrollHeight;
-    });
+  socket.on('private message', (msg) => {
+    if (msg.fromSelf) {
+      addMessage(`Jij: ${msg.text}`);
+      return;
+    }
 
-    socket.on('chat message', (msg) => {
-        const messageElement = document.createElement('div');
-        messageElement.classList.add('message');
-        messageElement.textContent = msg;
-        messages.appendChild(messageElement);
-        messages.scrollTop = messages.scrollHeight;
-    });
-    
+    if (msg.fromUserId !== toUserId) return;
 
-    socket.on('user notification', (notification) => {
-        const notificationElement = document.createElement('div');
-        notificationElement.classList.add('message');
-        notificationElement.style.background = '#fff3cd';
-        notificationElement.style.color = '#856404';
-        notificationElement.style.fontStyle = 'italic';
-        notificationElement.textContent = notification;
-        messages.appendChild(notificationElement);
-        messages.scrollTop = messages.scrollHeight;
-    });
+    addMessage(`${msg.fromName}: ${msg.text}`);
+  });
 
-    socket.on('typing', () => {
-        typingIndicator.textContent = 'Someone is typing...';
-    });
+  socket.on('user notification', (notification) => {
+    addMessage(notification);
+  });
 
-    socket.on('stop typing', () => {
-        typingIndicator.textContent = '';
-    });
+  socket.on('typing', (data) => {
+    if (data && data.fromUserId === toUserId) {
+      typingIndicator.textContent = 'De ander is aan het typen...';
+    }
+  });
 
-    messageInput.focus();
+  socket.on('stop typing', (data) => {
+    if (data && data.fromUserId === toUserId) {
+      typingIndicator.textContent = '';
+    }
+  });
+
+  messageInput.focus();
 }
