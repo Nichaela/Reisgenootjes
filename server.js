@@ -67,6 +67,7 @@ const client = new MongoClient(uri, {
 // database collections
 let users
 let discover
+let messages
 
 // =======================
 // MIDDELWARE (ALGEMEEN)
@@ -80,7 +81,9 @@ app.use((req, res, next) => {
 app.use((req, res, next) => {
   if (req.body) {
     for (let key in req.body) {
-      req.body[key] = xss(req.body[key])
+      if (typeof req.body[key] === 'string') {
+        req.body[key] = xss(req.body[key])
+      }
     }
   }
   next()
@@ -121,6 +124,9 @@ function registerGetRoutes() {
     res.render('pages/reset-password', { token: req.params.token })
   })
 
+  app.get('/forgot-password', (req, res) => {
+    res.render('pages/forgot-password', { error: null, success: null })
+    
   app.get('/register', (req, res) => {
     res.render('pages/register', { error: null })
   })
@@ -198,29 +204,20 @@ function registerGetRoutes() {
       })
 
       if (!post) {
-        return res.status(404).send('Post niet gevonden');
+        return res.status(404).send('Post niet gevonden')
       }
 
-      const postUser = await users.findOne({ _id: new ObjectId(post.userId) });
-
-      res.render('pages/post', { post, postUser });
-      const post = await discover.findOne({ _id: new ObjectId(req.params.id) })
-      if (!post) return res.status(404).send('Post niet gevonden')
-
-      const postUser = await users.findOne({ _id: new ObjectId(post.userId) })
-
-      // haal alle mederezigers op
-      const reizigersIds = post.reizigers || []
-      const mederezigers = await users.find({
-        _id: { $in: reizigersIds.map(id => new ObjectId(id)) }
-      }).toArray()
-
-      res.render('pages/post', { post, postUser, mederezigers, user: req.session.user || null })
+      res.render('pages/post', { user: req.session.user, post })
     } catch (err) {
       console.error(err)
-      res.status(500).send('Fout post laden')
+      res.status(500).send('Er ging iets mis bij het ophalen van de post')
     }
   })
+
+  app.get('/matchen', (req, res) => {
+    res.render('pages/matchen', { user: req.session.user })
+  })
+     
 
   //   // Matchen route
   //   app.get('/matchen', async (req, res) => {
@@ -235,12 +232,11 @@ function registerGetRoutes() {
   //   res.render('pages/matchen', { user: req.session.user, post: post, matchUser: matchUser, age: age })
   // })
 
-  app.get('/matchen', async (req, res) => {
+ app.get('/matchen', async (req, res) => {
     if (!req.session.user) return res.redirect('/login')
 
     const gezien = req.session.gezien || [];
     console.log('Gezien:', gezien)
-
     const post = await discover.findOne({
       userId: { $ne: new ObjectId(req.session.user._id) },
       _id: { $nin: gezien.map(id => new ObjectId(id)) }
@@ -258,8 +254,7 @@ function registerGetRoutes() {
     req.session.gezien.push(post._id.toString());
     return res.redirect('/matchen')
   }
-
-  const today = new Date();
+     const today = new Date();
   const birthDate = new Date(matchUser.birthday);
   let age = today.getFullYear() - birthDate.getFullYear();
   const month = today.getMonth() - birthDate.getMonth();
@@ -294,15 +289,63 @@ app.post('/likes', async (req, res) => {
 
   res.redirect('/matchen')
 })
+
   
-  app.get('/chatroom', (req, res) => {
+
+  app.get('/chatroom', async (req, res) => {
     if (!req.session.user) return res.redirect('/login')
-    res.render('pages/chatroom', { user: req.session.user })
+
+    try {
+      const allUsers = await users.find().toArray()
+      const otherUsers = allUsers.filter(otherUser =>
+        otherUser._id.toString() !== req.session.user._id.toString()
+      )
+
+      res.render('pages/chatroom', {
+        user: req.session.user,
+        users: otherUsers
+      })
+    } catch (err) {
+      console.error(err)
+      res.status(500).send('Fout bij ophalen van chatroom')
+    }
   })
 
-  app.get('/chat-channel', (req, res) => {
+    app.get('/chat-channel/:userId', async (req, res) => {
     if (!req.session.user) return res.redirect('/login')
-    res.render('pages/chat-channel', { user: req.session.user })
+
+    try {
+      const chatPartnerId = req.params.userId
+      const myUserId = req.session.user._id.toString()
+
+      const chatPartner = await users.findOne({ _id: new ObjectId(chatPartnerId) })
+
+      if (!chatPartner) {
+        return res.status(404).render('pages/errorstate', {
+          status: 404,
+          message: 'Gebruiker niet gevonden'
+        })
+      }
+
+      const conversationId = getConversationRoom(myUserId, chatPartnerId)
+
+      const conversationHistory = await messages
+        .find({ conversationId })
+        .sort({ createdAt: 1 })
+        .toArray()
+
+      res.render('pages/chat-channel', {
+        user: req.session.user,
+        chatPartner: {
+          _id: chatPartner._id.toString(),
+          name: chatPartner.name
+        },
+        conversationHistory
+      })
+    } catch (err) {
+      console.error(err)
+      res.status(500).send('Fout bij ophalen van chatkanaal')
+    }
   })
 
   app.get('/matchen/reset', (req, res) => {
@@ -385,40 +428,57 @@ app.get('/logout', (req, res) => {
 function registerPostRoutes() {
   // login
   app.post('/login', async (req, res) => {
-    const { email, password } = req.body
+    try {
+      const { email, password } = req.body
 
     // validatie checks
     if (!validator.isEmail(email)) {
       return res.status(400).render('pages/login', { error: 'Ongeldig emailadres' })
     }
 
-    const user = await users.findOne({ email: email })
-    if (!user) {
-      return res.status(401).render('pages/login', { error: 'Onbekende gebruiker' })
-    }
+      const user = await users.findOne({ email })
+      if (!user) {
+        return res.status(401).render('pages/login', { error: 'Onbekende gebruiker' })
+      }
 
-    const passwordMatch = await bcrypt.compare(password, user.password)
-    if (!passwordMatch) {
-      return res.status(401).render('pages/login', { error: 'Ongeldig wachtwoord' })
-    }
+      const passwordMatch = await bcrypt.compare(password, user.password)
+      if (!passwordMatch) {
+        return res.status(401).render('pages/login', { error: 'Ongeldig wachtwoord' })
+      }
 
-    req.session.user = {
-      _id: user._id,
-      email: user.email,
-      name: user.name,
-      lastName: user.lastName,
-      username: user.username,
-      bio: user.bio,
-      profile: user.profile,
-      gender: user.gender,
-      birthday: user.birthday,
-      interests: user.interests,
-      opzoek: user.opzoek
-    }
+      req.session.user = {
+        _id: user._id,
+        email: user.email,
+        name: user.name,
+        lastName: user.lastName,
+        username: user.username,
+        bio: user.bio,
+        profile: user.profile,
+        gender: user.gender,
+        birthday: user.birthday,
+        interests: user.interests,
+        opzoek: user.opzoek
+      }
 
-    return res.redirect('/discover')
+      return res.redirect('/discover')
+    } catch (err) {
+      console.error(err)
+      return res.status(500).render('pages/login', { error: 'Er ging iets mis bij inloggen' })
+    }
   })
 
+  // Logout
+  app.post('/logout', (req, res) => {
+    req.session.destroy((err) => {
+      if (err) {
+        console.error('Fout bij uitloggen:', err)
+        return res.status(500).send('Uitloggen mislukt')
+      }
+
+      res.clearCookie('connect.sid')
+      res.redirect('/login')
+    })
+  
   app.post('/forgot-password', async (req, res) => {
     const email = req.body.email
   
@@ -497,55 +557,59 @@ function registerPostRoutes() {
 
   //register
   app.post('/register', async (req, res) => {
-    const { name, lastName, email, password, username, birthday,
-      tel, gender, profile, image1, image2, image3, status,
-      bio, interests, opzoek
-    } = req.body
+    try {
+      const {
+        name,
+        lastName,
+        email,
+        password,
+        username,
+        birthday,
+        tel,
+        gender,
+        profile,
+        image1,
+        image2,
+        image3,
+        status,
+        bio,
+        interests,
+        opzoek
+      } = req.body
 
-    // validator checks
-    if (!validator.isEmail(email)) {
-      return res.status(400).render('pages/register', { error: 'Ongeldig emailadres' })
-    }
-    if (!validator.isLength(password, { min: 8 })) {
-      return res.status(400).render('pages/register', { error: 'Wachtwoord moet minimaal 8 tekens bevatten' })
-    }
-    const existingUser = await users.findOne({ email })
-    if (existingUser) {
-      return res.status(409).render('pages/register', { error: 'Email bestaat al' })
-    }
+      if (!validator.isEmail(email || '')) {
+        return res.status(400).render('pages/register', { error: 'Ongeldig emailadres' })
+      }
 
-    // password hashing
-    const hashedPassword = await bcrypt.hash(password, 10)
+      if (!validator.isLength(password || '', { min: 8 })) {
+        return res.status(400).render('pages/register', { error: 'Wachtwoord moet minimaal 8 tekens bevatten' })
+      }
 
-    const result = await users.insertOne({
-      name,
-      lastName,
-      email,
-      password: hashedPassword,
-      username,
-      birthday,
-      tel,
-      gender,
-      profile,
-      image1,
-      image2,
-      image3,
-      status,
-      bio,
-      interests,
-      opzoek
-    })
+      const existingUser = await users.findOne({ email })
+      if (existingUser) {
+        return res.status(409).render('pages/register', { error: 'Email bestaat al' })
+      }
 
-    // sessie opslaan na registratie
-    const nieuweUser = await users.findOne({ _id: result.insertedId })
-    req.session.user = {
-      _id: nieuweUser._id,
-      email: nieuweUser.email,
-      name: nieuweUser.name
-    }
+      const hashedPassword = await bcrypt.hash(password, 10)
 
-    return res.redirect('/discover')
-  })
+      const result = await users.insertOne({
+        name,
+        lastName,
+        email,
+        password: hashedPassword,
+        username,
+        birthday,
+        tel,
+        gender,
+        profile,
+        image1,
+        image2,
+        image3,
+        status,
+        bio,
+        interests,
+        opzoek
+      })
 
   //create-post formulier 
   app.post('/post', upload.single('postCoverImg'), async (req, res) => {
@@ -651,39 +715,110 @@ app.post('/likes', async (req, res) => {
 // =======================
 let connectedUsers = 0
 
+function getConversationRoom(userId1, userId2) {
+  return [userId1.toString(), userId2.toString()].sort().join('_')
+}
+
 function registerSocketHandlers() {
   io.on('connection', (socket) => {
+    const user = socket.request.session.user
+    console.log('session user:', user)
+
+    if (!user) {
+      return socket.disconnect()
+    }
+
+    const myUserId = user._id.toString()
+    socket.join(myUserId)
+
     connectedUsers++
-    console.log(`A user connected: ${socket.id} Total users: ${connectedUsers}`)
+    console.log(`🎉 A user connected: ${socket.id} Total users: ${connectedUsers}`)
 
-    // Notify others that someone joined
-    socket.broadcast.emit(
-      'user notification',
-      `Someone joined the chat! (${connectedUsers} users online)`
-    )
+    // gebruiker opent een specifiek chatkanaal
+    socket.on('join private chat', ({ otherUserId, otherUserName }) => {
+      if (!otherUserId) return
 
-    socket.on('chat message', (msg) => {
-      console.log('Message received:', msg)
-      io.emit('chat message', msg)
+      const roomName = getConversationRoom(myUserId, otherUserId)
+      socket.join(roomName)
+
+      socket.to(roomName).emit(
+        'user notification',
+        `${user.name} joined the chat with ${otherUserName || 'you'}`
+      )
+
+      console.log(`${user.name} joined room: ${roomName}`)
     })
 
-    // Typing indicators
-    socket.on('typing', () => {
-      socket.broadcast.emit('typing')
+    socket.on('leave private chat', ({ otherUserId }) => {
+      if (!otherUserId) return
+
+      const roomName = getConversationRoom(myUserId, otherUserId)
+      socket.leave(roomName)
+
+      socket.to(roomName).emit(
+        'user notification',
+        `${user.name} left the chat`
+      )
+
+      console.log(`${user.name} left room: ${roomName}`)
     })
 
-    socket.on('stop typing', () => {
-      socket.broadcast.emit('stop typing')
+    socket.on('private message', async({ toUserId, text }) => {
+      if (!toUserId || !text) return
+
+      const cleanText = xss(String(text).trim())
+      if (!cleanText) return
+
+      const roomName = getConversationRoom(myUserId, toUserId)
+      
+      await messages.insertOne({
+        conversationId: roomName,
+        fromUserId: myUserId,
+        toUserId: toUserId,
+        fromName: user.name,
+        text: cleanText,
+        createdAt: new Date()
+      })
+      
+      const payloadForReceiver = {
+        fromUserId: myUserId,
+        fromName: user.name,
+        text: cleanText,
+        timestamp: new Date().toISOString(),
+        fromSelf: false
+      }
+
+      const payloadForSender = {
+        fromUserId: myUserId,
+        fromName: user.name,
+        text: cleanText,
+        timestamp: new Date().toISOString(),
+        fromSelf: true
+      }
+
+      socket.emit('private message', payloadForSender)
+      socket.to(roomName).emit('private message', payloadForReceiver)
+
+      console.log(`Privébericht in room ${roomName}: ${cleanText}`)
+    })
+
+    socket.on('typing', ({ toUserId }) => {
+      if (!toUserId) return
+
+      const roomName = getConversationRoom(myUserId, toUserId)
+      socket.to(roomName).emit('typing', { fromUserId: myUserId })
+    })
+
+    socket.on('stop typing', ({ toUserId }) => {
+      if (!toUserId) return
+
+      const roomName = getConversationRoom(myUserId, toUserId)
+      socket.to(roomName).emit('stop typing', { fromUserId: myUserId })
     })
 
     socket.on('disconnect', () => {
       connectedUsers--
       console.log(`👋 A user disconnected: ${socket.id} Total users: ${connectedUsers}`)
-
-      socket.broadcast.emit(
-        'user notification',
-        `Someone left the chat. (${connectedUsers} users online)`
-      )
     })
   })
 }
@@ -693,11 +828,11 @@ function registerSocketHandlers() {
 // =======================
 
 function registerErrorHandlers() {
-  // Middleware to handle not found errors - error 404
   app.use((req, res) => {
     if (req.url === '/.well-known/appspecific/com.chrome.devtools.json') {
       return res.sendStatus(204)
     }
+
     console.error('404 error at URL: ' + req.url)
     res.status(404).render('pages/errorstate', {
       status: 404,
@@ -721,10 +856,10 @@ async function start() {
 
     const db = client.db(process.env.DB_NAME)
     users = db.collection(process.env.DB_COLLECTION)
-
     discover = db.collection('discover')
-
-    // routes registeren
+    messages = db.collection('messages')
+    
+    // Routes registreren
     registerGetRoutes()
     registerPostRoutes()
     registerSocketHandlers()
@@ -735,7 +870,6 @@ async function start() {
     server.listen(port, () => {
       console.log(`Server draait op poort ${port}`)
     })
-
   } catch (err) {
     console.log('Database connection error:', err)
     console.log('For uri -', uri)
