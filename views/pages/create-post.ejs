@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <%- include('../partials/head'); %>
-  <link rel="stylesheet" href="css/form.css">
+  <link rel="stylesheet" href="/css/form.css">
 </head>
 
 <body>
@@ -10,7 +10,7 @@
   <main>
 
     <!-- multer toevoegen voor fotos -->
-    <form method="POST" action="/post" class="multi-step-form" >
+    <form method="POST" action="/post" class="multi-step-form" enctype="multipart/form-data">
       <h1 class="underline" >Maak je reis</h1> 
 
       <section class="form-step form-active">
@@ -30,6 +30,9 @@
         <h2>Algemene informatie</h2>
 
         <!-- cover foto -->
+        <label for="postCoverImg"></label>
+        <input type="file" name="postCoverImg">
+         
 
         <label>Titel</label>
         <input type="text" placeholder="Titel van de reis"  name="title"/>

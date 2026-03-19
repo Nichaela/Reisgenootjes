@@ -13,6 +13,17 @@ const bcrypt = require('bcryptjs')
 
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb')
 
+const multer = require('multer')
+const path = require('path')
+const storage = multer.diskStorage({
+  destination: 'public/uploads/',
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname)
+    cb(null, Date.now() + ext)
+  }
+})
+const upload = multer({ storage: storage })
+
 // ==========================================
 // 2. APP, SERVER, SOCKET.IO
 // ==========================================
@@ -145,10 +156,6 @@ function registerGetRoutes() {
     res.render('pages/create-post', { user: req.session.user })
   })
 
-  app.get('/post', (req, res) => {
-    res.render('pages/post', { user: req.session.user })
-  })
-
   app.get('/post/:id', async (req, res) => {
     try {
       const postId = req.params.id;
@@ -158,7 +165,9 @@ function registerGetRoutes() {
         return res.status(404).send('Post niet gevonden');
       }
 
-      res.render('pages/post', { post });
+      const postUser = await users.findOne({ _id: new ObjectId(post.userId) });
+
+      res.render('pages/post',{ post, postUser });
 
     } catch (err) {
       console.error(err);
@@ -339,12 +348,14 @@ function registerPostRoutes() {
   })
 
   //create-post formulier 
-  app.post('/post', async (req, res) => {
+  app.post('/post', upload.single('postCoverImg'), async (req, res) => {
     try {
       if (!req.session.user) return res.redirect('/login')
 
       const { title, startDate, endDate, location, continent, persons, discription, gender } = req.body
-
+      
+      const postCoverImg = req.file ? req.file.filename : null
+    
       let age = req.body.age
       if (!Array.isArray(age)) {
         age = age ? [age] : []
@@ -358,6 +369,7 @@ function registerPostRoutes() {
       const result = await discover.insertOne({
         userId: new ObjectId(req.session.user._id), // koppeling aan gebruiker die ingelogd is
         title,
+        postCoverImg,
         startDate,
         endDate,
         location,
@@ -387,7 +399,7 @@ let connectedUsers = 0
 function registerSocketHandlers() {
   io.on('connection', (socket) => {
     connectedUsers++
-    console.log(`🎉 A user connected: ${socket.id} Total users: ${connectedUsers}`)
+    console.log(`A user connected: ${socket.id} Total users: ${connectedUsers}`)
 
     // Notify others that someone joined
     socket.broadcast.emit(
@@ -396,7 +408,7 @@ function registerSocketHandlers() {
     )
 
     socket.on('chat message', (msg) => {
-      console.log('📨 Message received:', msg)
+      console.log('Message received:', msg)
       io.emit('chat message', msg)
     })
 
