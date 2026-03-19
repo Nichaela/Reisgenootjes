@@ -23,25 +23,27 @@ document.querySelectorAll(".multi-step-form").forEach(form => {
       }
     })
 
-    // Password check op eerste stap
-    if (allValid && index === 0) {
-      const password = form.querySelector('input[name="password"]')
-      const confirmPassword = form.querySelector('input[name="confirmPassword"]')
+    // Password check alleen als de velden ook écht bestaan
+  if (allValid && index === 0) {
+    const password = form.querySelector('input[name="password"]')
+    const confirmPassword = form.querySelector('input[name="confirmPassword"]')
 
+    if (password && confirmPassword) { // ← null-check toegevoegd
       if (password.value.length < 8) {
         allValid = false
         password.setCustomValidity("Wachtwoord moet minimaal 8 tekens bevatten")
         password.reportValidity()
-        password.setCustomValidity("") // reset na tonen
+        password.setCustomValidity("")
       }
 
       if (password.value !== confirmPassword.value) {
         allValid = false
         confirmPassword.setCustomValidity("Wachtwoorden komen niet overeen")
         confirmPassword.reportValidity()
-        confirmPassword.setCustomValidity("") // reset
+        confirmPassword.setCustomValidity("")
       }
     }
+  }
 
     return allValid
   }
