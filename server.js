@@ -120,7 +120,7 @@ function registerGetRoutes() {
       const gejoindePosts = await discover.find({
         reizigers: new ObjectId(req.session.user._id)
       }).toArray()
-      
+      // samenvoegen en sorteren op startdatum
       const alleReizen = [...mijnPosts, ...gejoindePosts].sort((a, b) => 
         new Date(a.startDate) - new Date(b.startDate)
       )
@@ -334,11 +334,25 @@ function registerPostRoutes() {
   })
 
   //register
-  app.post('/register', async (req, res) => {
-    const { name, lastName, email, password, username, birthday,
-      tel, gender, profile, image1, image2, image3, status,
-      bio, interests, opzoek
+  app.post('/register', upload.fields([
+    { name: 'profileImg', maxCount: 1 },
+    { name: 'image1', maxCount: 1 },
+    { name: 'image2', maxCount: 1 },
+    { name: 'image3', maxCount: 1 },
+  ]), async (req, res) => {
+  
+    const { name, lastName, email, password, birthday,
+      tel, gender, status, bio, interests, opzoek
     } = req.body
+  
+    const profileImg = req.files['profileImg'] ? req.files['profileImg'][0].filename : null
+    const image1 = req.files['image1'] ? req.files['image1'][0].filename : null
+    const image2 = req.files['image2'] ? req.files['image2'][0].filename : null
+    const image3 = req.files['image3'] ? req.files['image3'][0].filename : null
+
+    const interestsArray = Array.isArray(interests)
+    ? interests
+    : (interests ? interests.split(',').map(i => i.trim()) : [])
 
     // validator checks
     if (!validator.isEmail(email)) {
@@ -360,38 +374,47 @@ function registerPostRoutes() {
       lastName,
       email,
       password: hashedPassword,
-      username,
       birthday,
       tel,
       gender,
-      profile,
+      profileImg,
       image1,
       image2,
       image3,
       status,
       bio,
-      interests,
+      interests: interestsArray,
       opzoek
     })
 
     // sessie opslaan na registratie
     const nieuweUser = await users.findOne({ _id: result.insertedId })
     req.session.user = {
-      _id: nieuweUser._id,
+      _id: nieuweUser._id,       
       email: nieuweUser.email,
-      name: nieuweUser.name
+      name: nieuweUser.name,
+      lastName: nieuweUser.lastName,
+      username: nieuweUser.username,
+      bio: nieuweUser.bio,
+      profile: nieuweUser.profile,
+      gender: nieuweUser.gender,
+      birthday: nieuweUser.birthday,
+      interests: nieuweUser.interests,
+      opzoek: nieuweUser.opzoek
     }
-
+    
     return res.redirect('/discover')
   })
 
   //create-post formulier 
   app.post('/post', upload.single('postCoverImg'), async (req, res) => {
+    if (!req.session.user) return res.redirect('/login')
     try {
-      if (!req.session.user) return res.redirect('/login')
+      const { title, startDate, endDate, location, continent, persons, description, gender } = req.body
+      if (!title || !startDate || !endDate || !location || !continent || !persons) {
+        return res.status(400).send('Vul alle verplichte velden in')
+      }
 
-      const { title, startDate, endDate, location, continent, persons, discription, gender } = req.body
-      
       const postCoverImg = req.file ? req.file.filename : null
     
       let age = req.body.age
@@ -413,7 +436,7 @@ function registerPostRoutes() {
         location,
         continent,
         persons: Number(persons),
-        discription,
+        description,
         supplies,
         age,
         gender
@@ -430,58 +453,65 @@ function registerPostRoutes() {
   app.post('/post/:id/join', async (req, res) => {
     if (!req.session.user) return res.redirect('/login')
 
-    const post = await discover.findOne({ _id: new ObjectId(req.params.id) })
-    if (!post) return res.status(404).send('Post niet gevonden')
+    try {
+      const post = await discover.findOne({ _id: new ObjectId(req.params.id) })
+      if (!post) return res.status(404).send('Post niet gevonden')
 
-    const aantalReizigers = post.reizigers ? post.reizigers.length : 0
+      const aantalReizigers = post.reizigers ? post.reizigers.length : 0
 
-    // check of de reis vol is
-    if (aantalReizigers >= post.persons) {
-      return res.status(403).send('Deze reis is vol')
+      // check of de reis vol is
+      if (aantalReizigers >= post.persons) {
+        return res.status(403).send('Deze reis is vol')
+      }
+      
+      // check of user al meedoet
+      const alGejoint = post.reizigers && post.reizigers.some(id => id.toString() === req.session.user._id.toString())
+      if (alGejoint) return res.redirect(`/post/${req.params.id}`)
+
+      // voeg user toe aan reizigers array
+      await discover.updateOne(
+        { _id: new ObjectId(req.params.id) },
+        { $push: { reizigers: new ObjectId(req.session.user._id) } }
+      )
+
+      res.redirect(`/post/${req.params.id}`)
+    } catch (err) {
+      console.error(err)
+      res.status(500).send('Er ging iets mis bij het joinen')
     }
-    
-    // check of user al meedoet
-    const alGejoint = post.reizigers && post.reizigers.some(id => id.toString() === req.session.user._id.toString())
-    if (alGejoint) return res.redirect(`/post/${req.params.id}`)
+  })
 
-    // voeg user toe aan reizigers array
-    await discover.updateOne(
-      { _id: new ObjectId(req.params.id) },
-      { $push: { reizigers: new ObjectId(req.session.user._id) } }
-    )
-
-    res.redirect(`/post/${req.params.id}`)
+  app.post('/likes', async (req, res) => {
+    if (!req.session.user) return res.redirect('/login')
+  
+    const matchedUserId = req.body.matchedUser;
+    const actie = req.body.actie;
+  
+    // Voeg toe aan gezien in sessie
+    if (!req.session.gezien) req.session.gezien = [];
+    req.session.gezien.push(matchedUserId);
+  
+    if (actie === 'like') {
+      // Sla like op in database bij de ingelogde gebruiker
+      await users.updateOne(
+        { _id: new ObjectId(req.session.user._id) },
+        { $addToSet: { likes: matchedUserId } }
+      )
+  
+      // Check of de andere persoon jou ook al geliket heeft
+      const andereUser = await users.findOne({ _id: new ObjectId(matchedUserId) });
+      const matchId = req.session.user._id.toString();
+  
+      if (andereUser.likes && andereUser.likes.includes(matchId)) {
+        return res.redirect('/chatroom')
+      }
+    }
+  
+    res.redirect('/matchen')
   })
 }
 
-app.post('/likes', async (req, res) => {
-  if (!req.session.user) return res.redirect('/login')
 
-  const matchedUserId = req.body.matchedUser;
-  const actie = req.body.actie;
-
-  // Voeg toe aan gezien in sessie
-  if (!req.session.gezien) req.session.gezien = [];
-  req.session.gezien.push(matchedUserId);
-
-  if (actie === 'like') {
-    // Sla like op in database bij de ingelogde gebruiker
-    await users.updateOne(
-      { _id: new ObjectId(req.session.user._id) },
-      { $addToSet: { likes: matchedUserId } }
-    )
-
-    // Check of de andere persoon jou ook al geliket heeft
-    const andereUser = await users.findOne({ _id: new ObjectId(matchedUserId) });
-    const matchId = req.session.user._id.toString();
-
-    if (andereUser.likes && andereUser.likes.includes(matchId)) {
-      return res.redirect('/chatroom')
-    }
-  }
-
-  res.redirect('/matchen')
-})
 
 // =======================
 // SOCKET.IO
