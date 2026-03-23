@@ -112,14 +112,13 @@ function registerGetRoutes() {
 
     try {
       const { ObjectId } = require('mongodb')
-
-      // haal de gemaakte en gejoinde reizen van de gebruiker op
       const mijnPosts = await discover.find({
         userId: new ObjectId(req.session.user._id),
       }).toArray()
       const gejoindePosts = await discover.find({
         reizigers: new ObjectId(req.session.user._id)
       }).toArray()
+      
       // samenvoegen en sorteren op startdatum
       const alleReizen = [...mijnPosts, ...gejoindePosts].sort((a, b) => 
         new Date(a.startDate) - new Date(b.startDate)
@@ -133,7 +132,7 @@ function registerGetRoutes() {
 
       res.render('pages/profile', {
         user: req.session.user,
-        alleReizen: alleReizen,
+        posts: mijnPosts,
         age: age
       })
 
@@ -145,7 +144,18 @@ function registerGetRoutes() {
 
   app.get('/discover', async (req, res) => {
     try {
-      const posts = await discover.find({}).toArray() // alle posts ophalen
+      const postsAlles = await discover.find({}).toArray() //haalt ALLES op uit discover collection 
+
+      const posts = [] //lege array waar data ingaat
+
+      for (const post of postsAlles) { //voor elke post uit de hele discover collection
+        const user = await users.findOne({ _id: post.userId }) //zoekt gebruiker op
+
+        posts.push({ //voegt user toe aan de post uit de user collection
+          ...post, // de '...' haalt alle data uit de post (titel, location etc)
+          user
+        })
+      }
 
       res.render('pages/discover', {
         user: req.session.user,
@@ -158,64 +168,38 @@ function registerGetRoutes() {
   })
 
   app.get('/create-post', (req, res) => {
-    if (!req.session.user) return res.redirect('/welkom')  
+    if (!req.session.user) return res.redirect('/welkom')
     res.render('pages/create-post', { user: req.session.user })
   })
+
   app.get('/post/:id', async (req, res) => {
     try {
-      const post = await discover.findOne({ _id: new ObjectId(req.params.id) })
-      if (!post) return res.status(404).send('Post niet gevonden')
-  
-      const postUser = await users.findOne({ _id: new ObjectId(post.userId) })
-  
-      // haal alle mederezigers op
-      const reizigersIds = post.reizigers || []
-      const mederezigers = await users.find({ 
-        _id: { $in: reizigersIds.map(id => new ObjectId(id)) } 
-      }).toArray()
+      const post = await discover.findOne({
+        _id: new ObjectId(req.params.id),
+      })
 
-      res.render('pages/post', { post, postUser, mederezigers, user: req.session.user || null })
+      if (!post) {
+        return res.status(404).send('Post niet gevonden');
+      }
+
+      const postUser = await users.findOne({ _id: new ObjectId(post.userId) });
+
+      res.render('pages/post', { post, postUser });
+
     } catch (err) {
       console.error(err)
       res.status(500).send('Fout post laden')
     }
   })
 
-//   // Matchen route
-//   app.get('/matchen', async (req, res) => {
-//   const post = await discover.findOne({});
-//   const matchUser = await users.findOne({ _id: new ObjectId(post.userId) });
-//     const today = new Date();
-//   const birthDate = new Date(matchUser.birthday);
-//   let age = today.getFullYear() - birthDate.getFullYear();
-//   const month = today.getMonth() - birthDate.getMonth();
-//   if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) age--;
-
-//   res.render('pages/matchen', { user: req.session.user, post: post, matchUser: matchUser, age: age })
-// })
-
   app.get('/matchen', async (req, res) => {
-    if (!req.session.user) return res.redirect('/login')
-
-    const gezien = req.session.gezien || [];
-    console.log('Gezien:', gezien)
-
-    const post = await discover.findOne({
-      userId: { $ne: new ObjectId(req.session.user._id) },
-      _id: { $nin: gezien.map(id => new ObjectId(id)) }
-    });
-
-  console.log('Post gevonden:', post?._id)
-    console.log('Post userId:', post?.userId)
-
-    if (!post) return res.render('pages/matchen', { user: req.session.user, post: null, matchUser: null, age: null })
-
+    const post = await discover.findOne({});
     const matchUser = await users.findOne({ _id: new ObjectId(post.userId) });
-
     const today = new Date();
     const birthDate = new Date(matchUser.birthday);
-    let age = today.getFullYear() - birthDate.getFullYear();
     const month = today.getMonth() - birthDate.getMonth();
+    let age = today.getFullYear() - birthDate.getFullYear();
+
     if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) age--;
 
     res.render('pages/matchen', { user: req.session.user, post: post, matchUser: matchUser, age: age })
@@ -231,29 +215,6 @@ function registerGetRoutes() {
     res.render('pages/chat-channel', { user: req.session.user })
   })
 
-  // route naar ontdek filter
-  app.get('/ontdekfilter', async (req, res) => {
-    try {
-      const db = client.db(process.env.DB_NAME);
-      const usersCollection = db.collection('users');
-      const discoverCollection = db.collection('discover');
-      const reizen = await discoverCollection.find({}).toArray();
-      const resultaat = []; for (const reis of reizen) {
-
-        //voor elke reis in de lijst reizen doe dit: 
-        const user = await usersCollection.findOne({
-          _id: reis.userId //vind een reis 
-        })
-        resultaat.push({ //pusht deze data in die lege array genaamd resultaat 
-          reis: reis, user: user
-        })
-      }
-
-      res.render('pages/ontdekfilter', {
-        reizen: resultaat //reizen = de array van de collection en resultaat is de array die ik heb gemaakt 
-      })
-    } catch (err) { console.error(err); res.status(500).send("Fout bij ophalen data"); }
-  })
 
   app.get('/logout', (req, res) => {
     req.session.destroy(() => {
@@ -262,35 +223,35 @@ function registerGetRoutes() {
   })
 }
 
-  //Huidge route naar filter menu + werkende continent filter 
-  app.get('/filter', async (req, res) => {
-    try {
-      const db = client.db(process.env.DB_NAME);
-      const usersCollection = db.collection('users');
-      const discoverCollection = db.collection('discover');
-      const reizen = await discoverCollection.find({}).toArray();
-      const resultaat = []; for (const reis of reizen) {
+//Huidge route naar filter menu + werkende continent filter 
+app.get('/filter', async (req, res) => {
+  try {
+    const db = client.db(process.env.DB_NAME);
+    const usersCollection = db.collection('users');
+    const discoverCollection = db.collection('discover');
+    const reizen = await discoverCollection.find({}).toArray();
+    const resultaat = []; for (const reis of reizen) {
 
-        //voor elke reis in de lijst reizen doe dit: 
-        const user = await usersCollection.findOne({
-          _id: reis.userId //vind een reis 
-        })
-        resultaat.push({ //pusht deze data in die lege array genaamd resultaat 
-          reis: reis, user: user
-        })
-      }
-
-      res.render('pages/filter', {
-        reizen: resultaat //reizen = de array van de collection en resultaat is de array die ik heb gemaakt 
+      //voor elke reis in de lijst reizen doe dit: 
+      const user = await usersCollection.findOne({
+        _id: reis.userId //vind een reis 
       })
-    } catch (err) { console.error(err); res.status(500).send("Fout bij ophalen data"); }
-  })
+      resultaat.push({ //pusht deze data in die lege array genaamd resultaat 
+        reis: reis, user: user
+      })
+    }
 
-  app.get('/logout', (req, res) => {
-    req.session.destroy(() => {
-      res.redirect('/welkom')
+    res.render('pages/filter', {
+      reizen: resultaat //reizen = de array van de collection en resultaat is de array die ik heb gemaakt 
     })
+  } catch (err) { console.error(err); res.status(500).send("Fout bij ophalen data"); }
+})
+
+app.get('/logout', (req, res) => {
+  req.session.destroy(() => {
+    res.redirect('/welkom')
   })
+})
 
 // =======================
 // POST ROUTES
@@ -414,9 +375,9 @@ function registerPostRoutes() {
       if (!title || !startDate || !endDate || !location || !continent || !persons) {
         return res.status(400).send('Vul alle verplichte velden in')
       }
-
+      
       const postCoverImg = req.file ? req.file.filename : null
-    
+
       let age = req.body.age
       if (!Array.isArray(age)) {
         age = age ? [age] : []
@@ -589,7 +550,7 @@ async function start() {
 
     const db = client.db(process.env.DB_NAME)
     users = db.collection(process.env.DB_COLLECTION)
-    
+
     discover = db.collection('discover')
 
     // routes registeren
@@ -603,7 +564,7 @@ async function start() {
     server.listen(port, () => {
       console.log(`Server draait op poort ${port}`)
     })
- 
+
   } catch (err) {
     console.log('Database connection error:', err)
     console.log('For uri -', uri)

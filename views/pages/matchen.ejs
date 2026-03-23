@@ -19,6 +19,10 @@
 
   <h1 class="underline" >Matchen</h1>
   <%- include('../partials/filtermenu'); %>
+  <% if (!matchUser) { %>
+  <p>Je hebt iedereen gezien!</p>
+  <a href="/matchen/reset">Opnieuw beginnen</a>
+<% } else { %>
  
   
   
@@ -72,7 +76,8 @@
 
 <section>
   <form action="/likes" method="POST">
-    <input type="hidden" name="matchedUser" value="<%= matchUser._id %>">
+    <input type="hidden" name="postId" value="<%= post._id %>">
+<input type="hidden" name="matchedUser" value="<%= matchUser._id %>">
     <button type="submit" name="actie" value="dislike">
       <img src="img/matcheniconen/kruis.svg" alt="Dislike">
     </button>
@@ -82,7 +87,7 @@
   </form>
 </section>
 
-
+<% } %>
   </main>
   <%- include('../partials/bottom-nav'); %>
 </body>
