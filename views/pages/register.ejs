@@ -10,7 +10,7 @@
   <main>
     <!-- Multi-step form -->
     <form method="POST" action="/register" class="multi-step-form" enctype="multipart/form-data">
-      <h1 class="underline">Maak jouw profiel</h1>
+      <h1 class="underline">Registreer</h1>
 
       <!-- ========== Stap 1: Account ========== -->
       <section class="form-step form-active">
@@ -40,11 +40,21 @@
         <label for="email">Email</label>
         <input type="email" id="email" name="email" placeholder="mail@mail.com" required>
 
-        <label for="password">Wachtwoord</label>
-        <input type="password" id="password" name="password" placeholder="Wachtwoord" required minlength="8">
+        <div class="password-wrapper">
+          <label for="password">Wachtwoord</label>
+          <input type="password" id="password" name="password" placeholder="Wachtwoord" required minlength="8">
+          <span class="toggle-password" onclick="togglePassword('password', this)">
+            <img src="img/Eye.svg" alt="Toon wachtwoord" class="eye-icon">
+          </span>
+        </div>
 
-        <label for="confirmPassword">Herhaal wachtwoord</label>
-        <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Herhaal wachtwoord" required>
+        <div class="password-wrapper">
+          <label for="confirmPassword">Herhaal wachtwoord</label>
+          <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Herhaal wachtwoord" required>
+          <span class="toggle-password" onclick="togglePassword('confirmPassword', this)">
+            <img src="img/Eye.svg" alt="Toon wachtwoord" class="eye-icon">
+          </span>
+        </div>
 
         <button type="button" class="gradient-btn" data-next>Volgende</button>
       </section>

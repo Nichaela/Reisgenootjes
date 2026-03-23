@@ -63,6 +63,10 @@ select {
   padding: var(--space-gap-xs);
 }
 
+#birthday{
+  background: var(--clr-surface);
+}
+
 textarea {
   height: fit-content;
   resize: none;
@@ -173,4 +177,32 @@ button:disabled {
   align-items: center;
 
   margin-top: var(--space-gap);
+}
+
+/* Wachtwoord zien en niet meer zien */
+.password-wrapper {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  margin-bottom: 1em;
+}
+
+.password-wrapper input {
+  width: 100%;
+  padding-right: 2.5em; /* ruimte voor oogje */
+  box-sizing: border-box;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 0.5em;
+  top: 50%;
+  transform: translateY(20%);
+  cursor: pointer;
+  user-select: none;
+}
+
+.toggle-password img.eye-icon {
+  width: 24px;
+  height: 24px;
 }

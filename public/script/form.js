@@ -309,3 +309,16 @@ searchInput?.addEventListener("input", (event) => { // is er input door de gebru
   noResults.style.display = anyResults ? "none" : "block";
 });
 
+// Oogje om wachtwoord zichtbaar te maken
+function togglePassword(fieldId, eyeSpan) {
+  const input = document.getElementById(fieldId);
+  const img = eyeSpan.querySelector('img');
+
+  if (input.type === 'password') {
+    input.type = 'text';
+    img.src = 'img/Eyeclose.svg'; // wissel naar gesloten oog
+  } else {
+    input.type = 'password';
+    img.src = 'img/Eye.svg'; // terug naar open oog
+  }
+}
