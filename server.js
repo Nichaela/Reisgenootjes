@@ -869,11 +869,10 @@ function registerErrorHandlers() {
   })
 }
 
+
 // =======================
 // START SERVER
 // =======================
-
-
 async function start() {
   try {
     await client.connect()
