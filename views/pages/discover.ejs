@@ -16,25 +16,25 @@
     <%- include('../partials/zoekbalk') %>
 
 
-
+<!-- Nieuw stukje, dat de pagina niet crasht als er geen posts zijn -->
     <ul class="reizen">
-      <% posts.forEach(post => { %>
-        <li
-          data-gender="<%= post.gender %>"
-          data-date="<%= post.startDate %>"
-          data-continent="<%= post.continent %>"
-          data-birthday="<%= post.user.birthday %>"
-        >
-          <a href="/post/<%= post._id %>">
-            <%- include('../partials/reisoproep', { post: post }) %>
-          </a>
-        </li>
-      <% }) %>
+      <% if (posts && posts.length > 0) { %>
+        <% posts.forEach(post => { %>
+          <li
+            data-gender="<%= post.gender %>"
+            data-date="<%= post.startDate %>"
+            data-continent="<%= post.continent %>"
+            data-birthday="<%= post.user?.birthday || '' %>"
+          >
+            <a href="/post/<%= post._id %>">
+              <%- include('../partials/reisoproep', { post: post }) %>
+            </a>
+          </li>
+        <% }) %>
+      <% } else { %>
+        <li>Er zijn nog geen reisgenoten om te tonen.</li>
+      <% } %>
     </ul>
-
-
-   
-
 
     <!-- zoekbalk -->
 
