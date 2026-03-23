@@ -373,7 +373,7 @@ button {
 /* Target het input element */
 #birthday {
   width: 100%;
-  -webkit-appearance: none;
+  /* -webkit-appearance: none; */
   background: transparent;
   margin-top: 2em;
 }
@@ -385,7 +385,7 @@ button {
 }
 
 #birthday::-webkit-slider-thumb {
-  -webkit-appearance: none;
+  /* -webkit-appearance: none; */
   width: 1.3em;
   height: 1.3em;
   background: var(--clr-primary);
