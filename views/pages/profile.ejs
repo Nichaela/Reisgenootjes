@@ -41,11 +41,16 @@
             <section>
                 <h2>Interesses:</h2>
                 <ul class="hobbies">
-                    <% user.interests.split(',').forEach(interesse=> { %>
+                    <!-- deze dubbele check weghalen als we de databse gaan opschonen want nu werkt het niet door de oude gebruikers -->
+                    <% const interestList = Array.isArray(user.interests) 
+                    ? user.interests 
+                    : (user.interests ? user.interests.split(',').map(i => i.trim()) : []) %>
+                
+                    <% interestList.forEach(interesse => { %>                       
                         <li class="hobby">
                             <%= interesse %>
                         </li>
-                        <% }) %>
+                    <% }) %>
                 </ul>
             </section>
 
