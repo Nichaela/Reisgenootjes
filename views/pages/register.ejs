@@ -9,7 +9,7 @@
 <body>
   <main>
     <!-- Multi-step form -->
-    <form method="POST" action="/register" class="multi-step-form">
+    <form method="POST" action="/register" class="multi-step-form" enctype="multipart/form-data">
       <h1 class="underline">Maak jouw profiel</h1>
 
       <!-- ========== Stap 1: Account ========== -->
@@ -66,7 +66,6 @@
         </div>
 
         <h2>Persoonlijke gegevens</h2>
-        <label for=""></label>
 
         <label for="birthday">Verjaardag</label>
         <input type="date" id="birthday" name="birthday" required>
@@ -103,7 +102,7 @@
 
         <h2>Profiel</h2>
 
-        <input type="file" id="profile" name="profile" accept="image/*">
+        <input type="file" id="profileImg" name="profileImg" accept="image/*">
         <input type="file" id="image1" name="image1" accept="image/*">
         <input type="file" id="image2" name="image2" accept="image/*">
         <input type="file" id="image3" name="image3" accept="image/*">
