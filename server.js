@@ -132,7 +132,7 @@ function registerGetRoutes() {
 
       res.render('pages/profile', {
         user: req.session.user,
-        posts: mijnPosts,
+        alleReizen: alleReizen,
         age: age
       })
 
