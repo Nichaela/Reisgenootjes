@@ -100,10 +100,6 @@ function registerGetRoutes() {
     res.render('pages/index', { data: null })
   })
 
-  app.get('/welkom', (req, res) => {
-    res.render('pages/welkom', { error: null })
-  })
-
   app.get('/login', (req, res) => {
     res.render('pages/login', { error: null })
   })
@@ -134,8 +130,7 @@ function registerGetRoutes() {
     if (!req.session.user) return res.redirect('/login')
 
     try {
-      const { ObjectId } = require('mongodb')
-
+      
       // haal de gemaakte en gejoinde reizen van de gebruiker op
       const mijnPosts = await discover.find({
         userId: new ObjectId(req.session.user._id),
@@ -192,7 +187,7 @@ function registerGetRoutes() {
   })
 
   app.get('/create-post', (req, res) => {
-    if (!req.session.user) return res.redirect('/welkom')
+    if (!req.session.user) return res.redirect('/')
     res.render('pages/create-post', { user: req.session.user })
   })
 
@@ -284,7 +279,7 @@ app.get('/ontdekfilter', async (req, res) => {
     const discoverCollection = db.collection('discover');
 
     const reizen = await discoverCollection.find({}).toArray();
-    const resultaat = []; 
+    const resultaat = []
     
     for (const reis of reizen) {
       //voor elke reis in de lijst reizen doe dit: 
@@ -315,7 +310,7 @@ app.get('/logout', (req, res) => {
     }
 
     res.clearCookie('connect.sid')
-    res.redirect('/welkom')
+    res.redirect('/')
   })
 })
 
@@ -326,7 +321,9 @@ app.get('/logout', (req, res) => {
       const usersCollection = db.collection('users');
       const discoverCollection = db.collection('discover');
       const reizen = await discoverCollection.find({}).toArray();
-      const resultaat = []; for (const reis of reizen) {
+      const resultaat = []
+
+       for (const reis of reizen) {
 
         //voor elke reis in de lijst reizen doe dit: 
         const user = await usersCollection.findOne({
