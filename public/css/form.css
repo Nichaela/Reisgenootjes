@@ -171,7 +171,7 @@ button:disabled {
   right: 0;
 }
 
-.login div {
+.login div:nth-of-type(1) {
   display: flex;
   justify-content: center;
   align-items: center;
