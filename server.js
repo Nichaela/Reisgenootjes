@@ -16,7 +16,6 @@ const crypto = require('crypto')
 const nodemailer = require('nodemailer')
 
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb')
-const { error } = require('console')
 
 const multer = require('multer')
 const path = require('path')
@@ -101,10 +100,6 @@ function registerGetRoutes() {
     res.render('pages/index', { data: null })
   })
 
-  app.get('/welkom', (req, res) => {
-    res.render('pages/welkom', { error: null })
-  })
-
   app.get('/login', (req, res) => {
     res.render('pages/login', { error: null })
   })
@@ -135,8 +130,7 @@ function registerGetRoutes() {
     if (!req.session.user) return res.redirect('/login')
 
     try {
-      const { ObjectId } = require('mongodb')
-
+      
       // haal de gemaakte en gejoinde reizen van de gebruiker op
       const mijnPosts = await discover.find({
         userId: new ObjectId(req.session.user._id),
@@ -193,7 +187,7 @@ function registerGetRoutes() {
   })
 
   app.get('/create-post', (req, res) => {
-    if (!req.session.user) return res.redirect('/welkom')
+    if (!req.session.user) return res.redirect('/')
     res.render('pages/create-post', { user: req.session.user })
   })
 
@@ -285,7 +279,7 @@ app.get('/ontdekfilter', async (req, res) => {
     const discoverCollection = db.collection('discover');
 
     const reizen = await discoverCollection.find({}).toArray();
-    const resultaat = []; 
+    const resultaat = []
     
     for (const reis of reizen) {
       //voor elke reis in de lijst reizen doe dit: 
@@ -316,7 +310,7 @@ app.get('/logout', (req, res) => {
     }
 
     res.clearCookie('connect.sid')
-    res.redirect('/welkom')
+    res.redirect('/')
   })
 })
 
@@ -327,7 +321,9 @@ app.get('/logout', (req, res) => {
       const usersCollection = db.collection('users');
       const discoverCollection = db.collection('discover');
       const reizen = await discoverCollection.find({}).toArray();
-      const resultaat = []; for (const reis of reizen) {
+      const resultaat = []
+
+       for (const reis of reizen) {
 
         //voor elke reis in de lijst reizen doe dit: 
         const user = await usersCollection.findOne({
@@ -518,8 +514,8 @@ function registerPostRoutes() {
   const image3 = req.files['image3'] ? req.files['image3'][0].filename : null
  
   const interestsArray = Array.isArray(interests)
-  ? interests
-  : (interests ? [interests] : []);
+    ? interests
+    : (interests ? [interests] : []);
  
   if (!validator.isEmail(email)) {
     return res.status(400).render('pages/register', { error: 'Ongeldig emailadres' })
@@ -672,11 +668,11 @@ function registerPostRoutes() {
     }
 
     return res.redirect('/matchen')
-  } catch (err) {
-    console.error('Fout in /likes:', err)
-    return res.status(500).send('Fout bij verwerken van like')
-  }
-})
+    } catch (err) {
+        console.error('Fout in /likes:', err)
+        return res.status(500).send('Fout bij verwerken van like')
+      }
+    })
 
   app.get('/chatroom', async (req, res) => {
     if (!req.session.user) return res.redirect('/login')
@@ -872,6 +868,7 @@ function registerErrorHandlers() {
     res.status(500).send('500: server error')
   })
 }
+
 // =======================
 // START SERVER
 // =======================

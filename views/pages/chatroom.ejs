@@ -12,26 +12,12 @@
   <main>
     <h1 class="underline" >Chatroom</h1>
     <atricle>
-      <h2>Nieuwe match</h2>  
-      <!-- Deze worden alleen laten zien als ze bestaan! zet in if else aansporing om naar Match te gaan! -->
+      <h2>Nieuwe match</h2>
       <% users.forEach(otherUser => { %>
         <a href="/chat-channel/<%= otherUser._id %>">
           <%= otherUser.name %>
         </a>
       <% }) %>
-      
-      <!-- <section>
-        <h3>Naam</h3>
-        <p>Laatst bericht met deze user</p>
-      </section> 
-      <section>
-        <h3>Naam</h3>
-        <p>Laatst bericht met deze user</p>
-      </section>
-      <section>
-        <h3>Naam</h3>
-        <p>Laatst bericht met deze user</p>
-      </section>-->
 
     </article>
 
