@@ -16,6 +16,7 @@ const crypto = require('crypto')
 const nodemailer = require('nodemailer')
 
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb')
+const { error } = require('console')
 
 const multer = require('multer')
 const path = require('path')
@@ -234,64 +235,53 @@ function registerGetRoutes() {
   //   res.render('pages/matchen', { user: req.session.user, post: post, matchUser: matchUser, age: age })
   // })
 
-  app.get('/matchen', async (req, res) => {
-    if (!req.session.user) return res.redirect('/login')
-
-    const gezien = req.session.gezien || [];
-    console.log('Gezien:', gezien)
-
-    const post = await discover.findOne({
-      userId: { $ne: new ObjectId(req.session.user._id) },
-      _id: { $nin: gezien.map(id => new ObjectId(id)) }
-    });
-
-    console.log('Post gevonden:', post?._id)
-    console.log('Post userId:', post?.userId)
-
-    if (!post) return res.render('pages/matchen', { user: req.session.user, post: null, matchUser: null, age: null })
-
-    const matchUser = await users.findOne({ _id: new ObjectId(post.userId) });
-
-  if (!matchUser) {
-    if (!req.session.gezien) req.session.gezien = [];
-    req.session.gezien.push(post._id.toString());
-    return res.redirect('/matchen')
-  }
-
-  const today = new Date();
-  const birthDate = new Date(matchUser.birthday);
-  let age = today.getFullYear() - birthDate.getFullYear();
-  const month = today.getMonth() - birthDate.getMonth();
-  if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) age--;
-
-    res.render('pages/matchen', { user: req.session.user, post: post, matchUser: matchUser, age: age })
-  })
-
-app.post('/likes', async (req, res) => {
+app.get('/matchen', async (req, res) => {
   if (!req.session.user) return res.redirect('/login')
 
-  const matchedUserId = req.body.matchedUser;
-  const postId = req.body.postId;
-  const actie = req.body.actie;
+  try {
+    if (!req.session.gezien) req.session.gezien = []
 
-  if (!req.session.gezien) req.session.gezien = [];
-  req.session.gezien.push(postId);
+    const mijnId = new ObjectId(req.session.user._id)
 
-  if (actie === 'like') {
-    await users.updateOne(
-      { _id: new ObjectId(req.session.user._id) },
-      { $addToSet: { likes: matchedUserId } }
-    )
+    const matchUser = await users.findOne({
+      _id: {
+        $ne: mijnId,
+        $nin: req.session.gezien.map(id => new ObjectId(id))
+      }
+    })
 
-    const andereUser = await users.findOne({ _id: new ObjectId(matchedUserId) });
-    const matchId = req.session.user._id.toString();
-
-    if (andereUser.likes && andereUser.likes.includes(matchId)) {
-      return res.redirect('/chatroom')
+    if (!matchUser) {
+      return res.render('pages/matchen', {
+        user: req.session.user,
+        post: null,
+        matchUser: null,
+        age: null
+      })
     }
-  }
 
-  res.redirect('/matchen')
+    const post = await discover.findOne({
+      userId: matchUser._id
+    })
+
+    const today = new Date()
+    const birthDate = new Date(matchUser.birthday)
+    let age = today.getFullYear() - birthDate.getFullYear()
+    const month = today.getMonth() - birthDate.getMonth()
+
+    if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) {
+      age--
+    }
+
+    return res.render('pages/matchen', {
+      user: req.session.user,
+      post,
+      matchUser,
+      age
+    })
+  } catch (err) {
+    console.error('Fout in /matchen:', err)
+    return res.status(500).send('Fout bij laden van matchen')
+  }
 })
 
   app.get('/matchen/reset', (req, res) => {
@@ -523,84 +513,74 @@ function registerPostRoutes() {
   })
 
   // register
-  app.post('/register', async (req, res) => {
-    try {
-      const {
-        name,
-        lastName,
-        email,
-        password,
-        username,
-        birthday,
-        tel,
-        gender,
-        profile,
-        image1,
-        image2,
-        image3,
-        status,
-        bio,
-        interests,
-        opzoek
-      } = req.body
-
-      if (!validator.isEmail(email || '')) {
-        return res.status(400).render('pages/register', { error: 'Ongeldig emailadres' })
-      }
-
-      if (!validator.isLength(password || '', { min: 8 })) {
-        return res.status(400).render('pages/register', { error: 'Wachtwoord moet minimaal 8 tekens bevatten' })
-      }
-
-      const existingUser = await users.findOne({ email })
-      if (existingUser) {
-        return res.status(409).render('pages/register', { error: 'Email bestaat al' })
-      }
-
-      const hashedPassword = await bcrypt.hash(password, 10)
-
-      const result = await users.insertOne({
-        name,
-        lastName,
-        email,
-        password: hashedPassword,
-        username,
-        birthday,
-        tel,
-        gender,
-        profile,
-        image1,
-        image2,
-        image3,
-        status,
-        bio,
-        interests,
-        opzoek,
-        likes: []
-      })
-
-      const nieuweUser = await users.findOne({ _id: result.insertedId })
-
-      req.session.user = {
-        _id: nieuweUser._id,
-        email: nieuweUser.email,
-        name: nieuweUser.name,
-        lastName: nieuweUser.lastName,
-        username: nieuweUser.username,
-        bio: nieuweUser.bio,
-        profile: nieuweUser.profile,
-        gender: nieuweUser.gender,
-        birthday: nieuweUser.birthday,
-        interests: nieuweUser.interests,
-        opzoek: nieuweUser.opzoek
-      }
-
-      return res.redirect('/discover')
-    } catch (err) {
-      console.error(err)
-      return res.status(500).render('pages/register', { error: 'Er ging iets mis bij registreren' })
-    }
+  app.post('/register', upload.fields([
+    { name: 'profileImg', maxCount: 1 },
+    { name: 'image1', maxCount: 1 },
+    { name: 'image2', maxCount: 1 },
+    { name: 'image3', maxCount: 1 },
+  ]), async (req, res) => {
+ 
+  const { name, lastName, email, password, birthday,
+    tel, gender, status, bio, interests, opzoek
+  } = req.body
+ 
+  const profileImg = req.files['profileImg'] ? req.files['profileImg'][0].filename : null
+  const image1 = req.files['image1'] ? req.files['image1'][0].filename : null
+  const image2 = req.files['image2'] ? req.files['image2'][0].filename : null
+  const image3 = req.files['image3'] ? req.files['image3'][0].filename : null
+ 
+  const interestsArray = Array.isArray(interests)
+    ? interests
+    : (interests ? interests.split(',').map(i => i.trim()) : [])
+ 
+  if (!validator.isEmail(email)) {
+    return res.status(400).render('pages/register', { error: 'Ongeldig emailadres' })
+  }
+  if (!validator.isLength(password, { min: 8 })) {
+    return res.status(400).render('pages/register', { error: 'Wachtwoord moet minimaal 8 tekens bevatten' })
+  }
+  const existingUser = await users.findOne({ email })
+  if (existingUser) {
+    return res.status(409).render('pages/register', { error: 'Email bestaat al' })
+  }
+ 
+  const hashedPassword = await bcrypt.hash(password, 10)
+ 
+  const result = await users.insertOne({
+    name,
+    lastName,
+    email,
+    password: hashedPassword,
+    birthday,
+    tel,
+    gender,
+    profileImg,
+    image1,
+    image2,
+    image3,
+    status,
+    bio,
+    interests: interestsArray,
+    opzoek
   })
+ 
+  const nieuweUser = await users.findOne({ _id: result.insertedId })
+  req.session.user = {
+    _id: nieuweUser._id,
+    email: nieuweUser.email,
+    name: nieuweUser.name,
+    lastName: nieuweUser.lastName,
+    username: nieuweUser.username,
+    bio: nieuweUser.bio,
+    profile: nieuweUser.profile,
+    gender: nieuweUser.gender,
+    birthday: nieuweUser.birthday,
+    interests: nieuweUser.interests,
+    opzoek: nieuweUser.opzoek
+  }
+  return res.redirect('/discover')
+})
+ 
 
   // create-post formulier
   app.post('/post', upload.single('postCoverImg'), async (req, res) => {
@@ -675,38 +655,40 @@ function registerPostRoutes() {
 
   // likes
   app.post('/likes', async (req, res) => {
-    if (!req.session.user) return res.redirect('/login')
+  if (!req.session.user) return res.redirect('/login')
 
-    try {
-      const matchedUserId = req.body.matchedUser
-      const actie = req.body.actie
+  try {
+    const matchedUserId = req.body.matchedUser
+    const actie = req.body.actie
 
-      if (!req.session.gezien) req.session.gezien = []
+    if (!req.session.gezien) req.session.gezien = []
+    if (matchedUserId && !req.session.gezien.includes(matchedUserId)) {
       req.session.gezien.push(matchedUserId)
-
-      if (actie === 'like') {
-        await users.updateOne(
-          { _id: new ObjectId(req.session.user._id) },
-          { $addToSet: { likes: matchedUserId } }
-        )
-
-        const andereUser = await users.findOne({
-          _id: new ObjectId(matchedUserId)
-        })
-
-        const matchId = req.session.user._id.toString()
-
-        if (andereUser && andereUser.likes && andereUser.likes.includes(matchId)) {
-          return res.redirect('/chatroom')
-        }
-      }
-
-      return res.redirect('/matchen')
-    } catch (err) {
-      console.error(err)
-      return res.status(500).send('Fout bij verwerken van like')
     }
-  })
+
+    if (actie === 'like') {
+      await users.updateOne(
+        { _id: new ObjectId(req.session.user._id) },
+        { $addToSet: { likes: matchedUserId } }
+      )
+
+      const andereUser = await users.findOne({
+        _id: new ObjectId(matchedUserId)
+      })
+
+      const matchId = req.session.user._id.toString()
+
+      if (andereUser && andereUser.likes && andereUser.likes.includes(matchId)) {
+        return res.redirect('/chatroom')
+      }
+    }
+
+    return res.redirect('/matchen')
+  } catch (err) {
+    console.error('Fout in /likes:', err)
+    return res.status(500).send('Fout bij verwerken van like')
+  }
+})
 
   app.get('/chatroom', async (req, res) => {
     if (!req.session.user) return res.redirect('/login')
