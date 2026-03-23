@@ -107,20 +107,20 @@ dropdowns.forEach(dropdown => {
 // ==========================================
 // Variabelen
 
-const filterButtons = document.querySelectorAll(".genders .filter-btn"); // Alleen gender knoppen
-const continentButtons = document.querySelectorAll(".continents .filter-btn"); // Continent knoppen
-const toggleButton = document.getElementById("toggleFilter");
-const filterMenu = document.getElementById("filterMenu");
-const closeButton = document.getElementById("closeMenu");
-const items = document.querySelectorAll(".reizen li");
+const filterButtons = document.querySelectorAll(".genders .filter-btn") // Alleen gender knoppen
+const continentButtons = document.querySelectorAll(".continents .filter-btn") // Continent knoppen
+const toggleButton = document.getElementById("toggleFilter")
+const filterMenu = document.getElementById("filterMenu")
+const closeButton = document.getElementById("closeMenu")
+const items = document.querySelectorAll(".reizen li")
 
-const dateFilter = document.getElementById("dateFilter");
+const dateFilter = document.getElementById("dateFilter")
 
-const birthdaySlider = document.getElementById("birthday");
-const birthdayValue = document.getElementById("birthdayValue");
+const birthdaySlider = document.getElementById("birthday")
+const birthdayValue = document.getElementById("birthdayValue")
 
-let activeFilters = new Set();       // gender
-let activeContinents = new Set();    // continent
+let activeFilters = new Set()      // gender
+let activeContinents = new Set()   // continent
 
 
 
@@ -129,12 +129,12 @@ let activeContinents = new Set();    // continent
 
 if (birthdaySlider && birthdayValue) {
 
-  birthdayValue.textContent = birthdaySlider.value; // startwaarde laten zien
+  birthdayValue.textContent = birthdaySlider.value // startwaarde laten zien
 
   birthdaySlider.addEventListener("input", () => {
-    birthdayValue.textContent = birthdaySlider.value; // realtime nummer updaten
-    filterItems(); // filter meteen updaten bij slider beweging
-  });
+    birthdayValue.textContent = birthdaySlider.value // realtime nummer updaten
+    filterItems() // filter meteen updaten bij slider beweging
+  })
 
 }
 
@@ -142,106 +142,106 @@ if (birthdaySlider && birthdayValue) {
 //Filter functie
 
 function filterItems() {
-  const selectedDate = dateFilter.value; //haalt data op uit input
-  const selectedAge = birthdaySlider ? parseInt(birthdaySlider.value) : null; 
+  const selectedDate = dateFilter.value //haalt data op uit input
+  const selectedAge = birthdaySlider ? parseInt(birthdaySlider.value) : null
 
   items.forEach(item => {
-    const gender = item.dataset.gender;
-    const continent = item.dataset.continent;
-    const date = item.dataset.date;
-    const itemBirthday = item.dataset.birthday;
-    const age = calculateAge(itemBirthday);
+    const gender = item.dataset.gender
+    const continent = item.dataset.continent
+    const date = item.dataset.date
+    const itemBirthday = item.dataset.birthday
+    const age = calculateAge(itemBirthday)
 
-    let showItem = true;
+    let showItem = true
 
     // Gender filter
-    if (activeFilters.size > 0 && !activeFilters.has(gender)) showItem = false;
+    if (activeFilters.size > 0 && !activeFilters.has(gender)) showItem = false
 
     // Continent filter
-    if (activeContinents.size > 0 && !activeContinents.has(continent)) showItem = false;
+    if (activeContinents.size > 0 && !activeContinents.has(continent)) showItem = false
 
     // Datum filter (alleen vanaf geselecteerde datum)
     if (selectedDate) {
-      const selected = new Date(selectedDate);
-      const itemDate = new Date(date);
-      if (itemDate < selected) showItem = false;
+      const selected = new Date(selectedDate)
+      const itemDate = new Date(date)
+      if (itemDate < selected) showItem = false
     }
 
     // Leeftijd filter
-    const ageMargin = 5;
+    const ageMargin = 5
     if (selectedAge !== null && (age < selectedAge - ageMargin || age > selectedAge + ageMargin)) {
-      showItem = false;
+      showItem = false
     }
 
-    item.style.display = showItem ? "block" : "none";
-  });
+    item.style.display = showItem ? "block" : "none"
+  })
 }
 
 //Open en close menu
 
 toggleButton.addEventListener("click", () => {
-  filterMenu.classList.add("show");
-  toggleButton.style.display = "none";
+  filterMenu.classList.add("show")
+  toggleButton.style.display = "none"
 });
 
 closeButton.addEventListener("click", () => {
-  filterMenu.classList.remove("show");
-  toggleButton.style.display = "block";
-});
+  filterMenu.classList.remove("show")
+  toggleButton.style.display = "block"
+})
 
 
 //Gender filters
 
 filterButtons.forEach(btn => {
   btn.addEventListener("click", () => {
-    const filter = btn.dataset.gender; // waarde wordt opgehaald (man/vrouw/anders)
+    const filter = btn.dataset.gender // waarde wordt opgehaald (man/vrouw/anders)
 
     if (activeFilters.has(filter)) {
-      activeFilters.delete(filter); // als filter al actief is -> verwijder filter
-      btn.classList.remove("active"); // active class wordt verwijderd
+      activeFilters.delete(filter) // als filter al actief is -> verwijder filter
+      btn.classList.remove("active") // active class wordt verwijderd
     } else {
-      activeFilters.add(filter); // filter was nog niet actief -> toevoegen
-      btn.classList.add("active"); // krijgt active class
+      activeFilters.add(filter) // filter was nog niet actief -> toevoegen
+      btn.classList.add("active") // krijgt active class
     }
 
-    filterItems(); // opnieuw filteren
-  });
-});
+    filterItems() // opnieuw filteren
+  })
+})
 
 //Continent filters
 
 continentButtons.forEach(btn => {
   btn.addEventListener("click", () => {
-    const filter = btn.dataset.continent; // waarde ophalen
+    const filter = btn.dataset.continent // waarde ophalen
 
     if (activeContinents.has(filter)) {
-      activeContinents.delete(filter); // filter verwijderen
-      btn.classList.remove("active");
+      activeContinents.delete(filter) // filter verwijderen
+      btn.classList.remove("active")
     } else {
-      activeContinents.add(filter); // filter toevoegen
-      btn.classList.add("active");
+      activeContinents.add(filter) // filter toevoegen
+      btn.classList.add("active")
     }
 
-    filterItems(); // opnieuw filteren
-  });
-});
+    filterItems() // opnieuw filteren
+  })
+})
 
 
 
 // Datum filter
 
-dateFilter.addEventListener("change", filterItems); // er wordt opnieuw gefilterd als de datum wordt veranderd
+dateFilter.addEventListener("change", filterItems) // er wordt opnieuw gefilterd als de datum wordt veranderd
 
 
 
 // Birthday naar leeftijd berekenen
 
 function calculateAge(birthday) { // hier staat eigenlijk: calculateAge("12-02-2004")
-  const today = new Date(); // geeft de datum van vandaag 
-  const birthDate = new Date(birthday); // maakt van een string een echte datum om mee te rekenen
+  const today = new Date() // geeft de datum van vandaag 
+  const birthDate = new Date(birthday) // maakt van een string een echte datum om mee te rekenen
 
-  let age = today.getFullYear() - birthDate.getFullYear(); // age = datumvandaag en jaar - geboortedatum en jaar, niet altijd correct dus:
-  const month = today.getMonth() - birthDate.getMonth(); // berekent of verjaardag nog moet komen (negatieve uitkomst = verjaardag moet nog komen)
+  let age = today.getFullYear() - birthDate.getFullYear() // age = datumvandaag en jaar - geboortedatum en jaar, niet altijd correct dus:
+  const month = today.getMonth() - birthDate.getMonth() // berekent of verjaardag nog moet komen (negatieve uitkomst = verjaardag moet nog komen)
 
   if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) {
     age--; // als verjaardagmaand nog moet komen OF de verjaardagdag moet nog komen, dan wordt er 1 jaar afgetrokken van leeftijd
@@ -254,19 +254,19 @@ function calculateAge(birthday) { // hier staat eigenlijk: calculateAge("12-02-2
 
 // Reset filters
 
-const resetButton = document.querySelector(".reset-filters");
+const resetButton = document.querySelector(".reset-filters")
 
 resetButton.addEventListener("click", () => {
   // 1. Alle actieve buttons verwijderen
-  activeFilters.clear();
-  activeContinents.clear();
+  activeFilters.clear()
+  activeContinents.clear()
 
   document.querySelectorAll(".filter-btn").forEach(btn => {
-    btn.classList.remove("active");
-  });
+    btn.classList.remove("active")
+  })
 
   // 2. Datum resetten
-  if (dateFilter) dateFilter.value = "";
+  if (dateFilter) dateFilter.value = ""
 
   // 3. Leeftijd slider resetten
   if (birthdaySlider) {
@@ -275,8 +275,8 @@ resetButton.addEventListener("click", () => {
   }
 
   // 4. Alles weer zichtbaar maken
-  filterItems();
-});
+  filterItems()
+})
 
 
 
@@ -284,41 +284,41 @@ resetButton.addEventListener("click", () => {
 // ZOEKBALK (browsen door reizen)
 // ==========================================
 
-const searchInput = document.getElementById("searchInput");
-const reizen = document.querySelectorAll(".reizen li");
-const noResults = document.getElementById("noResults"); // het element voor de boodschap
+const searchInput = document.getElementById("searchInput")
+const reizen = document.querySelectorAll(".reizen li")
+const noResults = document.getElementById("noResults") // het element voor de boodschap
 
 searchInput?.addEventListener("input", (event) => { // is er input door de gebruiker --> dan het volgende event
-  const zoekTerm = event.target.value.toLowerCase(); // gebruiker kan in zowel lower als uppercase typen
-  let anyResults = false; // houdt bij of er een match is
+  const zoekTerm = event.target.value.toLowerCase() // gebruiker kan in zowel lower als uppercase typen
+  let anyResults = false // houdt bij of er een match is
 
   reizen.forEach(li => {
-    const titel = li.querySelector(".post-title")?.textContent.toLowerCase() || ""; // Haalt de titel op en maakt er kleinletters van OF lege string om fout te voorkomen
-    const locatie = li.querySelector(".post-location")?.textContent.toLowerCase() || "";
+    const titel = li.querySelector(".post-title")?.textContent.toLowerCase() || "" // Haalt de titel op en maakt er kleinletters van OF lege string om fout te voorkomen
+    const locatie = li.querySelector(".post-location")?.textContent.toLowerCase() || ""
 
     // als titel of locatie zoekterm bevat, toon item, anders verberg
     if (titel.includes(zoekTerm) || locatie.includes(zoekTerm)) {
-      li.style.display = "block";
-      anyResults = true; // er is minstens één match
+      li.style.display = "block"
+      anyResults = true // er is minstens één match
     } else {
-      li.style.display = "none";
+      li.style.display = "none"
     }
-  });
+  })
 
   // als er geen resultaten zijn, laat boodschap zien, anders verberg
-  noResults.style.display = anyResults ? "none" : "block";
+  noResults.style.display = anyResults ? "none" : "block"
 });
 
 // Oogje om wachtwoord zichtbaar te maken
 function togglePassword(fieldId, eyeSpan) {
-  const input = document.getElementById(fieldId);
-  const img = eyeSpan.querySelector('img');
+  const input = document.getElementById(fieldId)
+  const img = eyeSpan.querySelector('img')
 
   if (input.type === 'password') {
-    input.type = 'text';
-    img.src = 'img/Eyeclose.svg'; // wissel naar gesloten oog
+    input.type = 'text'
+    img.src = 'img/Eyeclose.svg' // wissel naar gesloten oog
   } else {
-    input.type = 'password';
-    img.src = 'img/Eye.svg'; // terug naar open oog
+    input.type = 'password'
+    img.src = 'img/Eye.svg' // terug naar open oog
   }
 }
