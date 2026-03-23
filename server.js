@@ -144,14 +144,14 @@ function registerGetRoutes() {
 
   app.get('/discover', async (req, res) => {
     try {
-      const postsAlles = await discover.find({}).toArray() //haalt ALLES op uit discover collection 
+      const postsAlles = await discover.find({}).toArray() 
 
-      const posts = [] //lege array waar data ingaat
+      const posts = [] 
 
-      for (const post of postsAlles) { //voor elke post uit de hele discover collection
-        const user = await users.findOne({ _id: post.userId }) //zoekt gebruiker op
+      for (const post of postsAlles) { 
+        const user = await users.findOne({ _id: post.userId }) 
 
-        posts.push({ //voegt user toe aan de post uit de user collection
+        posts.push({ 
           ...post, // de '...' haalt alle data uit de post (titel, location etc)
           user
         })
@@ -166,6 +166,7 @@ function registerGetRoutes() {
       res.status(500).send('Er ging iets mis bij het laden van posts')
     }
   })
+  
 
   app.get('/create-post', (req, res) => {
     if (!req.session.user) return res.redirect('/welkom')
@@ -174,24 +175,24 @@ function registerGetRoutes() {
 
   app.get('/post/:id', async (req, res) => {
     try {
-      const post = await discover.findOne({
-        _id: new ObjectId(req.params.id),
-      })
-
-      if (!post) {
-        return res.status(404).send('Post niet gevonden');
-      }
-
-      const postUser = await users.findOne({ _id: new ObjectId(post.userId) });
-
-      res.render('pages/post', { post, postUser });
-
+      const post = await discover.findOne({ _id: new ObjectId(req.params.id) })
+      if (!post) return res.status(404).send('Post niet gevonden')
+  
+      const postUser = await users.findOne({ _id: new ObjectId(post.userId) })
+  
+      // haal alle mederezigers op
+      const reizigersIds = post.reizigers || []
+      const mederezigers = await users.find({ 
+        _id: { $in: reizigersIds.map(id => new ObjectId(id)) } 
+      }).toArray()
+  
+      res.render('pages/post', { post, postUser, mederezigers, user: req.session.user || null })
     } catch (err) {
       console.error(err)
       res.status(500).send('Fout post laden')
     }
   })
-
+  
   app.get('/matchen', async (req, res) => {
     const post = await discover.findOne({});
     const matchUser = await users.findOne({ _id: new ObjectId(post.userId) });
@@ -310,12 +311,11 @@ function registerPostRoutes() {
     const image1 = req.files['image1'] ? req.files['image1'][0].filename : null
     const image2 = req.files['image2'] ? req.files['image2'][0].filename : null
     const image3 = req.files['image3'] ? req.files['image3'][0].filename : null
-
+  
     const interestsArray = Array.isArray(interests)
-    ? interests
-    : (interests ? interests.split(',').map(i => i.trim()) : [])
-
-    // validator checks
+      ? interests
+      : (interests ? interests.split(',').map(i => i.trim()) : [])
+  
     if (!validator.isEmail(email)) {
       return res.status(400).render('pages/register', { error: 'Ongeldig emailadres' })
     }
@@ -326,10 +326,9 @@ function registerPostRoutes() {
     if (existingUser) {
       return res.status(409).render('pages/register', { error: 'Email bestaat al' })
     }
-
-    // password hashing
+  
     const hashedPassword = await bcrypt.hash(password, 10)
-
+  
     const result = await users.insertOne({
       name,
       lastName,
@@ -347,11 +346,10 @@ function registerPostRoutes() {
       interests: interestsArray,
       opzoek
     })
-
-    // sessie opslaan na registratie
+  
     const nieuweUser = await users.findOne({ _id: result.insertedId })
     req.session.user = {
-      _id: nieuweUser._id,       
+      _id: nieuweUser._id,
       email: nieuweUser.email,
       name: nieuweUser.name,
       lastName: nieuweUser.lastName,
@@ -413,13 +411,13 @@ function registerPostRoutes() {
   // join reis
   app.post('/post/:id/join', async (req, res) => {
     if (!req.session.user) return res.redirect('/login')
-
+  
     try {
       const post = await discover.findOne({ _id: new ObjectId(req.params.id) })
       if (!post) return res.status(404).send('Post niet gevonden')
-
+  
       const aantalReizigers = post.reizigers ? post.reizigers.length : 0
-
+  
       // check of de reis vol is
       if (aantalReizigers >= post.persons) {
         return res.status(403).send('Deze reis is vol')
@@ -428,13 +426,13 @@ function registerPostRoutes() {
       // check of user al meedoet
       const alGejoint = post.reizigers && post.reizigers.some(id => id.toString() === req.session.user._id.toString())
       if (alGejoint) return res.redirect(`/post/${req.params.id}`)
-
+  
       // voeg user toe aan reizigers array
       await discover.updateOne(
         { _id: new ObjectId(req.params.id) },
         { $push: { reizigers: new ObjectId(req.session.user._id) } }
       )
-
+  
       res.redirect(`/post/${req.params.id}`)
     } catch (err) {
       console.error(err)
