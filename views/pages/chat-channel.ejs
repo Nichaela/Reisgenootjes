@@ -1,22 +1,31 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <%- include('../partials/head'); %>
+ <link rel="stylesheet" href="/css/chatroom.css">
 </head>
 <body>
   <header>
     <%- include('../partials/header'); %>
   </header>
   <main>
-    <% if (user) { %>
-    <h1 class="underline"><%= user.name %> u chat met ... </h1>
-    <% } %>
+    
     <div class="chat-container">
         <div class="chat-header">
-            💬 Real-Time Chat
+            <% if (user) { %>
+              <h1 class="underline"> <%= user.name %> u chat met <span id="chatPartnerName"><%= chatPartner.name %></span></h1>
+            <% } %>
         </div>
-        <div id="messages"></div>
+        <div id="messages">
+          <% if (conversationHistory && conversationHistory.length > 0) { %>
+            <% conversationHistory.forEach((msg) => { %>
+              <div class="message <%= msg.fromUserId === user._id.toString() ? 'messageSent' : 'messageReceived' %>">
+                <%= msg.fromUserId === user._id.toString() ? 'Jij' : msg.fromName %>: <%= msg.text %>
+              </div>
+            <% }) %>
+          <% } %>
+        </div>
+        <input type="hidden" id="chatPartnerId" value="<%= chatPartner._id %>">
         <div id="typingIndicator" class="typing-indicator"></div>
         <div class="input-container">
             <input id="messageInput" type="text" placeholder="Type your message..." autocomplete="off">

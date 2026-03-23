@@ -1,0 +1,18 @@
+<article class="reisoproep">
+  <% if (post.postCoverImg) { %>
+    <img src="/uploads/<%= post.postCoverImg %>" alt="<%= post.title %>">
+  <% } %>
+
+  <span> <%= post.startDate %> tot <%= post.endDate %> </span>
+
+  <p class="post-location">
+    <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M6.5 3.35156C6.11834 3.35156 5.74526 3.46474 5.42792 3.67677C5.11059 3.88881 4.86325 4.19019 4.7172 4.54279C4.57115 4.89539 4.53293 5.28339 4.60739 5.65771C4.68185 6.03204 4.86563 6.37587 5.1355 6.64575C5.40538 6.91562 5.74921 7.0994 6.12354 7.17386C6.49786 7.24832 6.88586 7.2101 7.23846 7.06405C7.59106 6.918 7.89244 6.67066 8.10448 6.35333C8.31651 6.03599 8.42969 5.66291 8.42969 5.28125C8.42969 4.76946 8.22638 4.27864 7.8645 3.91675C7.50261 3.55487 7.01179 3.35156 6.5 3.35156Z" fill="#FC9B5E"/>
+    </svg>
+    <%= post.location %>
+  </p>
+
+  <h3 class="post-title"><%= post.title %></h3>
+
+  <button>→</button>
+</article>

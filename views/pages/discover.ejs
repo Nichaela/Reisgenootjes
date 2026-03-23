@@ -2,56 +2,53 @@
 <html lang="en">
 <head>
   <%- include('../partials/head'); %>
-  
+  <link rel="stylesheet" href="/css/matchen.css">
 </head>
 <body>
   <main>
-
-    <% if (user) { %>
-    <p>Welkom <%= user.name %></p>
-    <% } %>
-
     <h1 class="underline" >Ontdek</h1>
     <!-- filterknop -->
-
     <!-- onderweg -->
     <!-- opzoek -->
 
-    <ul>
-      <li>
-        <a href="/discover/post">
-          <img src="/img/onderweg.png" alt="Onderweg" class="discover-img">
-          <p>datum</p>
-          <ul>
-            <li>
-              <!-- linken naar profiel -->
-              <a href="">
-                <img src="" alt="">
-              </a>
-            </li>
-            <li>
-              <a href="">
-                <img src="" alt="">
-              </a>
-            </li>
-          </ul>
+    <%- include('../partials/ontdekfiltermenu') %>
 
-          <p>locatie</p>
-          <h2> titel </h2>
+    <%- include('../partials/zoekbalk') %>
 
-          <!-- knopje met pijl -->
-        </a>
-      </li>
+
+
+    <ul class="reizen">
+      <% posts.forEach(post => { %>
+        <li
+          data-gender="<%= post.gender %>"
+          data-date="<%= post.startDate %>"
+          data-continent="<%= post.continent %>"
+          data-birthday="<%= post.user.birthday %>"
+        >
+          <a href="/post/<%= post._id %>">
+            <%- include('../partials/reisoproep', { post: post }) %>
+          </a>
+        </li>
+      <% }) %>
     </ul>
 
 
+   
 
 
+    <!-- zoekbalk -->
+
+    <div id="noResults" style="display:none;">
+      <p>Geen resultaten gevonden</p>
+      <img src="/img/404.svg" alt="">
+    </div>
 
   </main>
 
   <footer>
     <%- include('../partials/bottom-nav'); %>
   </footer>
+
+  <script src="../script/form.js"></script>
 </body>
 </html>

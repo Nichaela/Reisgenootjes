@@ -9,6 +9,7 @@ const closeButton = document.getElementById("closeMenu");
 const items = document.querySelectorAll(".all li");
 
 const dateFilter = document.getElementById("dateFilter");
+const daysFilter = document.getElementById("daysFilter");
 
 const birthdaySlider = document.getElementById("birthday");
 const birthdayValue = document.getElementById("birthdayValue");
@@ -16,63 +17,48 @@ const birthdayValue = document.getElementById("birthdayValue");
 let activeFilters = new Set();       // gender
 let activeContinents = new Set();    // continent
 
-
-
-
 // =======================
 // Realtime slider update
 // =======================
-if (birthdaySlider && birthdayValue) {
-
-  birthdayValue.textContent = birthdaySlider.value; // startwaarde laten zien
-
-  birthdaySlider.addEventListener("input", () => {
-    birthdayValue.textContent = birthdaySlider.value; // realtime nummer updaten
-    filterItems(); // filter meteen updaten bij slider beweging
-  });
-
-}
-
-
+birthdayValue.textContent = birthdaySlider.value; // startwaarde laten zien
+birthdaySlider.addEventListener("input", () => {
+  birthdayValue.textContent = birthdaySlider.value; // realtime nummer updaten
+  filterItems(); // filter meteen updaten bij slider beweging
+});
 
 // =======================
 // Filter functie
 // =======================
 function filterItems() {
-  const selectedDate = dateFilter.value; //haalt data op uit input
-  const selectedAge = birthdaySlider ? parseInt(birthdaySlider.value) : null; 
+  const selectedDate = dateFilter.value; //datum wordt uit inputveld gehaald
+  const selectedDays = daysFilter.value ? parseInt(daysFilter.value) : null; //maakt van het ingevoerde getal (string) een getal
+  const selectedAge = birthdaySlider.value ? parseInt(birthdaySlider.value) : null; // leeftijd uit slider
 
   items.forEach(item => {
-    const gender = item.dataset.gender;
-    const continent = item.dataset.continent;
+    const gender = item.dataset.gender; //data uit html halen
+    const continent = item.dataset.continent; 
     const date = item.dataset.date;
-    const itemBirthday = item.dataset.birthday;
-    const age = calculateAge(itemBirthday);
+    const days = parseInt(item.dataset.days); //hetzelfde, maar omzetten string naar getal
 
-    let showItem = true;
+    const itemBirthday = item.dataset.birthday; // birthday van item
+    const age = calculateAge(itemBirthday); // bereken leeftijd
 
-    // Gender filter
-    if (activeFilters.size > 0 && !activeFilters.has(gender)) showItem = false;
+    let showItem = true; //standaard = item laten zien, kan later veranderen naar false
 
-    // Continent filter
+    if (activeFilters.size > 0 && !activeFilters.has(gender)) showItem = false; //als er een filter is geselecteerd EN het item hoort niet bij het filter = verberg item
     if (activeContinents.size > 0 && !activeContinents.has(continent)) showItem = false;
-
-    // Datum filter (alleen vanaf geselecteerde datum)
-    if (selectedDate) {
-      const selected = new Date(selectedDate);
-      const itemDate = new Date(date);
-      if (itemDate < selected) showItem = false;
-    }
-
-    // Leeftijd filter
-    const ageMargin = 5;
+    if (selectedDate && date !== selectedDate) showItem = false; //als een datum is gekozen EN datum van item is anders = verberg item
+    if (selectedDays !== null && days < selectedDays) showItem = false; //als er datum is gekozen EN item heeft minder dagen = verberg item
+    
+    const ageMargin = 5; // marge van 10 jaar
     if (selectedAge !== null && (age < selectedAge - ageMargin || age > selectedAge + ageMargin)) {
       showItem = false;
-    }
+    } //controle of er leeftijd is ingevuld EN komt de leeftijd van item overeen met ingoerde leeftijd
 
-    item.style.display = showItem ? "block" : "none";
+    item.style.display = showItem ? "block" : "none"; //bij showitem -> display block & bij else -> display none
   });
 }
+
 // =======================
 // Open/close menu
 // =======================
@@ -131,9 +117,7 @@ continentButtons.forEach(btn => {
 // Datum & dagen filters
 // =======================
 dateFilter.addEventListener("change", filterItems); // er wordt opnieuw gefilterd als de datum wordt veranderd
-if (daysFilter) {
-  daysFilter.addEventListener("input", filterItems);
-}
+daysFilter.addEventListener("input", filterItems); // er wordt opnieuw gefilterd als de dagen wordt veranderd
 
 
 // =======================
@@ -152,33 +136,3 @@ function calculateAge(birthday) { // hier staat eigenlijk: calculateAge("12-02-2
 
   return age; // geeft berekende leeftijd terug
 }
-
-
-// =======================
-// Reset filters
-// =======================
-
-const resetButton = document.querySelector(".reset-filters");
-
-resetButton.addEventListener("click", () => {
-  // 1. Alle actieve buttons verwijderen
-  activeFilters.clear();
-  activeContinents.clear();
-
-  document.querySelectorAll(".filter-btn").forEach(btn => {
-    btn.classList.remove("active");
-  });
-
-  // 2. Datum resetten
-  if (dateFilter) dateFilter.value = "";
-
-  // 3. Leeftijd slider resetten
-  if (birthdaySlider) {
-    birthdaySlider.value = birthdaySlider.min;
-    birthdayValue.textContent = birthdaySlider.min;
-  }
-
-  // 4. Alles weer zichtbaar maken
-  filterItems();
-});
-
