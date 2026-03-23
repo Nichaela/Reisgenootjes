@@ -513,84 +513,74 @@ function registerPostRoutes() {
   })
 
   // register
-  app.post('/register', async (req, res) => {
-    try {
-      const {
-        name,
-        lastName,
-        email,
-        password,
-        username,
-        birthday,
-        tel,
-        gender,
-        profile,
-        image1,
-        image2,
-        image3,
-        status,
-        bio,
-        interests,
-        opzoek
-      } = req.body
-
-      if (!validator.isEmail(email || '')) {
-        return res.status(400).render('pages/register', { error: 'Ongeldig emailadres' })
-      }
-
-      if (!validator.isLength(password || '', { min: 8 })) {
-        return res.status(400).render('pages/register', { error: 'Wachtwoord moet minimaal 8 tekens bevatten' })
-      }
-
-      const existingUser = await users.findOne({ email })
-      if (existingUser) {
-        return res.status(409).render('pages/register', { error: 'Email bestaat al' })
-      }
-
-      const hashedPassword = await bcrypt.hash(password, 10)
-
-      const result = await users.insertOne({
-        name,
-        lastName,
-        email,
-        password: hashedPassword,
-        username,
-        birthday,
-        tel,
-        gender,
-        profile,
-        image1,
-        image2,
-        image3,
-        status,
-        bio,
-        interests,
-        opzoek,
-        likes: []
-      })
-
-      const nieuweUser = await users.findOne({ _id: result.insertedId })
-
-      req.session.user = {
-        _id: nieuweUser._id,
-        email: nieuweUser.email,
-        name: nieuweUser.name,
-        lastName: nieuweUser.lastName,
-        username: nieuweUser.username,
-        bio: nieuweUser.bio,
-        profile: nieuweUser.profile,
-        gender: nieuweUser.gender,
-        birthday: nieuweUser.birthday,
-        interests: nieuweUser.interests,
-        opzoek: nieuweUser.opzoek
-      }
-
-      return res.redirect('/discover')
-    } catch (err) {
-      console.error(err)
-      return res.status(500).render('pages/register', { error: 'Er ging iets mis bij registreren' })
-    }
+  app.post('/register', upload.fields([
+    { name: 'profileImg', maxCount: 1 },
+    { name: 'image1', maxCount: 1 },
+    { name: 'image2', maxCount: 1 },
+    { name: 'image3', maxCount: 1 },
+  ]), async (req, res) => {
+ 
+  const { name, lastName, email, password, birthday,
+    tel, gender, status, bio, interests, opzoek
+  } = req.body
+ 
+  const profileImg = req.files['profileImg'] ? req.files['profileImg'][0].filename : null
+  const image1 = req.files['image1'] ? req.files['image1'][0].filename : null
+  const image2 = req.files['image2'] ? req.files['image2'][0].filename : null
+  const image3 = req.files['image3'] ? req.files['image3'][0].filename : null
+ 
+  const interestsArray = Array.isArray(interests)
+    ? interests
+    : (interests ? interests.split(',').map(i => i.trim()) : [])
+ 
+  if (!validator.isEmail(email)) {
+    return res.status(400).render('pages/register', { error: 'Ongeldig emailadres' })
+  }
+  if (!validator.isLength(password, { min: 8 })) {
+    return res.status(400).render('pages/register', { error: 'Wachtwoord moet minimaal 8 tekens bevatten' })
+  }
+  const existingUser = await users.findOne({ email })
+  if (existingUser) {
+    return res.status(409).render('pages/register', { error: 'Email bestaat al' })
+  }
+ 
+  const hashedPassword = await bcrypt.hash(password, 10)
+ 
+  const result = await users.insertOne({
+    name,
+    lastName,
+    email,
+    password: hashedPassword,
+    birthday,
+    tel,
+    gender,
+    profileImg,
+    image1,
+    image2,
+    image3,
+    status,
+    bio,
+    interests: interestsArray,
+    opzoek
   })
+ 
+  const nieuweUser = await users.findOne({ _id: result.insertedId })
+  req.session.user = {
+    _id: nieuweUser._id,
+    email: nieuweUser.email,
+    name: nieuweUser.name,
+    lastName: nieuweUser.lastName,
+    username: nieuweUser.username,
+    bio: nieuweUser.bio,
+    profile: nieuweUser.profile,
+    gender: nieuweUser.gender,
+    birthday: nieuweUser.birthday,
+    interests: nieuweUser.interests,
+    opzoek: nieuweUser.opzoek
+  }
+  return res.redirect('/discover')
+})
+ 
 
   // create-post formulier
   app.post('/post', upload.single('postCoverImg'), async (req, res) => {
