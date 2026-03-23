@@ -126,6 +126,7 @@ function registerGetRoutes() {
 
   app.get('/forgot-password', (req, res) => {
     res.render('pages/forgot-password', { error: null, success: null })
+  })  
     
   app.get('/register', (req, res) => {
     res.render('pages/register', { error: null })
@@ -354,41 +355,30 @@ app.post('/likes', async (req, res) => {
 })
 
   // route naar ontdek filter
-  app.get('/ontdekfilter', async (req, res) => {
+  app.get('/discover', async (req, res) => {
     try {
-      const db = client.db(process.env.DB_NAME);
-      const usersCollection = db.collection('users');
-      const discoverCollection = db.collection('discover');
-      const reizen = await discoverCollection.find({}).toArray();
-      const resultaat = []; for (const reis of reizen) {
+      const postsAlles = await discover.find({}).toArray() //haalt ALLES op uit discover collection 
 
-        //voor elke reis in de lijst reizen doe dit: 
-        const user = await usersCollection.findOne({
-          _id: reis.userId //vind een reis 
-        })
-        resultaat.push({ //pusht deze data in die lege array genaamd resultaat 
-          reis: reis, user: user
+      const posts = [] //lege array waar data ingaat
+
+      for (const post of postsAlles) { //voor elke post uit de hele discover collection
+        const user = await users.findOne({ _id: post.userId }) //zoekt gebruiker op
+
+        posts.push({ //voegt user toe aan de post uit de user collection
+          ...post, // de '...' haalt alle data uit de post (titel, location etc)
+          user
         })
       }
 
-      res.render('pages/ontdekfilter', {
-        reizen: resultaat //reizen = de array van de collection en resultaat is de array die ik heb gemaakt 
+      res.render('pages/discover', {
+        user: req.session.user,
+        posts,
       })
-    } catch (err) { console.error(err); res.status(500).send("Fout bij ophalen data"); }
+    } catch (err) {
+      console.error(err)
+      res.status(500).send('Er ging iets mis bij het laden van posts')
+    }
   })
-
-  app.get('/logout', (req, res) => {
-    req.session.destroy((err) => {
-      if (err) {
-        console.error(err)
-        return res.redirect('/discover')
-      }
-  
-      res.clearCookie('connect.sid')
-      res.redirect('/welkom')
-    })
-  })
-}
 
 //Huidge route naar filter menu + werkende continent filter 
 app.get('/filter', async (req, res) => {
@@ -415,11 +405,17 @@ app.get('/filter', async (req, res) => {
 })
 
 app.get('/logout', (req, res) => {
-  req.session.destroy(() => {
+  req.session.destroy((err) => {
+    if (err) {
+      console.error(err)
+      return res.redirect('/discover')
+    }
+
+    res.clearCookie('connect.sid')
     res.redirect('/welkom')
   })
 })
-
+}
 
 // =======================
 // POST ROUTES
@@ -466,6 +462,7 @@ function registerPostRoutes() {
       return res.status(500).render('pages/login', { error: 'Er ging iets mis bij inloggen' })
     }
   })
+}
 
   // Logout
   app.post('/logout', (req, res) => {
@@ -478,6 +475,7 @@ function registerPostRoutes() {
       res.clearCookie('connect.sid')
       res.redirect('/login')
     })
+  })  
   
   app.post('/forgot-password', async (req, res) => {
     const email = req.body.email
@@ -610,6 +608,11 @@ function registerPostRoutes() {
         interests,
         opzoek
       })
+    } catch (err) {
+      console.error(err)
+      res.status(500).send('Er ging iets mis bij het aanmaken van de post')
+    }
+  })
 
   //create-post formulier 
   app.post('/post', upload.single('postCoverImg'), async (req, res) => {
@@ -678,7 +681,6 @@ function registerPostRoutes() {
 
     res.redirect(`/post/${req.params.id}`)
   })
-}
 
 app.post('/likes', async (req, res) => {
   if (!req.session.user) return res.redirect('/login')
@@ -708,6 +710,7 @@ app.post('/likes', async (req, res) => {
 
   res.redirect('/matchen')
 })
+
 
 // =======================
 // SOCKET.IO
