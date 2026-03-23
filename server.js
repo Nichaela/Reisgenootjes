@@ -136,11 +136,11 @@ function registerGetRoutes() {
 
   app.get('/discover', async (req, res) => {
     try {
-      const postsRaw = await discover.find({}).toArray() //haalt ALLES op uit discover collection
+      const postsAlles = await discover.find({}).toArray() //haalt ALLES op uit discover collection 
 
       const posts = [] //lege array waar data ingaat
 
-      for (const post of postsRaw) { //voor elke post uit de hele discover collection
+      for (const post of postsAlles) { //voor elke post uit de hele discover collection
         const user = await users.findOne({ _id: post.userId }) //zoekt gebruiker op
 
         posts.push({ //voegt user toe aan de post uit de user collection
