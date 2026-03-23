@@ -25,12 +25,15 @@
 <% } else { %>
  
   
-  
-
-   <section>
+  <section class="match-card"
+    data-gender="<%= matchUser.gender %>"
+    data-continent="<%= post.continent %>"
+    data-date="<%= post.startDate %>"
+    data-birthday="<%= matchUser.birthday %>"
+>
   <img src="img/accounts/MarkvanFlied.jpg" alt="Account foto">
   <div class="profile-info">
-   <h2><%= matchUser.name %> • <%= age %></h2>
+    <h2><%= matchUser.name %> • <%= age %></h2>
     <ul>
       <li><img src="img/matcheniconen/gendermale.svg"><%= matchUser.gender %></li>
       <li><img src="img/matcheniconen/MapPin.svg">55 km van jou vandaan</li>
@@ -39,6 +42,7 @@
     </ul>
   </div>
 </section>
+
 
 <section>
     <p>State • Opzoek naar reisgenootje</p>
@@ -78,6 +82,20 @@
   <form action="/likes" method="POST">
     <input type="hidden" name="postId" value="<%= post._id %>">
 <input type="hidden" name="matchedUser" value="<%= matchUser._id %>">
+
+<div class="gender-preference">
+  <p>Kies voorkeur:</p>
+  <label>
+    <input type="radio" name="genderPreference" value="man"> Man
+  </label>
+  <label>
+    <input type="radio" name="genderPreference" value="vrouw"> Vrouw
+  </label>
+  <label>
+    <input type="radio" name="genderPreference" value="anders"> Anders
+  </label>
+</div>
+
     <button type="submit" name="actie" value="dislike">
       <img src="img/matcheniconen/kruis.svg" alt="Dislike">
     </button>

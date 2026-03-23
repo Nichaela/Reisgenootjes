@@ -112,7 +112,12 @@ const continentButtons = document.querySelectorAll(".continents .filter-btn"); /
 const toggleButton = document.getElementById("toggleFilter");
 const filterMenu = document.getElementById("filterMenu");
 const closeButton = document.getElementById("closeMenu");
-const items = document.querySelectorAll(".reizen li");
+let items;
+if (document.querySelectorAll(".reizen li").length > 0) {
+  items = document.querySelectorAll(".reizen li"); // discover pagina
+} else if (document.querySelectorAll(".match-card").length > 0) {
+  items = document.querySelectorAll(".match-card"); // matchen pagina
+}
 
 const dateFilter = document.getElementById("dateFilter");
 
