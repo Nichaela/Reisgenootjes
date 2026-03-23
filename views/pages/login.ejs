@@ -80,8 +80,13 @@
         <label for="email">Email:</label>
         <input type="email" name="email" placeholder="Je email" required>
 
-        <label for="password">Wachtwoord:</label>
-        <input type="password" name="password" placeholder="Je wachtwoord" required minlength="8">
+        <div class="password-wrapper">
+          <label for="password">Wachtwoord</label>
+          <input type="password" id="password" name="password" placeholder="Wachtwoord" required minlength="8">
+          <span class="toggle-password" onclick="togglePassword('password', this)">
+            <img src="img/Eye.svg" alt="Toon wachtwoord" class="eye-icon">
+          </span>
+        </div>
 
         <input class="gradient-btn" type="submit" value="Inloggen">
 
@@ -102,6 +107,7 @@
     <%- include('../partials/bottom-nav'); %>
   </footer>
 
+  <script src="../script/form.js"></script>
 </body>
 
 </html>
