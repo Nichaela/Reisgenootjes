@@ -4,7 +4,6 @@
   <%- include('../partials/head'); %>
   <link rel="stylesheet" href="/css/matchen.css">
   <link rel="stylesheet" href="/css/filter.css">
-  <link rel="stylesheet" href="/css/style.css">
   <script defer src="/javascript/filter.js"></script>
 </head>
 <body>
@@ -47,8 +46,18 @@
       <section>
         <h2>Interesse</h2>
         <ul class="hobbies">
-          <% matchUser.interests.split(',').forEach(interesse => { %>
-            <li class="hobby"><%= interesse %></li>
+          <% 
+            let interestsList = []
+
+            if (Array.isArray(matchUser.interests)) {
+              interestsList = matchUser.interests
+            } else if (typeof matchUser.interests === 'string') {
+              interestsList = matchUser.interests.split(',')
+            }
+          %>
+
+          <% interestsList.forEach(interesse => { %>
+            <li class="hobby"><%= interesse.trim() %></li>
           <% }) %>
         </ul>
       </section>
