@@ -25,7 +25,7 @@ section:nth-of-type(1) {
 }  
 
 
-section:nth-of-type(1) img {
+section:nth-of-type(1) > img:nth-of-type(1) {
   display: block;
   border-radius: 0.5rem;
   width: 100%;

@@ -3,9 +3,8 @@
 
 <head>
     <%- include('../partials/head'); %>
-        <link rel="stylesheet" href="style.css">
-        <link rel="stylesheet" href="css/profiel.css">
-        <script defer src="javascript/filter.js"></script>
+        <link rel="stylesheet" href="/css/profiel.css">
+        <script defer src="/javascript/filter.js"></script>
         <title>Profielpagina <%= user.name %>
         </title>
 </head>
@@ -18,10 +17,10 @@
         <% if (user) { %>
             <h1 class="underline">Profiel</h1>
             <section class="profile-pictures">
-                <h2>Gallerij</h2>
-                <img src="img/accounts/SophieBijZee.png" alt="Sophie bij zee">
-                <img src="img/accounts/SophieBijBerg.png" alt="Sophie kijkt naar een berg">
-                <img src="img/accounts/SophieBijWeiland.png" alt="een tentje in de bergen met uitzicht">
+                <h2>Galerij</h2>
+                <img src="/img/accounts/SophieBijZee.png" alt="Sophie bij zee">
+                <img src="/img/accounts/SophieBijBerg.png" alt="Sophie kijkt naar een berg">
+                <img src="/img/accounts/SophieBijWeiland.png" alt="een tentje in de bergen met uitzicht">
             </section>
 
             <section>
@@ -30,10 +29,10 @@
                 </h2>
                 <div class="profile-info">
                     <ul>
-                        <li><img src="img/GenderFemale.svg">
+                        <li><img src="/img/GenderFemale.svg">
                             <%= user.gender %>
                         </li>
-                        <li><img src="img/location.svg">Nederland</li>
+                        <li><img src="/img/location.svg">Nederland</li>
                     </ul>
                 </div>
             </section>
@@ -45,7 +44,7 @@
                     <% const interestList = Array.isArray(user.interests) 
                     ? user.interests 
                     : (user.interests ? user.interests.split(',').map(i => i.trim()) : []) %>
-                
+
                     <% interestList.forEach(interesse => { %>                       
                         <li class="hobby">
                             <%= interesse %>
@@ -53,7 +52,7 @@
                     <% }) %>
                 </ul>
             </section>
-
+            <section>
             <h2>Planning</h2>
             <% if (alleReizen.length === 0) { %>
                 <p>Je hebt nog geen reizen.</p>
@@ -70,7 +69,7 @@
               <% } %>
 
 
-            
+
             </section>
             <% } %>
     </main>

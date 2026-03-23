@@ -222,18 +222,6 @@ function registerGetRoutes() {
     }
   })
 
-  //   // Matchen route
-  //   app.get('/matchen', async (req, res) => {
-  //   const post = await discover.findOne({});
-  //   const matchUser = await users.findOne({ _id: new ObjectId(post.userId) });
-  //     const today = new Date();
-  //   const birthDate = new Date(matchUser.birthday);
-  //   let age = today.getFullYear() - birthDate.getFullYear();
-  //   const month = today.getMonth() - birthDate.getMonth();
-  //   if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) age--;
-
-  //   res.render('pages/matchen', { user: req.session.user, post: post, matchUser: matchUser, age: age })
-  // })
 
 app.get('/matchen', async (req, res) => {
   if (!req.session.user) return res.redirect('/login')
@@ -284,7 +272,7 @@ app.get('/matchen', async (req, res) => {
   }
 })
 
-  app.get('/matchen/reset', (req, res) => {
+app.get('/matchen/reset', (req, res) => {
   req.session.gezien = [];
   res.redirect('/matchen')
 })
@@ -530,8 +518,8 @@ function registerPostRoutes() {
   const image3 = req.files['image3'] ? req.files['image3'][0].filename : null
  
   const interestsArray = Array.isArray(interests)
-    ? interests
-    : (interests ? interests.split(',').map(i => i.trim()) : [])
+  ? interests
+  : (interests ? [interests] : []);
  
   if (!validator.isEmail(email)) {
     return res.status(400).render('pages/register', { error: 'Ongeldig emailadres' })
