@@ -1,97 +1,84 @@
-const socket = io();
-const messages = document.getElementById('messages');
-const messageInput = document.getElementById('messageInput');
-const sendButton = document.getElementById('sendButton');
-const typingIndicator = document.getElementById('typingIndicator');
-const chatPartnerInput = document.getElementById('chatPartnerId');
-const chatPartnerNameElement = document.getElementById('chatPartnerName');
+const socket = io()
 
-let typingTimer;
-let isTyping = false;
-let toUserId = chatPartnerInput ? chatPartnerInput.value : null;
-let otherUserName = chatPartnerNameElement ? chatPartnerNameElement.textContent.trim() : '';
+const messages = document.getElementById('messages')
+const input = document.getElementById('messageInput')
+const sendButton = document.getElementById('sendButton')
+const chatPartnerId = document.getElementById('chatPartnerId').value
+const chatPartnerName = document.getElementById('chatPartnerName').textContent
+const typingIndicator = document.getElementById('typingIndicator')
 
-if (!messages || !messageInput || !sendButton || !typingIndicator || !toUserId) {
-  console.log('Geen chatpagina, chat JS wordt overgeslagen');
-} else {
-  socket.emit('join private chat', {
-    otherUserId: toUserId,
-    otherUserName: otherUserName
-  });
+let typingTimeout
 
-  window.addEventListener('beforeunload', () => {
-    socket.emit('leave private chat', { otherUserId: toUserId });
-  });
+socket.emit('join private chat', {
+  otherUserId: chatPartnerId,
+  otherUserName: chatPartnerName
+})
 
-  function addMessage(text, type = 'message') {
-    const messageElement = document.createElement('div');
-    messageElement.classList.add(type);
-    messageElement.textContent = text;
-    messages.appendChild(messageElement);
-    messages.scrollTop = messages.scrollHeight;
-  }
+function addMessageToScreen(data) {
+  const div = document.createElement('div')
+  div.classList.add('message')
+  div.classList.add(data.fromSelf ? 'messageSent' : 'messageReceived')
+  div.textContent = `${data.fromSelf ? 'Jij' : data.fromName}: ${data.text}`
 
-  function sendMessage() {
-    const message = messageInput.value.trim();
-    if (!message) return;
-
-    socket.emit('private message', {
-      toUserId,
-      text: message
-    });
-
-    messageInput.value = '';
-    socket.emit('stop typing', { toUserId });
-    isTyping = false;
-  }
-
-  sendButton.addEventListener('click', sendMessage);
-
-  messageInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      sendMessage();
-      return;
-    }
-
-    if (!isTyping) {
-      socket.emit('typing', { toUserId });
-      isTyping = true;
-    }
-
-    clearTimeout(typingTimer);
-    typingTimer = setTimeout(() => {
-      socket.emit('stop typing', { toUserId });
-      isTyping = false;
-    }, 1000);
-  });
-
-  socket.on('private message', (msg) => {
-    if (msg.fromSelf) {
-      addMessage(`Jij: ${msg.text}`);
-      return;
-    }
-
-    if (msg.fromUserId !== toUserId) return;
-
-    addMessage(`${msg.fromName}: ${msg.text}`);
-  });
-
-  socket.on('user notification', (notification) => {
-    addMessage(notification);
-  });
-
-  socket.on('typing', (data) => {
-    if (data && data.fromUserId === toUserId) {
-      typingIndicator.textContent = 'De ander is aan het typen...';
-    }
-  });
-
-  socket.on('stop typing', (data) => {
-    if (data && data.fromUserId === toUserId) {
-      typingIndicator.textContent = '';
-    }
-  });
-
-  messageInput.focus();
+  messages.appendChild(div)
+  messages.scrollTop = messages.scrollHeight
 }
+
+function sendMessage() {
+  const text = input.value.trim()
+  if (!text) return
+
+  socket.emit('private message', {
+    toUserId: chatPartnerId,
+    text: text
+  })
+
+  socket.emit('stop typing', { toUserId: chatPartnerId })
+
+  input.value = ''
+  typingIndicator.textContent = ''
+}
+
+sendButton.addEventListener('click', sendMessage)
+
+input.addEventListener('keypress', (event) => {
+  if (event.key === 'Enter') {
+    event.preventDefault()
+    sendMessage()
+  }
+})
+
+input.addEventListener('input', () => {
+  if (input.value.trim()) {
+    socket.emit('typing', { toUserId: chatPartnerId })
+
+    clearTimeout(typingTimeout)
+    typingTimeout = setTimeout(() => {
+      socket.emit('stop typing', { toUserId: chatPartnerId })
+    }, 1000)
+  } else {
+    socket.emit('stop typing', { toUserId: chatPartnerId })
+  }
+})
+
+socket.on('private message', (data) => {
+  addMessageToScreen(data)
+})
+
+socket.on('typing', () => {
+  typingIndicator.textContent = `${chatPartnerName} is typing...`
+})
+
+socket.on('stop typing', () => {
+  typingIndicator.textContent = ''
+})
+
+socket.on('user notification', (message) => {
+  console.log(message)
+})
+
+window.addEventListener('beforeunload', () => {
+  socket.emit('leave private chat', { otherUserId: chatPartnerId })
+})
+
+messages.scrollTop = messages.scrollHeight

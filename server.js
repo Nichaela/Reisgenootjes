@@ -16,7 +16,6 @@ const crypto = require('crypto')
 const nodemailer = require('nodemailer')
 
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb')
-const { error } = require('console')
 
 const multer = require('multer')
 const path = require('path')
@@ -40,20 +39,23 @@ const io = socketIo(server)
 // =======================
 // CONFIGURATIE & DATABASE
 // =======================
-app.use(express.urlencoded({ extended: true })) //parse form data
-app.use(express.static('public')) //server static files
-app.set('view engine', 'ejs') // EJS templating 
+// source: https://socket.io/how-to/use-with-express-session
+const sessionMiddleware = session({
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+})
 
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
-  })
-)
+app
+  .use(express.urlencoded({ extended: true }))
+  .use(express.static('public'))
+  .set('view engine', 'ejs')
+  .use(sessionMiddleware)
+
+io.engine.use(sessionMiddleware)
 
 // Construct URL used to connect to database from info in the .env file
-const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}/?retryWrites=true&w=majority`
+const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}/${process.env.DB_NAME}?retryWrites=true&w=majority`
 
 // Create a MongoClient
 const client = new MongoClient(uri, {
@@ -124,10 +126,6 @@ function registerGetRoutes() {
     res.render('pages/reset-password', { token: req.params.token })
   })
 
-  app.get('/forgot-password', (req, res) => {
-    res.render('pages/forgot-password', { error: null, success: null })
-  })  
-    
   app.get('/register', (req, res) => {
     res.render('pages/register', { error: null })
   })
@@ -198,27 +196,30 @@ function registerGetRoutes() {
     res.render('pages/create-post', { user: req.session.user })
   })
 
-  app.get('/post/:id', async (req, res) => {
-    try {
+    app.get('/post/:id', async (req, res) => {
+     try {
       const post = await discover.findOne({
-        _id: new ObjectId(req.params.id),
+              _id: new ObjectId(req.params.id),
       })
 
       if (!post) {
         return res.status(404).send('Post niet gevonden')
       }
+  
+      const postUser = await users.findOne({ _id: post.userId })
+  
+      // haal alle mederezigers op
+      const reizigersIds = post.reizigers || []
+      const mederezigers = await users.find({ 
+        _id: { $in: reizigersIds.map(id => new ObjectId(id)) } 
+      }).toArray()
 
-      res.render('pages/post', { user: req.session.user, post })
+      res.render('pages/post', { post, postUser, mederezigers, user: req.session.user || null })
     } catch (err) {
-      console.error(err)
-      res.status(500).send('Er ging iets mis bij het ophalen van de post')
+        console.error(err)
+        res.status(500).send('Fout post laden')
     }
   })
-
-  app.get('/matchen', (req, res) => {
-    res.render('pages/matchen', { user: req.session.user })
-  })
-     
 
   //   // Matchen route
   //   app.get('/matchen', async (req, res) => {
@@ -233,11 +234,12 @@ function registerGetRoutes() {
   //   res.render('pages/matchen', { user: req.session.user, post: post, matchUser: matchUser, age: age })
   // })
 
- app.get('/matchen', async (req, res) => {
+  app.get('/matchen', async (req, res) => {
     if (!req.session.user) return res.redirect('/login')
 
     const gezien = req.session.gezien || [];
     console.log('Gezien:', gezien)
+
     const post = await discover.findOne({
       userId: { $ne: new ObjectId(req.session.user._id) },
       _id: { $nin: gezien.map(id => new ObjectId(id)) }
@@ -255,7 +257,8 @@ function registerGetRoutes() {
     req.session.gezien.push(post._id.toString());
     return res.redirect('/matchen')
   }
-     const today = new Date();
+
+  const today = new Date();
   const birthDate = new Date(matchUser.birthday);
   let age = today.getFullYear() - birthDate.getFullYear();
   const month = today.getMonth() - birthDate.getMonth();
@@ -291,117 +294,40 @@ app.post('/likes', async (req, res) => {
   res.redirect('/matchen')
 })
 
-  
-
-  app.get('/chatroom', async (req, res) => {
-    if (!req.session.user) return res.redirect('/login')
-
-    try {
-      const allUsers = await users.find().toArray()
-      const otherUsers = allUsers.filter(otherUser =>
-        otherUser._id.toString() !== req.session.user._id.toString()
-      )
-
-      res.render('pages/chatroom', {
-        user: req.session.user,
-        users: otherUsers
-      })
-    } catch (err) {
-      console.error(err)
-      res.status(500).send('Fout bij ophalen van chatroom')
-    }
-  })
-
-    app.get('/chat-channel/:userId', async (req, res) => {
-    if (!req.session.user) return res.redirect('/login')
-
-    try {
-      const chatPartnerId = req.params.userId
-      const myUserId = req.session.user._id.toString()
-
-      const chatPartner = await users.findOne({ _id: new ObjectId(chatPartnerId) })
-
-      if (!chatPartner) {
-        return res.status(404).render('pages/errorstate', {
-          status: 404,
-          message: 'Gebruiker niet gevonden'
-        })
-      }
-
-      const conversationId = getConversationRoom(myUserId, chatPartnerId)
-
-      const conversationHistory = await messages
-        .find({ conversationId })
-        .sort({ createdAt: 1 })
-        .toArray()
-
-      res.render('pages/chat-channel', {
-        user: req.session.user,
-        chatPartner: {
-          _id: chatPartner._id.toString(),
-          name: chatPartner.name
-        },
-        conversationHistory
-      })
-    } catch (err) {
-      console.error(err)
-      res.status(500).send('Fout bij ophalen van chatkanaal')
-    }
-  })
-
   app.get('/matchen/reset', (req, res) => {
   req.session.gezien = [];
   res.redirect('/matchen')
 })
 
-  // route naar ontdek filter
-  app.get('/discover', async (req, res) => {
-    try {
-      const postsAlles = await discover.find({}).toArray() //haalt ALLES op uit discover collection 
-
-      const posts = [] //lege array waar data ingaat
-
-      for (const post of postsAlles) { //voor elke post uit de hele discover collection
-        const user = await users.findOne({ _id: post.userId }) //zoekt gebruiker op
-
-        posts.push({ //voegt user toe aan de post uit de user collection
-          ...post, // de '...' haalt alle data uit de post (titel, location etc)
-          user
-        })
-      }
-
-      res.render('pages/discover', {
-        user: req.session.user,
-        posts,
-      })
-    } catch (err) {
-      console.error(err)
-      res.status(500).send('Er ging iets mis bij het laden van posts')
-    }
-  })
-
-//Huidge route naar filter menu + werkende continent filter 
-app.get('/filter', async (req, res) => {
+// route naar ontdek filter
+app.get('/ontdekfilter', async (req, res) => {
   try {
     const db = client.db(process.env.DB_NAME);
     const usersCollection = db.collection('users');
     const discoverCollection = db.collection('discover');
-    const reizen = await discoverCollection.find({}).toArray();
-    const resultaat = []; for (const reis of reizen) {
 
+    const reizen = await discoverCollection.find({}).toArray();
+    const resultaat = []; 
+    
+    for (const reis of reizen) {
       //voor elke reis in de lijst reizen doe dit: 
       const user = await usersCollection.findOne({
         _id: reis.userId //vind een reis 
       })
+      
       resultaat.push({ //pusht deze data in die lege array genaamd resultaat 
-        reis: reis, user: user
+        reis: reis, 
+        user: user
       })
     }
 
-    res.render('pages/filter', {
+    res.render('pages/ontdekfilter', {
       reizen: resultaat //reizen = de array van de collection en resultaat is de array die ik heb gemaakt 
     })
-  } catch (err) { console.error(err); res.status(500).send("Fout bij ophalen data"); }
+  } catch (err) { 
+    console.error(err)
+    res.status(500).send("Fout bij ophalen data") 
+  }
 })
 
 app.get('/logout', (req, res) => {
@@ -415,6 +341,31 @@ app.get('/logout', (req, res) => {
     res.redirect('/welkom')
   })
 })
+
+  //Huidge route naar filter menu + werkende continent filter 
+  app.get('/filter', async (req, res) => {
+    try {
+      const db = client.db(process.env.DB_NAME);
+      const usersCollection = db.collection('users');
+      const discoverCollection = db.collection('discover');
+      const reizen = await discoverCollection.find({}).toArray();
+      const resultaat = []; for (const reis of reizen) {
+
+        //voor elke reis in de lijst reizen doe dit: 
+        const user = await usersCollection.findOne({
+          _id: reis.userId //vind een reis 
+        })
+        resultaat.push({ //pusht deze data in die lege array genaamd resultaat 
+          reis: reis, 
+          user: user
+        })
+      }
+
+      res.render('pages/filter', {
+        reizen: resultaat //reizen = de array van de collection en resultaat is de array die ik heb gemaakt 
+      })
+    } catch (err) { console.error(err); res.status(500).send("Fout bij ophalen data"); }
+  })
 }
 
 // =======================
@@ -427,10 +378,9 @@ function registerPostRoutes() {
     try {
       const { email, password } = req.body
 
-    // validatie checks
-    if (!validator.isEmail(email)) {
-      return res.status(400).render('pages/login', { error: 'Ongeldig emailadres' })
-    }
+      if (!validator.isEmail(email || '')) {
+        return res.status(400).render('pages/login', { error: 'Ongeldig emailadres' })
+      }
 
       const user = await users.findOne({ email })
       if (!user) {
@@ -462,9 +412,8 @@ function registerPostRoutes() {
       return res.status(500).render('pages/login', { error: 'Er ging iets mis bij inloggen' })
     }
   })
-}
 
-  // Logout
+  // logout
   app.post('/logout', (req, res) => {
     req.session.destroy((err) => {
       if (err) {
@@ -475,85 +424,105 @@ function registerPostRoutes() {
       res.clearCookie('connect.sid')
       res.redirect('/login')
     })
-  })  
-  
+  })
+
+  // forgot password
   app.post('/forgot-password', async (req, res) => {
-    const email = req.body.email
-  
-    // Validator check
-    if (!validator.isEmail(email)) {
-      return res.render('pages/forgot-password', { error: 'Ongeldig emailadres', success: null })
-    }
-  
-    const user = await users.findOne({ email })
-    if (!user) {
-      return res.render('pages/forgot-password', { error: 'Email niet gevonden', success: null })
-    }
-  
-    // Maak een reset token en expiry
-    const resetToken = crypto.randomBytes(32).toString('hex')
-    const resetTokenExpiry = Date.now() + 3600000 // 1 uur geldig
-  
-    await users.updateOne(
-      { _id: user._id },
-      { $set: { resetToken, resetTokenExpiry } }
-    )
-  
-    // Verstuur email met link
-    const transporter = nodemailer.createTransport({
-      service: 'Gmail', // of andere mailprovider
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
+    try {
+      const email = req.body.email
+
+      if (!validator.isEmail(email || '')) {
+        return res.render('pages/forgot-password', {
+          error: 'Ongeldig emailadres',
+          success: null
+        })
       }
-    })
-  
-    const resetLink = `${req.protocol}://${req.get('host')}/reset-password/${resetToken}`
-  
-    await transporter.sendMail({
-      from: process.env.EMAIL_USER,
-      to: email,
-      subject: 'Reset je wachtwoord',
-      html: `<p>Klik op deze link om je wachtwoord te resetten: <a href="${resetLink}">${resetLink}</a></p>`
-    })
-  
-    res.render('pages/forgot-password', { error: null, success: 'Reset link is verstuurd!' })
+
+      const user = await users.findOne({ email })
+      if (!user) {
+        return res.render('pages/forgot-password', {
+          error: 'Email niet gevonden',
+          success: null
+        })
+      }
+
+      const resetToken = crypto.randomBytes(32).toString('hex')
+      const resetTokenExpiry = Date.now() + 3600000
+
+      await users.updateOne(
+        { _id: user._id },
+        { $set: { resetToken, resetTokenExpiry } }
+      )
+
+      const transporter = nodemailer.createTransport({
+        service: 'Gmail',
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASS
+        }
+      })
+
+      const resetLink = `${req.protocol}://${req.get('host')}/reset-password/${resetToken}`
+
+      await transporter.sendMail({
+        from: process.env.EMAIL_USER,
+        to: email,
+        subject: 'Reset je wachtwoord',
+        html: `<p>Klik op deze link om je wachtwoord te resetten: <a href="${resetLink}">${resetLink}</a></p>`
+      })
+
+      return res.render('pages/forgot-password', {
+        error: null,
+        success: 'Reset link is verstuurd!'
+      })
+    } catch (err) {
+      console.error(err)
+      return res.status(500).render('pages/forgot-password', {
+        error: 'Er ging iets mis bij het versturen van de reset link',
+        success: null
+      })
+    }
   })
 
   // reset wachtwoord
   app.post('/reset-password', async (req, res) => {
-    const { token, password } = req.body
-  
-    const user = await users.findOne({
-      resetToken: token,
-      resetTokenExpiry: { $gt: Date.now() }
-    })
-  
-    if (!user) {
-      return res.send('Link is ongeldig of verlopen')
-    }
-  
-    if (!validator.isLength(password, { min: 8 })) {
-      return res.send('Wachtwoord moet minimaal 8 tekens zijn')
-    }
-  
-    const hashedPassword = await bcrypt.hash(password, 10)
-  
-    await users.updateOne(
-      { _id: user._id },
-      {
-        $set: { password: hashedPassword },
-        $unset: {
-          resetToken: "",
-          resetTokenExpiry: ""
-        }
+    try {
+      const { token, password } = req.body
+
+      const user = await users.findOne({
+        resetToken: token,
+        resetTokenExpiry: { $gt: Date.now() }
+      })
+
+      if (!user) {
+        return res.send('Link is ongeldig of verlopen')
       }
-    )
-  
-    res.send('Wachtwoord succesvol gereset! Je kunt nu inloggen.')
+
+      if (!validator.isLength(password || '', { min: 8 })) {
+        return res.send('Wachtwoord moet minimaal 8 tekens zijn')
+      }
+
+      const hashedPassword = await bcrypt.hash(password, 10)
+
+      await users.updateOne(
+        { _id: user._id },
+        {
+          $set: { password: hashedPassword },
+          $unset: {
+            resetToken: '',
+            resetTokenExpiry: ''
+          }
+        }
+      )
+
+      return res.send('Wachtwoord succesvol gereset! Je kunt nu inloggen.')
+    } catch (err) {
+      console.error(err)
+      return res.status(500).send('Er ging iets mis bij resetten van het wachtwoord')
+    }
   })
 
-  //register
+  // register
   app.post('/register', async (req, res) => {
     try {
       const {
@@ -606,15 +575,34 @@ function registerPostRoutes() {
         status,
         bio,
         interests,
-        opzoek
+        opzoek,
+        likes: []
       })
+
+      const nieuweUser = await users.findOne({ _id: result.insertedId })
+
+      req.session.user = {
+        _id: nieuweUser._id,
+        email: nieuweUser.email,
+        name: nieuweUser.name,
+        lastName: nieuweUser.lastName,
+        username: nieuweUser.username,
+        bio: nieuweUser.bio,
+        profile: nieuweUser.profile,
+        gender: nieuweUser.gender,
+        birthday: nieuweUser.birthday,
+        interests: nieuweUser.interests,
+        opzoek: nieuweUser.opzoek
+      }
+
+      return res.redirect('/discover')
     } catch (err) {
       console.error(err)
-      res.status(500).send('Er ging iets mis bij het aanmaken van de post')
+      return res.status(500).render('pages/register', { error: 'Er ging iets mis bij registreren' })
     }
   })
 
-  //create-post formulier 
+  // create-post formulier
   app.post('/post', upload.single('postCoverImg'), async (req, res) => {
     try {
       if (!req.session.user) return res.redirect('/login')
@@ -628,13 +616,12 @@ function registerPostRoutes() {
         age = age ? [age] : []
       }
 
-      // Supplies als array van nieuwe regels
       const supplies = req.body.supplies
         ? req.body.supplies.split('\n').map(item => item.trim()).filter(Boolean)
         : []
 
       const result = await discover.insertOne({
-        userId: new ObjectId(req.session.user._id), // koppeling aan gebruiker die ingelogd is
+        userId: new ObjectId(req.session.user._id),
         title,
         postCoverImg,
         startDate,
@@ -651,66 +638,133 @@ function registerPostRoutes() {
       return res.redirect(`/post/${result.insertedId}`)
     } catch (err) {
       console.error(err)
-      res.status(500).send('Er ging iets mis bij het aanmaken van de post')
+      return res.status(500).send('Er ging iets mis bij het aanmaken van de post')
     }
   })
 
   // join reis
   app.post('/post/:id/join', async (req, res) => {
-    if (!req.session.user) return res.redirect('/login')
+    try {
+      if (!req.session.user) return res.redirect('/login')
 
-    const post = await discover.findOne({ _id: new ObjectId(req.params.id) })
-    if (!post) return res.status(404).send('Post niet gevonden')
+      const post = await discover.findOne({ _id: new ObjectId(req.params.id) })
+      if (!post) return res.status(404).send('Post niet gevonden')
 
-    const aantalReizigers = post.reizigers ? post.reizigers.length : 0
+      const aantalReizigers = post.reizigers ? post.reizigers.length : 0
 
-    // check of de reis vol is
-    if (aantalReizigers >= post.persons) {
-      return res.status(403).send('Deze reis is vol')
+      if (aantalReizigers >= post.persons) {
+        return res.status(403).send('Deze reis is vol')
+      }
+
+      const alGejoint = post.reizigers && post.reizigers.some(
+        id => id.toString() === req.session.user._id.toString()
+      )
+      if (alGejoint) return res.redirect(`/post/${req.params.id}`)
+
+      await discover.updateOne(
+        { _id: new ObjectId(req.params.id) },
+        { $push: { reizigers: new ObjectId(req.session.user._id) } }
+      )
+
+      return res.redirect(`/post/${req.params.id}`)
+    } catch (err) {
+      console.error(err)
+      return res.status(500).send('Er ging iets mis bij het joinen van de reis')
     }
-
-    // check of user al meedoet
-    const alGejoint = post.reizigers && post.reizigers.some(id => id.toString() === req.session.user._id.toString())
-    if (alGejoint) return res.redirect(`/post/${req.params.id}`)
-
-    // voeg user toe aan reizigers array
-    await discover.updateOne(
-      { _id: new ObjectId(req.params.id) },
-      { $push: { reizigers: new ObjectId(req.session.user._id) } }
-    )
-
-    res.redirect(`/post/${req.params.id}`)
   })
 
-app.post('/likes', async (req, res) => {
-  if (!req.session.user) return res.redirect('/login')
+  // likes
+  app.post('/likes', async (req, res) => {
+    if (!req.session.user) return res.redirect('/login')
 
-  const matchedUserId = req.body.matchedUser;
-  const actie = req.body.actie;
+    try {
+      const matchedUserId = req.body.matchedUser
+      const actie = req.body.actie
 
-  // Voeg toe aan gezien in sessie
-  if (!req.session.gezien) req.session.gezien = [];
-  req.session.gezien.push(matchedUserId);
+      if (!req.session.gezien) req.session.gezien = []
+      req.session.gezien.push(matchedUserId)
 
-  if (actie === 'like') {
-    // Sla like op in database bij de ingelogde gebruiker
-    await users.updateOne(
-      { _id: new ObjectId(req.session.user._id) },
-      { $addToSet: { likes: matchedUserId } }
-    )
+      if (actie === 'like') {
+        await users.updateOne(
+          { _id: new ObjectId(req.session.user._id) },
+          { $addToSet: { likes: matchedUserId } }
+        )
 
-    // Check of de andere persoon jou ook al geliket heeft
-    const andereUser = await users.findOne({ _id: new ObjectId(matchedUserId) });
-    const matchId = req.session.user._id.toString();
+        const andereUser = await users.findOne({
+          _id: new ObjectId(matchedUserId)
+        })
 
-    if (andereUser.likes && andereUser.likes.includes(matchId)) {
-      return res.redirect('/chatroom')
+        const matchId = req.session.user._id.toString()
+
+        if (andereUser && andereUser.likes && andereUser.likes.includes(matchId)) {
+          return res.redirect('/chatroom')
+        }
+      }
+
+      return res.redirect('/matchen')
+    } catch (err) {
+      console.error(err)
+      return res.status(500).send('Fout bij verwerken van like')
     }
-  }
+  })
 
-  res.redirect('/matchen')
-})
+  app.get('/chatroom', async (req, res) => {
+    if (!req.session.user) return res.redirect('/login')
 
+    try {
+      const allUsers = await users.find().toArray()
+      const otherUsers = allUsers.filter(otherUser =>
+        otherUser._id.toString() !== req.session.user._id.toString()
+      )
+
+      res.render('pages/chatroom', {
+        user: req.session.user,
+        users: otherUsers
+      })
+    } catch (err) {
+      console.error(err)
+      res.status(500).send('Fout bij ophalen van chatroom')
+    }
+  })
+    
+  app.get('/chat-channel/:userId', async (req, res) => {
+    if (!req.session.user) return res.redirect('/login')
+
+    try {
+      const chatPartnerId = req.params.userId
+      const myUserId = req.session.user._id.toString()
+
+      const chatPartner = await users.findOne({ _id: new ObjectId(chatPartnerId) })
+
+      if (!chatPartner) {
+        return res.status(404).render('pages/errorstate', {
+          status: 404,
+          message: 'Gebruiker niet gevonden'
+        })
+      }
+
+      const conversationId = getConversationRoom(myUserId, chatPartnerId)
+
+      const conversationHistory = await messages
+        .find({ conversationId })
+        .sort({ createdAt: 1 })
+        .toArray()
+
+      res.render('pages/chat-channel', {
+        user: req.session.user,
+        chatPartner: {
+          _id: chatPartner._id.toString(),
+          name: chatPartner.name
+        },
+        conversationHistory
+      })
+    } catch (err) {
+      console.error(err)
+      res.status(500).send('Fout bij ophalen van chatkanaal')
+    }
+  })
+  
+}
 
 // =======================
 // SOCKET.IO
@@ -825,7 +879,6 @@ function registerSocketHandlers() {
     })
   })
 }
-
 // =======================
 // ERROR HANDLING
 // =======================
@@ -853,22 +906,22 @@ function registerErrorHandlers() {
 // START SERVER
 // =======================
 
+
 async function start() {
   try {
     await client.connect()
+    console.log('Database connection established')
 
     const db = client.db(process.env.DB_NAME)
     users = db.collection(process.env.DB_COLLECTION)
     discover = db.collection('discover')
     messages = db.collection('messages')
-    
-    // Routes registreren
+
     registerGetRoutes()
     registerPostRoutes()
     registerSocketHandlers()
     registerErrorHandlers()
 
-    // Server starten
     const port = process.env.PORT || 3000
     server.listen(port, () => {
       console.log(`Server draait op poort ${port}`)
