@@ -672,11 +672,11 @@ function registerPostRoutes() {
     }
 
     return res.redirect('/matchen')
-  } catch (err) {
-    console.error('Fout in /likes:', err)
-    return res.status(500).send('Fout bij verwerken van like')
-  }
-})
+    } catch (err) {
+        console.error('Fout in /likes:', err)
+        return res.status(500).send('Fout bij verwerken van like')
+      }
+    })
 
   app.get('/chatroom', async (req, res) => {
     if (!req.session.user) return res.redirect('/login')
@@ -872,6 +872,7 @@ function registerErrorHandlers() {
     res.status(500).send('500: server error')
   })
 }
+
 // =======================
 // START SERVER
 // =======================
