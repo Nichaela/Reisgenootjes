@@ -221,74 +221,57 @@ function registerGetRoutes() {
   app.get('/matchen', async (req, res) => {
     if (!req.session.user) return res.redirect('/login')
   
-    const gezien = req.session.gezien || []
-
-
-  let genderFilterUsers = null;
-
-  if (req.session.genderPreference) {
-    genderFilterUsers = await users.find({
-      gender: req.session.genderPreference
-    }).toArray();
-  }
-  
-  
-    // Basis filter: niet jezelf en niet gezien
-    const query = {
-      userId: { $ne: new ObjectId(req.session.user._id) },
-      _id: { $nin: gezien.map(id => new ObjectId(id)) }
-    }
-  
-    // 🔹 EXTRA FILTER
-    if (genderFilterUsers) {
-      const userIds = genderFilterUsers.map(u => new ObjectId(u._id));
-      query.userId.$in = userIds;
-    }
-    
-
-
     try {
-      const post = await discover.findOne(query)
+      if (!req.session.gezien) req.session.gezien = []
   
-      // Geen post meer over
-      if (!post) return res.render('pages/matchen', {
-        user: req.session.user,
-        post: null,
-        matchUser: null,
-        age: null
-      })
+      const mijnId = new ObjectId(req.session.user._id)
   
-      const matchUser = await users.findOne({ _id: new ObjectId(post.userId) })
-  
-      // MatchUser niet gevonden? Voeg post toe aan gezien en herlaad
-      if (!matchUser) {
-        if (!req.session.gezien) req.session.gezien = []
-        req.session.gezien.push(post._id.toString())
-        return res.redirect('/matchen')
+      const query = {
+        _id: {
+          $ne: mijnId,
+          $nin: req.session.gezien.map(id => new ObjectId(id))
+        }
       }
   
-      // Bereken leeftijd
+      if (req.session.genderPreference) {
+        query.gender = req.session.genderPreference
+      }
+  
+      const matchUser = await users.findOne(query)
+  
+      if (!matchUser) {
+        return res.render('pages/matchen', {
+          user: req.session.user,
+          post: null,
+          matchUser: null,
+          age: null
+        })
+      }
+  
+      const post = await discover.findOne({
+        userId: matchUser._id
+      })
+  
       const today = new Date()
       const birthDate = new Date(matchUser.birthday)
       let age = today.getFullYear() - birthDate.getFullYear()
       const month = today.getMonth() - birthDate.getMonth()
-      if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) age--
   
-      // Render altijd met veilige variabelen
-      res.render('pages/matchen', {
+      if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) {
+        age--
+      }
+  
+      return res.render('pages/matchen', {
         user: req.session.user,
-        post: post || null,
-        matchUser: matchUser || null,
-        age: age || null
+        post,
+        matchUser,
+        age
       })
-  
     } catch (err) {
-      console.error(err)
-      res.status(500).send('Er ging iets mis bij het laden van de match')
+      console.error('Fout in /matchen:', err)
+      return res.status(500).send('Fout bij laden van matchen')
     }
   })
-
-
  //prpobeersels annabel
 
 
@@ -304,6 +287,7 @@ app.post('/likes', async (req, res) => {
   if (genderPreference) {
     req.session.genderPreference = genderPreference;
   }
+
 
   if (!req.session.gezien) req.session.gezien = [];
   req.session.gezien.push(postId);
@@ -717,33 +701,47 @@ function registerPostRoutes() {
     res.redirect(`/post/${req.params.id}`)
   })
  
+// likes
 app.post('/likes', async (req, res) => {
   if (!req.session.user) return res.redirect('/login')
- 
-  const matchedUserId = req.body.matchedUser;
-  const actie = req.body.actie;
- 
-  // Voeg toe aan gezien in sessie
-  if (!req.session.gezien) req.session.gezien = [];
-  req.session.gezien.push(matchedUserId);
- 
-  if (actie === 'like') {
-    // Sla like op in database bij de ingelogde gebruiker
-    await users.updateOne(
-      { _id: new ObjectId(req.session.user._id) },
-      { $addToSet: { likes: matchedUserId } }
-    )
- 
-    // Check of de andere persoon jou ook al geliket heeft
-    const andereUser = await users.findOne({ _id: new ObjectId(matchedUserId) });
-    const matchId = req.session.user._id.toString();
- 
-    if (andereUser.likes && andereUser.likes.includes(matchId)) {
-      return res.redirect('/chatroom')
+
+  try {
+    const matchedUserId = req.body.matchedUser
+    const actie = req.body.actie
+    const genderPreference = req.body.genderPreference
+
+    if (!req.session.gezien) req.session.gezien = []
+
+    if (matchedUserId && !req.session.gezien.includes(matchedUserId)) {
+      req.session.gezien.push(matchedUserId)
     }
+
+    if (genderPreference) {
+      req.session.genderPreference = genderPreference
+    }
+
+    if (actie === 'like') {
+      await users.updateOne(
+        { _id: new ObjectId(req.session.user._id) },
+        { $addToSet: { likes: matchedUserId } }
+      )
+
+      const andereUser = await users.findOne({
+        _id: new ObjectId(matchedUserId)
+      })
+
+      const matchId = req.session.user._id.toString()
+
+      if (andereUser && andereUser.likes && andereUser.likes.includes(matchId)) {
+        return res.redirect('/chatroom')
+      }
+    }
+
+    return res.redirect('/matchen')
+  } catch (err) {
+    console.error('Fout in /likes:', err)
+    return res.status(500).send('Fout bij verwerken van like')
   }
- 
-  res.redirect('/matchen')
 })
  
  
