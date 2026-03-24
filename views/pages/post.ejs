@@ -67,7 +67,7 @@
       </section>
 
       <h2>Omschrijving</h2>
-      <p><%= post.discription %> </p>
+      <p><%= post.description %> </p>
 
       <h2>De route</h2>
       <!-- <img src="  " alt="route <%= post.title %>"> -->
@@ -90,9 +90,10 @@
           <p><%= postUser.birthday %></p>
         </a>
         <!-- deze moet naar de chat met deze persoon gaan -->
-        <a href="/chat" class="gradient-btn">Stuur <%= postUser.name %> een bericht</a>
+        <a href="/chat-channel/<%= postUser._id %>" class="gradient-btn">Stuur <%= postUser.name %> een bericht</a>
       </article>
     </section>
+  
 
     <!-- is ingelogde gebruiker niet de maker van de post? dan kan je joinen -->
 
