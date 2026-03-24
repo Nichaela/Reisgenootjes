@@ -230,12 +230,21 @@ app.get('/matchen', async (req, res) => {
 
     const mijnId = new ObjectId(req.session.user._id)
 
-    const matchUser = await users.findOne({
-      _id: {
-        $ne: mijnId,
-        $nin: req.session.gezien.map(id => new ObjectId(id))
-      }
-    })
+    const voorkeur = req.session.genderPreference //toegevoegd door annabel
+
+const query = {
+  _id: {
+    $ne: mijnId,
+    $nin: req.session.gezien.map(id => new ObjectId(id))
+  }
+}
+
+// alleen filteren als er een voorkeur is
+if (voorkeur) {
+  query.gender = voorkeur
+}
+
+const matchUser = await users.findOne(query)
 
     if (!matchUser) {
       return res.render('pages/matchen', {

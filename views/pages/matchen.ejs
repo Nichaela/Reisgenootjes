@@ -5,10 +5,6 @@
   <%- include('../partials/head'); %>
   <link rel="stylesheet" href="/css/matchen.css">
   <link rel="stylesheet" href="/css/filter.css">
-<<<<<<< HEAD
-  <script defer src="/javascript/filter.js"></script>
-=======
->>>>>>> ce113a78582b2c1f5d55c0eba8c2d0e67e567f26
 </head>
 
 <body>
@@ -17,17 +13,28 @@
   </header>
 
   <main>
-    <% if (user) { %>
-      <p>Welkom <%= user.name %></p>
-    <% } %>
-
     <h1 class="underline">Matchen</h1>
-    <%- include('../partials/filtermenu'); %>
+
 
     <% if (!matchUser) { %>
+
       <p>Je hebt iedereen gezien!</p>
       <a href="/matchen/reset">Opnieuw beginnen</a>
+
     <% } else { %>
+
+      <div class="voorkeur-buttons">
+
+        <input type="radio" id="man" name="genderPreference" value="man" form="likeForm">
+        <label for="man">Man</label>
+      
+        <input type="radio" id="vrouw" name="genderPreference" value="vrouw" form="likeForm">
+        <label for="vrouw">Vrouw</label>
+      
+        <input type="radio" id="anders" name="genderPreference" value="anders" form="likeForm">
+        <label for="anders">Anders</label>
+      
+      </div>
 
       <section>
         <img src="/img/accounts/MarkvanFlied.jpg" alt="Account foto">
@@ -43,7 +50,7 @@
       </section>
 
       <section>
-        <p>State • Opzoek naar reisgenootje</p>
+        <p>Status • Op zoek naar reisgenootje</p>
         <h2>Bio</h2>
         <p><%= matchUser.bio %></p>
       </section>
@@ -85,35 +92,19 @@
 
       <section>
         <h2>Gallerij</h2>
-        <img src="/img/accounts/markvoorkant.jpg" alt="mark van de voorkant">
-        <img src="/img/accounts/markwandelen.jpg" alt="mark die aan het wandelen is">
-        <img src="/img/accounts/tentje.jpg" alt="een tentje in de bergen met uitzicht">
+        <img src="/img/accounts/markvoorkant.jpg" alt="">
+        <img src="/img/accounts/markwandelen.jpg" alt="">
+        <img src="/img/accounts/tentje.jpg" alt="">
       </section>
 
       <section>
-        <form action="/likes" method="POST">
+        <form id="likeForm" action="/likes" method="POST">
+
           <% if (post) { %>
             <input type="hidden" name="postId" value="<%= post._id %>">
           <% } %>
+
           <input type="hidden" name="matchedUser" value="<%= matchUser._id %>">
-
-    <% if (!matchUser) { %>
-      <p>Je hebt iedereen gezien!</p>
-      <a href="/matchen/reset">Opnieuw beginnen</a>
-    <% } else { %>
-
-          <div class="gender-preference">
-            <p>Kies voorkeur:</p>
-            <label>
-              <input type="radio" name="genderPreference" value="man"> Man
-            </label>
-            <label>
-              <input type="radio" name="genderPreference" value="vrouw"> Vrouw
-            </label>
-            <label>
-              <input type="radio" name="genderPreference" value="anders"> Anders
-            </label>
-          </div>
 
           <button type="submit" name="actie" value="dislike">
             <img src="/img/matcheniconen/kruis.svg" alt="Dislike">
@@ -122,6 +113,7 @@
           <button type="submit" name="actie" value="like">
             <img src="/img/matcheniconen/Heart.svg" alt="Like">
           </button>
+
         </form>
       </section>
 
@@ -129,14 +121,5 @@
   </main>
 
   <%- include('../partials/bottom-nav'); %>
-<<<<<<< HEAD
 </body>
 </html>
-
- 
-=======
-  <script defer src="/javascript/filter.js"></script>
-  </body>
-
-</html>
->>>>>>> ce113a78582b2c1f5d55c0eba8c2d0e67e567f26
