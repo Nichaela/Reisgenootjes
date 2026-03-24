@@ -8,6 +8,9 @@
 </head>
 
 <body>
+  <header>
+    <%- include('../partials/header'); %>
+  </header>
 
   <main>
 
@@ -62,6 +65,17 @@
             <ul class="hobbies">
               <% let interestsList=[] if (Array.isArray(matchUser.interests)) { interestsList=matchUser.interests } else
                 if (typeof matchUser.interests==='string' ) { interestsList=matchUser.interests.split(',') } %>
+<<<<<<< HEAD
+
+                <% interestsList.forEach(interesse=> { %>
+                  <li class="hobby">
+                    <%= interesse.trim() %>
+                  </li>
+                  <% }) %>
+            </ul>
+          </section>
+=======
+>>>>>>> 50140fa (welkom naam weggehaald)
 
                 <% interestsList.forEach(interesse=> { %>
                   <li class="hobby">
@@ -71,6 +85,16 @@
             </ul>
           </section>
 
+          <section>
+            <h2>Geplande trip</h2>
+            <% if (post) { %>
+              <a href="/post/<%= post._id %>">
+                <%- include('../partials/reisoproep', { post: post }) %>
+              </a>
+              <% } else { %>
+                <p>Geen geplande trip beschikbaar.</p>
+                <% } %>
+          </section>
           <section>
             <h2>Geplande trip</h2>
             <% if (post) { %>
@@ -157,9 +181,14 @@
     <script defer src="/javascript/filter.js"></script>
 </body>
 <<<<<<< HEAD
+<<<<<<< HEAD
     <script defer src="/javascript/filter.js"></script>
 </body>
 =======
 >>>>>>> e5f3fc9 (welkom naam weggehaald)
+=======
+    <script defer src="/javascript/filter.js"></script>
+</body>
+>>>>>>> 50140fa (welkom naam weggehaald)
 
 </html>
