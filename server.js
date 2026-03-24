@@ -518,7 +518,7 @@ function registerPostRoutes() {
  
   const interestsArray = Array.isArray(interests)
     ? interests
-    : (interests ? interests.split(',').map(i => i.trim()) : [])
+    : (interests ? [interests] : []);
  
   if (!validator.isEmail(email)) {
     return res.status(400).render('pages/register', { error: 'Ongeldig emailadres' })
