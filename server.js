@@ -16,7 +16,6 @@ const crypto = require('crypto')
 const nodemailer = require('nodemailer')
 
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb')
-const { error } = require('console')
 
 const multer = require('multer')
 const path = require('path')
