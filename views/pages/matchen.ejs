@@ -92,6 +92,10 @@
           <% } %>
           <input type="hidden" name="matchedUser" value="<%= matchUser._id %>">
 
+    <% if (!matchUser) { %>
+      <p>Je hebt iedereen gezien!</p>
+      <a href="/matchen/reset">Opnieuw beginnen</a>
+    <% } else { %>
 
           <div class="gender-preference">
             <p>Kies voorkeur:</p>

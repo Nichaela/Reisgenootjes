@@ -44,7 +44,7 @@
                     <% const interestList = Array.isArray(user.interests) 
                     ? user.interests 
                     : (user.interests ? user.interests.split(',').map(i => i.trim()) : []) %>
-
+                
                     <% interestList.forEach(interesse => { %>                       
                         <li class="hobby">
                             <%= interesse %>
