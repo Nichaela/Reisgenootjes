@@ -100,10 +100,6 @@ function registerGetRoutes() {
     res.render('pages/index', { data: null })
   })
 
-  app.get('/welkom', (req, res) => {
-    res.render('pages/welkom', { error: null })
-  })
-
   app.get('/login', (req, res) => {
     res.render('pages/login', { error: null })
   })
@@ -134,7 +130,6 @@ function registerGetRoutes() {
     if (!req.session.user) return res.redirect('/login')
 
     try {
-      const { ObjectId } = require('mongodb')
 
       // haal de gemaakte en gejoinde reizen van de gebruiker op
       const mijnPosts = await discover.find({
@@ -144,7 +139,7 @@ function registerGetRoutes() {
         reizigers: new ObjectId(req.session.user._id)
       }).toArray()
 
-      const alleReizen = [...mijnPosts, ...gejoindePosts].sort((a, b) =>
+      const alleReizen = [...mijnPosts, ...gejoindePosts].sort((a, b) => 
         new Date(a.startDate) - new Date(b.startDate)
       )
 
@@ -192,14 +187,14 @@ function registerGetRoutes() {
   })
 
   app.get('/create-post', (req, res) => {
-    if (!req.session.user) return res.redirect('/welkom')
+    if (!req.session.user) return res.redirect('/')
     res.render('pages/create-post', { user: req.session.user })
   })
 
-  app.get('/post/:id', async (req, res) => {
-    try {
+    app.get('/post/:id', async (req, res) => {
+     try {
       const post = await discover.findOne({
-        _id: new ObjectId(req.params.id),
+              _id: new ObjectId(req.params.id),
       })
 
       if (!post) {
@@ -210,126 +205,114 @@ function registerGetRoutes() {
 
       // haal alle mederezigers op
       const reizigersIds = post.reizigers || []
-      const mederezigers = await users.find({
-        _id: { $in: reizigersIds.map(id => new ObjectId(id)) }
+      const mederezigers = await users.find({ 
+        _id: { $in: reizigersIds.map(id => new ObjectId(id)) } 
       }).toArray()
 
       res.render('pages/post', { post, postUser, mederezigers, user: req.session.user || null })
     } catch (err) {
-      console.error(err)
-      res.status(500).send('Fout post laden')
+        console.error(err)
+        res.status(500).send('Fout post laden')
     }
   })
 
-  //   // Matchen route
-  //   app.get('/matchen', async (req, res) => {
-  //   const post = await discover.findOne({});
-  //   const matchUser = await users.findOne({ _id: new ObjectId(post.userId) });
-  //     const today = new Date();
-  //   const birthDate = new Date(matchUser.birthday);
-  //   let age = today.getFullYear() - birthDate.getFullYear();
-  //   const month = today.getMonth() - birthDate.getMonth();
-  //   if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) age--;
 
-  //   res.render('pages/matchen', { user: req.session.user, post: post, matchUser: matchUser, age: age })
-  // })
+app.get('/matchen', async (req, res) => {
+  if (!req.session.user) return res.redirect('/login')
 
-  app.get('/matchen', async (req, res) => {
-    if (!req.session.user) return res.redirect('/login')
+  try {
+    if (!req.session.gezien) req.session.gezien = []
 
-    try {
-      if (!req.session.gezien) req.session.gezien = []
+    const mijnId = new ObjectId(req.session.user._id)
 
-      const mijnId = new ObjectId(req.session.user._id)
-
-      const matchUser = await users.findOne({
-        _id: {
-          $ne: mijnId,
-          $nin: req.session.gezien.map(id => new ObjectId(id))
-        }
-      })
-
-      if (!matchUser) {
-        return res.render('pages/matchen', {
-          user: req.session.user,
-          post: null,
-          matchUser: null,
-          age: null
-        })
+    const matchUser = await users.findOne({
+      _id: {
+        $ne: mijnId,
+        $nin: req.session.gezien.map(id => new ObjectId(id))
       }
+    })
 
-      const post = await discover.findOne({
-        userId: matchUser._id
-      })
-
-      const today = new Date()
-      const birthDate = new Date(matchUser.birthday)
-      let age = today.getFullYear() - birthDate.getFullYear()
-      const month = today.getMonth() - birthDate.getMonth()
-
-      if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) {
-        age--
-      }
-
+    if (!matchUser) {
       return res.render('pages/matchen', {
         user: req.session.user,
-        post,
-        matchUser,
-        age
+        post: null,
+        matchUser: null,
+        age: null
       })
-    } catch (err) {
-      console.error('Fout in /matchen:', err)
-      return res.status(500).send('Fout bij laden van matchen')
     }
-  })
 
-  app.get('/matchen/reset', (req, res) => {
-    req.session.gezien = [];
-    res.redirect('/matchen')
-  })
-
-  // route naar ontdek filter
-  app.get('/ontdekfilter', async (req, res) => {
-    try {
-      const db = client.db(process.env.DB_NAME);
-      const usersCollection = db.collection('users');
-      const discoverCollection = db.collection('discover');
-
-      const reizen = await discoverCollection.find({}).toArray();
-      const resultaat = [];
-
-      for (const reis of reizen) {
-        //voor elke reis in de lijst reizen doe dit: 
-        const user = await usersCollection.findOne({
-          _id: reis.userId //vind een reis 
-        })
-
-        resultaat.push({ //pusht deze data in die lege array genaamd resultaat 
-          reis: reis,
-          user: user
-        })
-      }
-
-      res.render('pages/ontdekfilter', {
-        reizen: resultaat //reizen = de array van de collection en resultaat is de array die ik heb gemaakt 
-      })
-    } catch (err) {
-      console.error(err)
-      res.status(500).send("Fout bij ophalen data")
-    }
-  })
-
-  app.get('/logout', (req, res) => {
-    req.session.destroy((err) => {
-      if (err) {
-        console.error(err)
-        return res.redirect('/discover')
-      }
-
-      res.clearCookie('connect.sid')
-      res.redirect('/welkom')
+    const post = await discover.findOne({
+      userId: matchUser._id
     })
+
+    const today = new Date()
+    const birthDate = new Date(matchUser.birthday)
+    let age = today.getFullYear() - birthDate.getFullYear()
+    const month = today.getMonth() - birthDate.getMonth()
+
+    if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) {
+      age--
+    }
+
+    return res.render('pages/matchen', {
+      user: req.session.user,
+      post,
+      matchUser,
+      age
+    })
+  } catch (err) {
+    console.error('Fout in /matchen:', err)
+    return res.status(500).send('Fout bij laden van matchen')
+  }
+})
+
+app.get('/matchen/reset', (req, res) => {
+  req.session.gezien = [];
+  res.redirect('/matchen')
+})
+
+// route naar ontdek filter
+app.get('/ontdekfilter', async (req, res) => {
+  try {
+    const db = client.db(process.env.DB_NAME);
+    const usersCollection = db.collection('users');
+    const discoverCollection = db.collection('discover');
+
+    const reizen = await discoverCollection.find({}).toArray();
+    const resultaat = []
+
+    for (const reis of reizen) {
+      //voor elke reis in de lijst reizen doe dit: 
+      const user = await usersCollection.findOne({
+        _id: reis.userId //vind een reis 
+      })
+
+      resultaat.push({ //pusht deze data in die lege array genaamd resultaat 
+        reis: reis, 
+        user: user
+      })
+    }
+
+    res.render('pages/ontdekfilter', {
+      reizen: resultaat //reizen = de array van de collection en resultaat is de array die ik heb gemaakt 
+    })
+  } catch (err) { 
+    console.error(err)
+    res.status(500).send("Fout bij ophalen data") 
+  }
+})
+
+app.get('/logout', (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      console.error(err)
+      return res.redirect('/discover')
+    }
+
+    res.clearCookie('connect.sid')
+    res.redirect('/')
   })
+})
 
   //Huidge route naar filter menu + werkende continent filter 
   app.get('/filter', async (req, res) => {
@@ -338,14 +321,16 @@ function registerGetRoutes() {
       const usersCollection = db.collection('users');
       const discoverCollection = db.collection('discover');
       const reizen = await discoverCollection.find({}).toArray();
-      const resultaat = []; for (const reis of reizen) {
+      const resultaat = []
+
+       for (const reis of reizen) {
 
         //voor elke reis in de lijst reizen doe dit: 
         const user = await usersCollection.findOne({
           _id: reis.userId //vind een reis 
         })
         resultaat.push({ //pusht deze data in die lege array genaamd resultaat 
-          reis: reis,
+          reis: reis, 
           user: user
         })
       }
@@ -523,66 +508,66 @@ function registerPostRoutes() {
     { name: 'image3', maxCount: 1 },
   ]), async (req, res) => {
 
-    const { name, lastName, email, password, birthday,
-      tel, gender, status, bio, interests, opzoek
-    } = req.body
+  const { name, lastName, email, password, birthday,
+    tel, gender, status, bio, interests, opzoek
+  } = req.body
 
-    const profileImg = req.files['profileImg'] ? req.files['profileImg'][0].filename : null
-    const image1 = req.files['image1'] ? req.files['image1'][0].filename : null
-    const image2 = req.files['image2'] ? req.files['image2'][0].filename : null
-    const image3 = req.files['image3'] ? req.files['image3'][0].filename : null
+  const profileImg = req.files['profileImg'] ? req.files['profileImg'][0].filename : null
+  const image1 = req.files['image1'] ? req.files['image1'][0].filename : null
+  const image2 = req.files['image2'] ? req.files['image2'][0].filename : null
+  const image3 = req.files['image3'] ? req.files['image3'][0].filename : null
 
-    const interestsArray = Array.isArray(interests)
-      ? interests
-      : (interests ? [interests] : []);
+  const interestsArray = Array.isArray(interests)
+    ? interests
+    : (interests ? [interests] : []);
 
-    if (!validator.isEmail(email)) {
-      return res.status(400).render('pages/register', { error: 'Ongeldig emailadres' })
-    }
-    if (!validator.isLength(password, { min: 8 })) {
-      return res.status(400).render('pages/register', { error: 'Wachtwoord moet minimaal 8 tekens bevatten' })
-    }
-    const existingUser = await users.findOne({ email })
-    if (existingUser) {
-      return res.status(409).render('pages/register', { error: 'Email bestaat al' })
-    }
+  if (!validator.isEmail(email)) {
+    return res.status(400).render('pages/register', { error: 'Ongeldig emailadres' })
+  }
+  if (!validator.isLength(password, { min: 8 })) {
+    return res.status(400).render('pages/register', { error: 'Wachtwoord moet minimaal 8 tekens bevatten' })
+  }
+  const existingUser = await users.findOne({ email })
+  if (existingUser) {
+    return res.status(409).render('pages/register', { error: 'Email bestaat al' })
+  }
 
-    const hashedPassword = await bcrypt.hash(password, 10)
+  const hashedPassword = await bcrypt.hash(password, 10)
 
-    const result = await users.insertOne({
-      name,
-      lastName,
-      email,
-      password: hashedPassword,
-      birthday,
-      tel,
-      gender,
-      profileImg,
-      image1,
-      image2,
-      image3,
-      status,
-      bio,
-      interests: interestsArray,
-      opzoek
-    })
-
-    const nieuweUser = await users.findOne({ _id: result.insertedId })
-    req.session.user = {
-      _id: nieuweUser._id,
-      email: nieuweUser.email,
-      name: nieuweUser.name,
-      lastName: nieuweUser.lastName,
-      username: nieuweUser.username,
-      bio: nieuweUser.bio,
-      profile: nieuweUser.profile,
-      gender: nieuweUser.gender,
-      birthday: nieuweUser.birthday,
-      interests: nieuweUser.interests,
-      opzoek: nieuweUser.opzoek
-    }
-    return res.redirect('/discover')
+  const result = await users.insertOne({
+    name,
+    lastName,
+    email,
+    password: hashedPassword,
+    birthday,
+    tel,
+    gender,
+    profileImg,
+    image1,
+    image2,
+    image3,
+    status,
+    bio,
+    interests: interestsArray,
+    opzoek
   })
+
+  const nieuweUser = await users.findOne({ _id: result.insertedId })
+  req.session.user = {
+    _id: nieuweUser._id,
+    email: nieuweUser.email,
+    name: nieuweUser.name,
+    lastName: nieuweUser.lastName,
+    username: nieuweUser.username,
+    bio: nieuweUser.bio,
+    profile: nieuweUser.profile,
+    gender: nieuweUser.gender,
+    birthday: nieuweUser.birthday,
+    interests: nieuweUser.interests,
+    opzoek: nieuweUser.opzoek
+  }
+  return res.redirect('/discover')
+})
 
 
   // create-post formulier
@@ -658,40 +643,40 @@ function registerPostRoutes() {
 
   // likes
   app.post('/likes', async (req, res) => {
-    if (!req.session.user) return res.redirect('/login')
+  if (!req.session.user) return res.redirect('/login')
 
-    try {
-      const matchedUserId = req.body.matchedUser
-      const actie = req.body.actie
+  try {
+    const matchedUserId = req.body.matchedUser
+    const actie = req.body.actie
 
-      if (!req.session.gezien) req.session.gezien = []
-      if (matchedUserId && !req.session.gezien.includes(matchedUserId)) {
-        req.session.gezien.push(matchedUserId)
-      }
-
-      if (actie === 'like') {
-        await users.updateOne(
-          { _id: new ObjectId(req.session.user._id) },
-          { $addToSet: { likes: matchedUserId } }
-        )
-
-        const andereUser = await users.findOne({
-          _id: new ObjectId(matchedUserId)
-        })
-
-        const matchId = req.session.user._id.toString()
-
-        if (andereUser && andereUser.likes && andereUser.likes.includes(matchId)) {
-          return res.redirect('/chatroom')
-        }
-      }
-
-      return res.redirect('/matchen')
-    } catch (err) {
-      console.error('Fout in /likes:', err)
-      return res.status(500).send('Fout bij verwerken van like')
+    if (!req.session.gezien) req.session.gezien = []
+    if (matchedUserId && !req.session.gezien.includes(matchedUserId)) {
+      req.session.gezien.push(matchedUserId)
     }
-  })
+
+    if (actie === 'like') {
+      await users.updateOne(
+        { _id: new ObjectId(req.session.user._id) },
+        { $addToSet: { likes: matchedUserId } }
+      )
+
+      const andereUser = await users.findOne({
+        _id: new ObjectId(matchedUserId)
+      })
+
+      const matchId = req.session.user._id.toString()
+
+      if (andereUser && andereUser.likes && andereUser.likes.includes(matchId)) {
+        return res.redirect('/chatroom')
+      }
+    }
+
+    return res.redirect('/matchen')
+    } catch (err) {
+        console.error('Fout in /likes:', err)
+        return res.status(500).send('Fout bij verwerken van like')
+      }
+    })
 
   app.get('/chatroom', async (req, res) => {
     if (!req.session.user) return res.redirect('/login')
@@ -805,7 +790,7 @@ function registerSocketHandlers() {
       console.log(`${user.name} left room: ${roomName}`)
     })
 
-    socket.on('private message', async ({ toUserId, text }) => {
+    socket.on('private message', async({ toUserId, text }) => {
       if (!toUserId || !text) return
 
       const cleanText = xss(String(text).trim())
@@ -887,6 +872,7 @@ function registerErrorHandlers() {
     res.status(500).send('500: server error')
   })
 }
+
 // =======================
 // START SERVER
 // =======================

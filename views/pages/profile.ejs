@@ -3,9 +3,8 @@
 
 <head>
     <%- include('../partials/head'); %>
-        <link rel="stylesheet" href="style.css">
-        <link rel="stylesheet" href="css/profiel.css">
-        <script defer src="javascript/filter.js"></script>
+        <link rel="stylesheet" href="/css/profiel.css">
+        <script defer src="/javascript/filter.js"></script>
         <title>Profielpagina <%= user.name %>
         </title>
 </head>
@@ -30,10 +29,10 @@
                 </h2>
                 <div class="profile-info">
                     <ul>
-                        <li><img src="img/GenderFemale.svg">
+                        <li><img src="/img/GenderFemale.svg">
                             <%= user.gender %>
                         </li>
-                        <li><img src="img/location.svg">Nederland</li>
+                        <li><img src="/img/location.svg">Nederland</li>
                     </ul>
                 </div>
             </section>
@@ -42,17 +41,18 @@
                 <h2>Interesses:</h2>
                 <ul class="hobbies">
                     <!-- deze dubbele check weghalen als we de databse gaan opschonen want nu werkt het niet door de oude gebruikers -->
-                    <% const interestList=Array.isArray(user.interests) ? user.interests : (user.interests ?
-                        user.interests.split(',').map(i=> i.trim()) : []) %>
+                    <% const interestList = Array.isArray(user.interests) 
+                    ? user.interests 
+                    : (user.interests ? user.interests.split(',').map(i => i.trim()) : []) %>
 
-                        <% interestList.forEach(interesse=> { %>
-                            <li class="hobby">
-                                <%= interesse %>
-                            </li>
-                            <% }) %>
+                    <% interestList.forEach(interesse => { %>                       
+                        <li class="hobby">
+                            <%= interesse %>
+                        </li>
+                    <% }) %>
                 </ul>
             </section>
-
+            <section>
             <h2>Planning</h2>
             <% if (alleReizen.length===0) { %>
                 <p>Je hebt nog geen reizen.</p>
