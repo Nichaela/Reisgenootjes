@@ -91,19 +91,75 @@
           </p>
         </section>
 
+<<<<<<< HEAD
         <section>
           <h2>Gallerij</h2>
           <img src="/uploads/<%= matchUser.image1 %>" alt="Galerij foto 1">
           <img src="/uploads/<%= matchUser.image2 %>" alt="Galerij foto 2">
           <img src="/uploads/<%= matchUser.image3 %>" alt="Galerij foto 3">
         </section>
+=======
+                <% interestsList.forEach(interesse=> { %>
+                  <li class="hobby">
+                    <%= interesse.trim() %>
+                  </li>
+                  <% }) %>
+            </ul>
+          </section>
+          <section>
+            <h2>Interesse</h2>
+            <ul class="hobbies">
+              <% let interestsList=[] if (Array.isArray(matchUser.interests)) { interestsList=matchUser.interests } else
+                if (typeof matchUser.interests==='string' ) { interestsList=matchUser.interests.split(',') } %>
+<<<<<<< HEAD
+
+                <% interestsList.forEach(interesse=> { %>
+                  <li class="hobby">
+                    <%= interesse.trim() %>
+                  </li>
+                  <% }) %>
+            </ul>
+          </section>
+=======
+>>>>>>> 50140fa (welkom naam weggehaald)
+>>>>>>> 9d90123 (welkom naam weggehaald)
 
         <section>
           <form id="likeForm" action="/likes" method="POST">
 
             <% if (post) { %>
+<<<<<<< HEAD
               <input type="hidden" name="postId" value="<%= post._id %>">
               <% } %>
+=======
+              <a href="/post/<%= post._id %>">
+                <%- include('../partials/reisoproep', { post: post }) %>
+              </a>
+              <% } else { %>
+                <p>Geen geplande trip beschikbaar.</p>
+                <% } %>
+          </section>
+          <section>
+            <h2>Geplande trip</h2>
+            <% if (post) { %>
+              <a href="/post/<%= post._id %>">
+                <%- include('../partials/reisoproep', { post: post }) %>
+              </a>
+              <% } else { %>
+                <p>Geen geplande trip beschikbaar.</p>
+                <% } %>
+          </section>
+          <section>
+            <h2>Geplande trip</h2>
+            <% if (post) { %>
+              <a href="/post/<%= post._id %>">
+                <%- include('../partials/reisoproep', { post: post }) %>
+              </a>
+              <% } else { %>
+                <p>Geen geplande trip beschikbaar.</p>
+                <% } %>
+          </section>
+>>>>>>> 9d90123 (welkom naam weggehaald)
 
                 <input type="hidden" name="matchedUser" value="<%= matchUser._id %>">
 
@@ -124,9 +180,14 @@
   <%- include('../partials/bottom-nav'); %>
 </body>
 <<<<<<< HEAD
+<<<<<<< HEAD
     <script defer src="/javascript/filter.js"></script>
 </body>
 =======
 >>>>>>> e5f3fc9 (welkom naam weggehaald)
+=======
+    <script defer src="/javascript/filter.js"></script>
+</body>
+>>>>>>> 50140fa (welkom naam weggehaald)
 
 </html>
