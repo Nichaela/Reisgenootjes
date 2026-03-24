@@ -26,7 +26,7 @@
     <% } else { %>
 
       <section>
-        <img src="/img/accounts/MarkvanFlied.jpg" alt="Account foto">
+        <img src="/uploads/<%= matchUser.profileImg %>" alt="Account foto">
         <div class="profile-info">
           <h2><%= matchUser.name %> • <%= age %></h2>
           <ul>
@@ -45,23 +45,23 @@
       </section>
 
       <section>
-        <h2>Interesse</h2>
-        <ul class="hobbies">
-          <% 
-            let interestsList = []
-
-            if (Array.isArray(matchUser.interests)) {
-              interestsList = matchUser.interests
-            } else if (typeof matchUser.interests === 'string') {
-              interestsList = matchUser.interests.split(',')
-            }
-          %>
-
-          <% interestsList.forEach(interesse => { %>
-            <li class="hobby"><%= interesse.trim() %></li>
-          <% }) %>
-        </ul>
-      </section>
+                <h2>Interesse</h2>
+                <ul class="hobbies">
+                  <%
+                    let interestsList = []
+         
+                    if (Array.isArray(matchUser.interests)) {
+                      interestsList = matchUser.interests
+                    } else if (typeof matchUser.interests === 'string') {
+                      interestsList = matchUser.interests.split(',')
+                    }
+                  %>
+         
+                  <% interestsList.forEach(interesse => { %>
+                    <li class="hobby"><%= interesse.trim() %></li>
+                  <% }) %>
+                </ul>
+              </section>
 
       <section>
         <h2>Geplande trip</h2>
@@ -81,9 +81,9 @@
 
       <section>
         <h2>Gallerij</h2>
-        <img src="/img/accounts/markvoorkant.jpg" alt="mark van de voorkant">
-        <img src="/img/accounts/markwandelen.jpg" alt="mark die aan het wandelen is">
-        <img src="/img/accounts/tentje.jpg" alt="een tentje in de bergen met uitzicht">
+  <img src="/uploads/<%= matchUser.image1 %>" alt="Galerij foto 1">
+  <img src="/uploads/<%= matchUser.image2 %>" alt="Galerij foto 2">
+  <img src="/uploads/<%= matchUser.image3 %>" alt="Galerij foto 3">
       </section>
 
       <section>

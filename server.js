@@ -114,11 +114,11 @@ function registerGetRoutes() {
       resetToken: req.params.token,
       resetTokenExpiry: { $gt: Date.now() }
     })
-  
+
     if (!user) {
       return res.send('Link is ongeldig of verlopen')
     }
-  
+
     res.render('pages/reset-password', { token: req.params.token })
   })
 
@@ -130,7 +130,7 @@ function registerGetRoutes() {
     if (!req.session.user) return res.redirect('/login')
 
     try {
-      
+
       // haal de gemaakte en gejoinde reizen van de gebruiker op
       const mijnPosts = await discover.find({
         userId: new ObjectId(req.session.user._id),
@@ -138,7 +138,7 @@ function registerGetRoutes() {
       const gejoindePosts = await discover.find({
         reizigers: new ObjectId(req.session.user._id)
       }).toArray()
-      
+
       const alleReizen = [...mijnPosts, ...gejoindePosts].sort((a, b) => 
         new Date(a.startDate) - new Date(b.startDate)
       )
@@ -200,9 +200,9 @@ function registerGetRoutes() {
       if (!post) {
         return res.status(404).send('Post niet gevonden')
       }
-  
+
       const postUser = await users.findOne({ _id: post.userId })
-  
+
       // haal alle mederezigers op
       const reizigersIds = post.reizigers || []
       const mederezigers = await users.find({ 
@@ -280,13 +280,13 @@ app.get('/ontdekfilter', async (req, res) => {
 
     const reizen = await discoverCollection.find({}).toArray();
     const resultaat = []
-    
+
     for (const reis of reizen) {
       //voor elke reis in de lijst reizen doe dit: 
       const user = await usersCollection.findOne({
         _id: reis.userId //vind een reis 
       })
-      
+
       resultaat.push({ //pusht deze data in die lege array genaamd resultaat 
         reis: reis, 
         user: user
@@ -374,6 +374,10 @@ function registerPostRoutes() {
         username: user.username,
         bio: user.bio,
         profile: user.profile,
+        profileImg: user.profileImg,
+        image1: user.image1,
+        image2: user.image2,
+        image3: user.image3,
         gender: user.gender,
         birthday: user.birthday,
         interests: user.interests,
@@ -503,20 +507,20 @@ function registerPostRoutes() {
     { name: 'image2', maxCount: 1 },
     { name: 'image3', maxCount: 1 },
   ]), async (req, res) => {
- 
+
   const { name, lastName, email, password, birthday,
     tel, gender, status, bio, interests, opzoek
   } = req.body
- 
+
   const profileImg = req.files['profileImg'] ? req.files['profileImg'][0].filename : null
   const image1 = req.files['image1'] ? req.files['image1'][0].filename : null
   const image2 = req.files['image2'] ? req.files['image2'][0].filename : null
   const image3 = req.files['image3'] ? req.files['image3'][0].filename : null
- 
+
   const interestsArray = Array.isArray(interests)
     ? interests
     : (interests ? [interests] : []);
- 
+
   if (!validator.isEmail(email)) {
     return res.status(400).render('pages/register', { error: 'Ongeldig emailadres' })
   }
@@ -527,9 +531,9 @@ function registerPostRoutes() {
   if (existingUser) {
     return res.status(409).render('pages/register', { error: 'Email bestaat al' })
   }
- 
+
   const hashedPassword = await bcrypt.hash(password, 10)
- 
+
   const result = await users.insertOne({
     name,
     lastName,
@@ -547,7 +551,7 @@ function registerPostRoutes() {
     interests: interestsArray,
     opzoek
   })
- 
+
   const nieuweUser = await users.findOne({ _id: result.insertedId })
   req.session.user = {
     _id: nieuweUser._id,
@@ -564,7 +568,7 @@ function registerPostRoutes() {
   }
   return res.redirect('/discover')
 })
- 
+
 
   // create-post formulier
   app.post('/post', upload.single('postCoverImg'), async (req, res) => {
@@ -692,7 +696,7 @@ function registerPostRoutes() {
       res.status(500).send('Fout bij ophalen van chatroom')
     }
   })
-    
+
   app.get('/chat-channel/:userId', async (req, res) => {
     if (!req.session.user) return res.redirect('/login')
 
@@ -729,7 +733,7 @@ function registerPostRoutes() {
       res.status(500).send('Fout bij ophalen van chatkanaal')
     }
   })
-  
+
 }
 
 // =======================
@@ -793,7 +797,7 @@ function registerSocketHandlers() {
       if (!cleanText) return
 
       const roomName = getConversationRoom(myUserId, toUserId)
-      
+
       await messages.insertOne({
         conversationId: roomName,
         fromUserId: myUserId,
@@ -802,7 +806,7 @@ function registerSocketHandlers() {
         text: cleanText,
         createdAt: new Date()
       })
-      
+
       const payloadForReceiver = {
         fromUserId: myUserId,
         fromName: user.name,
