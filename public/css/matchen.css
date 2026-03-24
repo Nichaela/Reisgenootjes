@@ -119,7 +119,7 @@ section:nth-of-type(6) h2 {
   width: 1px;
 }
 
-section:last-of-type {
+section:last-of-type form {
   display: flex;
   justify-content: space-between;
 }
