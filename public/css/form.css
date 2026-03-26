@@ -1,26 +1,4 @@
 /* forms */
-.voortgangsbalk {
-  display: flex;
-  gap: var(--space-gap-xs);
-}
-
-.voortgangsbalk div {
-  height: .3rem;
-  width: 100%;
-  border-radius: var(--border-radius);
-}
-
-.voortgangsbalk-active {
-  background-color: var(--clr-primary);
-}
-
-.voortgangsbalk-inactive {
-  background-color: var(--clr-surface);
-}
-
-.multi-step-form {
-  height: 80vh;
-}
 
 form {
   display: grid;
@@ -29,11 +7,12 @@ form {
   position: relative;
 }
 
-.form-step>a,
-.form-step>button[data-prev] {
-  position: absolute;
-  top: 0;
-  right: 0;
+a {
+  color: var(--clr-text);
+  text-decoration: underline;
+  text-decoration-color: var(--clr-primary);
+  text-decoration-thickness: .125rem;
+  text-underline-offset: .2rem;
 }
 
 form div {
@@ -72,15 +51,7 @@ textarea {
   resize: none;
 }
 
-/* multipage form */
-.form-step {
-  display: none;
-}
-
-.form-step.form-active {
-  display: block;
-}
-
+/* Deze fixt streepje van h1 vanwege de pijl absolutez*/
 form h1 {
   width: fit-content;
 }
@@ -110,6 +81,49 @@ input.gradient-btn {
   bottom: var(--space-gap-s);
 }
 
+.voortgangsbalk {
+  display: flex;
+  gap: var(--space-gap-xs);
+}
+
+.voortgangsbalk div {
+  height: .3rem;
+  width: 100%;
+  border-radius: var(--border-radius);
+}
+
+.voortgangsbalk-active {
+  background-color: var(--clr-primary);
+}
+
+.voortgangsbalk-inactive {
+  background-color: var(--clr-surface);
+}
+
+.multi-step-form {
+  height: 80vh;
+}
+
+.form-step>a,
+.form-step>button[data-prev] {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+
+
+/* multipage form */
+.form-step {
+  display: none;
+}
+
+.form-step.form-active {
+  display: block;
+}
+
+
+
 /* checkboxes voor aanmeldform */
 .options {
   display: flex;
@@ -138,14 +152,7 @@ input.gradient-btn {
 }
 
 /* a in inlog form */
-a {
-  color: var(--clr-text);
 
-  text-decoration: underline;
-  text-decoration-color: var(--clr-primary);
-  text-decoration-thickness: .125rem;
-  text-underline-offset: .2rem;
-}
 
 /* disabled button form*/
 button:disabled {

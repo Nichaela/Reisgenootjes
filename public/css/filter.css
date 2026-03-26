@@ -26,7 +26,6 @@
   margin-top: -.6em;
 }
 
-
 /* Filter knop */
 .toggleFilter {
   position: fixed;
@@ -123,11 +122,6 @@
   max-width: 8em;
 }
 
-h3 {
-  font-size: 1em;
-  font-weight: 400;
-}
-
 
 /* Alle labels boven hun input plaatsen */
 .filter-menu label {
@@ -155,7 +149,6 @@ h3 {
 
 .reset-filters {
   justify-self: center;
-
   display: block;
   margin: 0.5em 0;
   padding: 0.5em .8em;
@@ -164,6 +157,5 @@ h3 {
   font-size: 1em;
   color: var(--clr-neutral);
   background: var(--gradient-primary);
-
   margin-top: 3em;
 }
