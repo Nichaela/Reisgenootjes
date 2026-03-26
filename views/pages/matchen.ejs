@@ -8,25 +8,32 @@
 </head>
 
 <body>
-  <header>
-    <%- include('../partials/header'); %>
-  </header>
-
   <main>
-    <% if (user) { %>
-      <p>Welkom <%= user.name %></p>
-    <% } %>
-
     <h1 class="underline">Matchen</h1>
-    <%- include('../partials/filtermenu'); %>
+
 
     <% if (!matchUser) { %>
+
       <p>Je hebt iedereen gezien!</p>
       <a href="/matchen/reset">Opnieuw beginnen</a>
+
     <% } else { %>
 
+      <div class="voorkeur-buttons">
+
+        <input type="radio" id="man" name="genderPreference" value="man" form="likeForm">
+        <label for="man">Man</label>
+      
+        <input type="radio" id="vrouw" name="genderPreference" value="vrouw" form="likeForm">
+        <label for="vrouw">Vrouw</label>
+      
+        <input type="radio" id="anders" name="genderPreference" value="anders" form="likeForm">
+        <label for="anders">Anders</label>
+      
+      </div>
+
       <section>
-        <img src="/img/accounts/MarkvanFlied.jpg" alt="Account foto">
+        <img src="/uploads/<%= matchUser.profileImg %>" alt="Account foto">
         <div class="profile-info">
           <h2><%= matchUser.name %> • <%= age %></h2>
           <ul>
@@ -39,29 +46,29 @@
       </section>
 
       <section>
-        <p>State • Opzoek naar reisgenootje</p>
+        <p>Status • Op zoek naar reisgenootje</p>
         <h2>Bio</h2>
         <p><%= matchUser.bio %></p>
       </section>
 
       <section>
-        <h2>Interesse</h2>
-        <ul class="hobbies">
-          <% 
-            let interestsList = []
-
-            if (Array.isArray(matchUser.interests)) {
-              interestsList = matchUser.interests
-            } else if (typeof matchUser.interests === 'string') {
-              interestsList = matchUser.interests.split(',')
-            }
-          %>
-
-          <% interestsList.forEach(interesse => { %>
-            <li class="hobby"><%= interesse.trim() %></li>
-          <% }) %>
-        </ul>
-      </section>
+                <h2>Interesse</h2>
+                <ul class="hobbies">
+                  <%
+                    let interestsList = []
+         
+                    if (Array.isArray(matchUser.interests)) {
+                      interestsList = matchUser.interests
+                    } else if (typeof matchUser.interests === 'string') {
+                      interestsList = matchUser.interests.split(',')
+                    }
+                  %>
+         
+                  <% interestsList.forEach(interesse => { %>
+                    <li class="hobby"><%= interesse.trim() %></li>
+                  <% }) %>
+                </ul>
+              </section>
 
       <section>
         <h2>Geplande trip</h2>
@@ -81,16 +88,18 @@
 
       <section>
         <h2>Gallerij</h2>
-        <img src="/img/accounts/markvoorkant.jpg" alt="mark van de voorkant">
-        <img src="/img/accounts/markwandelen.jpg" alt="mark die aan het wandelen is">
-        <img src="/img/accounts/tentje.jpg" alt="een tentje in de bergen met uitzicht">
+  <img src="/uploads/<%= matchUser.image1 %>" alt="Galerij foto 1">
+  <img src="/uploads/<%= matchUser.image2 %>" alt="Galerij foto 2">
+  <img src="/uploads/<%= matchUser.image3 %>" alt="Galerij foto 3">
       </section>
 
       <section>
-        <form action="/likes" method="POST">
+        <form id="likeForm" action="/likes" method="POST">
+
           <% if (post) { %>
             <input type="hidden" name="postId" value="<%= post._id %>">
           <% } %>
+
           <input type="hidden" name="matchedUser" value="<%= matchUser._id %>">
 
           <button type="submit" name="actie" value="dislike">
@@ -100,6 +109,7 @@
           <button type="submit" name="actie" value="like">
             <img src="/img/matcheniconen/Heart.svg" alt="Like">
           </button>
+
         </form>
       </section>
 
@@ -107,7 +117,5 @@
   </main>
 
   <%- include('../partials/bottom-nav'); %>
-  <script defer src="/javascript/filter.js"></script>
-  </body>
-
+</body>
 </html>

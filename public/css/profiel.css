@@ -70,15 +70,4 @@ section:nth-of-type(3) p {
   margin-bottom: 0.5rem;
 }
 
-.hobbies {
-  display: flex;
-}
-
-.hobby {
-  border: .05rem solid var(--clr-primary);
-  border-radius: 5rem;
-  padding: 0.5rem;
-  margin: 0.5rem;
-}
-
 
