@@ -44,13 +44,10 @@ const io = socketIo(server)
 // Construct URL used to connect to database from info in the .env file
 const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}/${process.env.DB_NAME}?retryWrites=true&w=majority`
 
-
-const MongoStore = require('connect-mongo').default
 const sessionMiddleware = session({
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
-  store: MongoStore.create({ mongoUrl: uri })
 })
 
 app
@@ -103,10 +100,6 @@ app.use((req, res, next) => {
 function registerGetRoutes() {
   app.get('/', (req, res) => {
     res.render('pages/index', { data: null })
-  })
-
-  app.get('/welkom', (req, res) => {
-    res.render('pages/welkom', { error: null })
   })
 
   app.get('/login', (req, res) => {
@@ -197,7 +190,7 @@ function registerGetRoutes() {
   })
 
   app.get('/create-post', (req, res) => {
-    if (!req.session.user) return res.redirect('/welkom')
+    if (!req.session.user) return res.redirect('/login')
     res.render('pages/create-post', { user: req.session.user })
   })
 
@@ -299,9 +292,11 @@ app.get('/logout', (req, res) => {
     }
 
     res.clearCookie('connect.sid')
-    res.redirect('/welkom')
+    res.redirect('/')
   })
 })
+
+}
 
 
 // =======================
