@@ -8,17 +8,11 @@
 </head>
 
 <body>
-  <header>
-    <%- include('../partials/header'); %>
-  </header>
-
   <main>
-    <% if (user) { %>
-      <p>Welkom <%= user.name %></p>
-    <% } %>
-
-    <h1 class="underline">Matchen</h1>
-    <%- include('../partials/filtermenu'); %>
+    <header>
+      <h1 class="underline">Matchen</h1>
+      <%- include('../partials/filtermenu'); %>
+    </header>
 
     <% if (!matchUser) { %>
       <p>Je hebt iedereen gezien!</p>

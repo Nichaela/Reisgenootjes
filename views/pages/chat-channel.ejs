@@ -1,42 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <%- include('../partials/head'); %>
- <link rel="stylesheet" href="/css/chatroom.css">
-</head>
-<body>
-  <header>
-    <%- include('../partials/header'); %>
-  </header>
-  <main>
-    
-    <div class="chat-container">
-        <div class="chat-header">
-            <% if (user) { %>
-              <h1 class="underline"> <%= user.name %> u chat met <span id="chatPartnerName"><%= chatPartner.name %></span></h1>
+  <head>
+    <%- include('../partials/head'); %>
+  <link rel="stylesheet" href="/css/chatroom.css">
+  </head>
+  <body>
+    <header>
+      <div class="chat-header">
+        <% if (user) { %>
+          <h1 class="underline"> <%= user.name %> u chat met <span id="chatPartnerName"><%= chatPartner.name %></span></h1>
+        <% } %>
+      </div>
+    </header>
+    <main>
+      
+      <div class="chat-container">
+          
+          <div id="messages">
+            <% if (conversationHistory && conversationHistory.length > 0) { %>
+              <% conversationHistory.forEach((msg) => { %>
+                <div class="message <%= msg.fromUserId === user._id.toString() ? 'messageSent' : 'messageReceived' %>">
+                  <%= msg.fromUserId === user._id.toString() ? 'Jij' : msg.fromName %>: <%= msg.text %>
+                </div>
+              <% }) %>
             <% } %>
-        </div>
-        <div id="messages">
-          <% if (conversationHistory && conversationHistory.length > 0) { %>
-            <% conversationHistory.forEach((msg) => { %>
-              <div class="message <%= msg.fromUserId === user._id.toString() ? 'messageSent' : 'messageReceived' %>">
-                <%= msg.fromUserId === user._id.toString() ? 'Jij' : msg.fromName %>: <%= msg.text %>
-              </div>
-            <% }) %>
-          <% } %>
-        </div>
-        <input type="hidden" id="chatPartnerId" value="<%= chatPartner._id %>">
-        <div id="typingIndicator" class="typing-indicator"></div>
-        <div class="input-container">
-            <input id="messageInput" type="text" placeholder="Type your message..." autocomplete="off">
-            <button id="sendButton">Send</button>
-        </div>
-    </div>
-  </main>
-  <script src="/socket.io/socket.io.js"></script>
-  <script src="/js/chat-channel.js"></script>
-  <%- include('../partials/bottom-nav'); %>
-</body>
+          </div>
+          <input type="hidden" id="chatPartnerId" value="<%= chatPartner._id %>">
+          <div id="typingIndicator" class="typing-indicator"></div>
+          <div class="input-container">
+              <input id="messageInput" type="text" placeholder="Type your message..." autocomplete="off">
+              <button id="sendButton">Send</button>
+          </div>
+      </div>
+    </main>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/javascript/chat-channel.js"></script>
+    <%- include('../partials/bottom-nav'); %>
+  </body>
 </html>
 
 <!-- source: https://medium.com/@basukori8463/build-a-real-time-chat-app-from-scratch-with-node-js-and-socket-io-9714b7076372 -->
