@@ -105,10 +105,6 @@ function registerGetRoutes() {
     res.render('pages/index', { data: null })
   })
 
-  app.get('/welkom', (req, res) => {
-    res.render('pages/welkom', { error: null })
-  })
-
   app.get('/login', (req, res) => {
     res.render('pages/login', { error: null })
   })
@@ -197,7 +193,7 @@ function registerGetRoutes() {
   })
 
   app.get('/create-post', (req, res) => {
-    if (!req.session.user) return res.redirect('/welkom')
+    if (!req.session.user) return res.redirect('/')
     res.render('pages/create-post', { user: req.session.user })
   })
 
@@ -299,7 +295,7 @@ app.get('/logout', (req, res) => {
     }
 
     res.clearCookie('connect.sid')
-    res.redirect('/welkom')
+    res.redirect('/')
   })
 })
 
