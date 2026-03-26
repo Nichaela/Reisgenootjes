@@ -119,7 +119,7 @@ section:nth-of-type(6) h2 {
   width: 1px;
 }
 
-section:last-of-type {
+section:last-of-type form {
   display: flex;
   justify-content: space-between;
 }
@@ -131,4 +131,36 @@ section:last-of-type button {
   background-color: var(--clr-text);
   border-radius: 4rem;
   border-style: none;
+}
+
+
+/* Filter buttons gender */
+
+.voorkeur-buttons {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-top: 2em;
+}
+
+.voorkeur-buttons input[type="radio"] {
+  display: none;
+}
+
+.voorkeur-buttons label {
+  margin: 0.5em 0;
+  padding: 0.5em .8em;
+  border: .05em solid var(--clr-text);
+  border-radius: 10em;
+  cursor: pointer;
+  font-size: 1em;
+  color: var(--clr-text);
+  transition: all 0.2s ease;
+}
+
+/* geselecteerd */
+.voorkeur-buttons input[type="radio"]:checked + label {
+  background: var(--gradient-primary);
+  color: var(--clr-neutral);
+  border: none;
 }
