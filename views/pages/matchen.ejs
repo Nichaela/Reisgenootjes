@@ -13,17 +13,28 @@
   </header>
 
   <main>
-    <% if (user) { %>
-      <p>Welkom <%= user.name %></p>
-    <% } %>
-
     <h1 class="underline">Matchen</h1>
-    <%- include('../partials/filtermenu'); %>
+
 
     <% if (!matchUser) { %>
+
       <p>Je hebt iedereen gezien!</p>
       <a href="/matchen/reset">Opnieuw beginnen</a>
+
     <% } else { %>
+
+      <div class="voorkeur-buttons">
+
+        <input type="radio" id="man" name="genderPreference" value="man" form="likeForm">
+        <label for="man">Man</label>
+      
+        <input type="radio" id="vrouw" name="genderPreference" value="vrouw" form="likeForm">
+        <label for="vrouw">Vrouw</label>
+      
+        <input type="radio" id="anders" name="genderPreference" value="anders" form="likeForm">
+        <label for="anders">Anders</label>
+      
+      </div>
 
       <section>
         <img src="/uploads/<%= matchUser.profileImg %>" alt="Account foto">
@@ -39,7 +50,7 @@
       </section>
 
       <section>
-        <p>State • Opzoek naar reisgenootje</p>
+        <p>Status • Op zoek naar reisgenootje</p>
         <h2>Bio</h2>
         <p><%= matchUser.bio %></p>
       </section>
@@ -81,16 +92,24 @@
 
       <section>
         <h2>Gallerij</h2>
+<<<<<<< HEAD
+        <img src="/img/accounts/markvoorkant.jpg" alt="">
+        <img src="/img/accounts/markwandelen.jpg" alt="">
+        <img src="/img/accounts/tentje.jpg" alt="">
+=======
   <img src="/uploads/<%= matchUser.image1 %>" alt="Galerij foto 1">
   <img src="/uploads/<%= matchUser.image2 %>" alt="Galerij foto 2">
   <img src="/uploads/<%= matchUser.image3 %>" alt="Galerij foto 3">
+>>>>>>> 04ba4c5f98562d4f8ab1c34a367fd6f2a9b0f80b
       </section>
 
       <section>
-        <form action="/likes" method="POST">
+        <form id="likeForm" action="/likes" method="POST">
+
           <% if (post) { %>
             <input type="hidden" name="postId" value="<%= post._id %>">
           <% } %>
+
           <input type="hidden" name="matchedUser" value="<%= matchUser._id %>">
 
           <button type="submit" name="actie" value="dislike">
@@ -100,6 +119,7 @@
           <button type="submit" name="actie" value="like">
             <img src="/img/matcheniconen/Heart.svg" alt="Like">
           </button>
+
         </form>
       </section>
 
@@ -107,7 +127,5 @@
   </main>
 
   <%- include('../partials/bottom-nav'); %>
-  <script defer src="/javascript/filter.js"></script>
-  </body>
-
+</body>
 </html>
