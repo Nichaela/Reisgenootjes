@@ -107,10 +107,9 @@ h3 {
 }
 
 section {
-  margin: 1.5rem 0;
+  margin-bottom: 1.5rem;
 }
-
-.heading {
+F.heading {
   margin-bottom: var(--space-gap-s);
 }
 

@@ -100,7 +100,7 @@ section:last-of-type form {
 }
 
 section:last-of-type button {
-  margin-bottom: 5rem;
+  /* margin-bottom: 5rem; */
   padding: 1rem;
   background-color: var(--clr-text);
   border-radius: 4rem;
