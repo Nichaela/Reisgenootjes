@@ -220,7 +220,7 @@ svg.line path{
 .reizen {
   width: 100%;
   display: grid;
-  gap: 2rem;
+  gap: 1rem;
 }
 .reizen a {
   width: 100%;

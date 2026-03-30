@@ -64,10 +64,11 @@
 
 .chat-header {
     border-bottom: 1px solid #e0e0e0;
-    padding: 20px;
     text-align: center;
     font-size: 1.2em;
     font-weight: bold;
+    display: flex;
+    justify-content: space-between;
 }
 
 #messages {
@@ -79,7 +80,7 @@
 }
 
 .message {
-    display: flex;
+    /* display: flex; */
     margin-bottom: 1em;
     padding: 10px 1em;
     border-radius: 18px;
@@ -96,11 +97,9 @@
     background: #c8e6c9;
 }
 
-.input-container {
+.bottom-container {
     display: flex;
-    padding: 1.25em;
-    background: white;
-    border-top: 1px solid #e0e0e0;
+    flex-direction: column;
     position: absolute;
     left: 0;
     right: 0;
@@ -108,6 +107,12 @@
     width: 100%;
     box-sizing: border-box;
     min-height: var(--input-height);
+    border-top: 1px solid #e0e0e0;
+}
+
+.input-container {
+    display: flex;
+    justify-content: space-between;
 }
 
 #messageInput {
