@@ -107,25 +107,60 @@ dropdowns.forEach(dropdown => {
 // ==========================================
 // Variabelen
 
-const filterButtons = document.querySelectorAll(".genders .filter-btn") // Alleen gender knoppen
+const filterButtons = document.querySelectorAll(".genders .filter-btn") //Alleen gender knoppen
 const continentButtons = document.querySelectorAll(".continents .filter-btn") // Continent knoppen
 const toggleButton = document.getElementById("toggleFilter")
 const filterMenu = document.getElementById("filterMenu")
 const closeButton = document.getElementById("closeMenu")
-const items = document.querySelectorAll(".reizen li")
+
+let items; //aanmaken van een variabele
+if (document.querySelectorAll(".reizen li").length > 0) { //zoekt alle list items in de reizen lijst, length controleert of er minstens 1 in de lijst staat
+  items = document.querySelectorAll(".reizen li") // zo ja, items wordt alle list elementen in de lijst reizen
+} else if (document.querySelectorAll(".match-card").length > 0) { //als  er geen reizen lijst is, maar wel minstens 1 match card
+  items = document.querySelectorAll(".match-card") // zo ja, items wordt alle match card elementen
+}
 
 const dateFilter = document.getElementById("dateFilter")
 
 const birthdaySlider = document.getElementById("birthday")
 const birthdayValue = document.getElementById("birthdayValue")
 
-let activeFilters = new Set()      // gender
-let activeContinents = new Set()   // continent
+let activeFilters = new Set()      // houdt geselecteerde gender filters bij
+let activeContinents = new Set()   // houdt geselecteerde continenten filters bij
 
 
+// ==========================================
+// Open en close menu
+// ==========================================
+
+toggleButton.addEventListener("click", () => {
+  filterMenu.classList.add("show")
+  toggleButton.style.display = "none"
+});
+
+closeButton.addEventListener("click", () => {
+  filterMenu.classList.remove("show")
+  toggleButton.style.display = "block"
+})
 
 
-//Realtime slider update
+// ==========================================
+// Controle van resultaten
+// ==========================================
+
+function checkNoResults() {
+  const allItems = document.querySelectorAll(".reizen li") //alle reizen elementen worden geselecteerd
+  const visibleItems = Array.from(allItems).filter(item => { //er wordt een array gemaakt van de list
+    return item.style.display !== "none"
+  })
+
+  noResults.style.display = visibleItems.length === 0 ? "block" : "none"
+}
+
+
+// ==========================================
+// Leeftijd slider
+// ==========================================
 
 if (birthdaySlider && birthdayValue) {
 
@@ -139,7 +174,9 @@ if (birthdaySlider && birthdayValue) {
 }
 
 
-//Filter functie
+// ==========================================
+// Filter functie
+// ==========================================
 
 function filterItems() {
   const selectedDate = dateFilter.value //haalt data op uit input
@@ -154,10 +191,10 @@ function filterItems() {
 
     let showItem = true
 
-    // Gender filter
+    // Gender
     if (activeFilters.size > 0 && !activeFilters.has(gender)) showItem = false
 
-    // Continent filter
+    // Continent
     if (activeContinents.size > 0 && !activeContinents.has(continent)) showItem = false
 
     // Datum filter (alleen vanaf geselecteerde datum)
@@ -167,7 +204,7 @@ function filterItems() {
       if (itemDate < selected) showItem = false
     }
 
-    // Leeftijd filter
+    // Leeftijd
     const ageMargin = 5
     if (selectedAge !== null && (age < selectedAge - ageMargin || age > selectedAge + ageMargin)) {
       showItem = false
@@ -175,23 +212,17 @@ function filterItems() {
 
     item.style.display = showItem ? "block" : "none"
   })
+
+  checkNoResults() //laatste check of er resultaten zijn
+
 }
 
-//Open en close menu
 
-toggleButton.addEventListener("click", () => {
-  filterMenu.classList.add("show")
-  toggleButton.style.display = "none"
-});
+// ==========================================
+// Eventlisteners voor de knoppen
+// ==========================================
 
-closeButton.addEventListener("click", () => {
-  filterMenu.classList.remove("show")
-  toggleButton.style.display = "block"
-})
-
-
-//Gender filters
-
+//Gender
 filterButtons.forEach(btn => {
   btn.addEventListener("click", () => {
     const filter = btn.dataset.gender // waarde wordt opgehaald (man/vrouw/anders)
@@ -208,8 +239,7 @@ filterButtons.forEach(btn => {
   })
 })
 
-//Continent filters
-
+//Continenten
 continentButtons.forEach(btn => {
   btn.addEventListener("click", () => {
     const filter = btn.dataset.continent // waarde ophalen
@@ -226,15 +256,13 @@ continentButtons.forEach(btn => {
   })
 })
 
-
-
-// Datum filter
-
+//Datum
 dateFilter.addEventListener("change", filterItems) // er wordt opnieuw gefilterd als de datum wordt veranderd
 
 
-
-// Birthday naar leeftijd berekenen
+// ==========================================
+// Birthday naar leeftijd
+// ==========================================
 
 function calculateAge(birthday) { // hier staat eigenlijk: calculateAge("12-02-2004")
   const today = new Date() // geeft de datum van vandaag 
@@ -251,33 +279,29 @@ function calculateAge(birthday) { // hier staat eigenlijk: calculateAge("12-02-2
 }
 
 
-
-// Reset filters
+// ==========================================
+// Filter reset + eventlisteners
+// ==========================================
 
 const resetButton = document.querySelector(".reset-filters")
 
 resetButton.addEventListener("click", () => {
-  // 1. Alle actieve buttons verwijderen
   activeFilters.clear()
-  activeContinents.clear()
+  activeContinents.clear()  //Alle actieve buttons verwijderen
 
   document.querySelectorAll(".filter-btn").forEach(btn => {
-    btn.classList.remove("active")
+    btn.classList.remove("active") //Active class verwijderen (style)
   })
 
-  // 2. Datum resetten
-  if (dateFilter) dateFilter.value = ""
+  if (dateFilter) dateFilter.value = "" //Datum resetten
 
-  // 3. Leeftijd slider resetten
-  if (birthdaySlider) {
-    birthdaySlider.value = birthdaySlider.min;
-    birthdayValue.textContent = birthdaySlider.min;
+  if (birthdaySlider) { //Kijkt of leeftijd slider bestaat op de pagina
+    birthdaySlider.value = birthdaySlider.min; //zet slider weer op de minimale leeftijd (18)
+    birthdayValue.textContent = birthdaySlider.min; //de text boven de slider ook weer naar 18
   }
 
-  // 4. Alles weer zichtbaar maken
-  filterItems()
+  filterItems() //Alles weer zichtbaar maken
 })
-
 
 
 // ==========================================
@@ -288,25 +312,21 @@ const searchInput = document.getElementById("searchInput")
 const reizen = document.querySelectorAll(".reizen li")
 const noResults = document.getElementById("noResults") // het element voor de boodschap
 
-searchInput?.addEventListener("input", (event) => { // is er input door de gebruiker --> dan het volgende event
+searchInput?.addEventListener("input", (event) => { // is er input door de gebruiker, dan het volgende event
   const zoekTerm = event.target.value.toLowerCase() // gebruiker kan in zowel lower als uppercase typen
-  let anyResults = false // houdt bij of er een match is
 
   reizen.forEach(li => {
     const titel = li.querySelector(".post-title")?.textContent.toLowerCase() || "" // Haalt de titel op en maakt er kleinletters van OF lege string om fout te voorkomen
-    const locatie = li.querySelector(".post-location")?.textContent.toLowerCase() || ""
+    const locatie = li.querySelector(".post-location")?.textContent.toLowerCase() || "" //Hetzelde geldt voor locatie
 
-    // als titel of locatie zoekterm bevat, toon item, anders verberg
-    if (titel.includes(zoekTerm) || locatie.includes(zoekTerm)) {
-      li.style.display = "block"
-      anyResults = true // er is minstens één match
+    if (titel.includes(zoekTerm) || locatie.includes(zoekTerm)) { // Als titel of locatie zoekterm bevat
+      li.style.display = "block" //Toon
     } else {
-      li.style.display = "none"
+      li.style.display = "none" //Verberg
     }
   })
 
-  // als er geen resultaten zijn, laat boodschap zien, anders verberg
-  noResults.style.display = anyResults ? "none" : "block"
+  checkNoResults() //laatste check of er resultaten zijn
 });
 
 // Oogje om wachtwoord zichtbaar te maken

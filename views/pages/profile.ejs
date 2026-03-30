@@ -11,16 +11,21 @@
 
 <body>
     <header>
-        <%- include('../partials/header'); %>
+      <% if (user) { %>
+        <form action="/logout" method="POST">
+            <button type="submit">Logout</button>
+        </form>
+      <% } %>
+
     </header>
     <main>
         <% if (user) { %>
             <h1 class="underline">Profiel</h1>
             <section class="profile-pictures">
-                <h2>Galerij</h2>
-                <img src="/img/accounts/SophieBijZee.png" alt="Sophie bij zee">
-                <img src="/img/accounts/SophieBijBerg.png" alt="Sophie kijkt naar een berg">
-                <img src="/img/accounts/SophieBijWeiland.png" alt="een tentje in de bergen met uitzicht">
+                <h2>Gallerij</h2>
+                <img src="/uploads/<%= user.profileImg %>" alt="profiel foto">
+                <img src="/uploads/<%= user.image2 %>" alt="Galerij foto 2">
+                <img src="/uploads/<%= user.image3 %>" alt="Galerij foto 3">
             </section>
 
             <section>
@@ -54,24 +59,24 @@
             </section>
             <section>
             <h2>Planning</h2>
-            <% if (alleReizen.length === 0) { %>
+            <% if (alleReizen.length===0) { %>
                 <p>Je hebt nog geen reizen.</p>
-              <% } else { %>
-                <ul class="reizen">
-                    <% alleReizen.forEach(post => { %>
-                        <li>
-                            <a href="/post/<%= post._id %>">
-                                <%- include('../partials/reisoproep', { post: post }) %>
-                            </a>
-                        </li>
-                    <% }) %>
-                </ul>
-              <% } %>
+                <% } else { %>
+                    <ul class="reizen">
+                        <% alleReizen.forEach(post=> { %>
+                            <li>
+                                <a href="/post/<%= post._id %>">
+                                    <%- include('../partials/reisoproep', { post: post }) %>
+                                </a>
+                            </li>
+                            <% }) %>
+                    </ul>
+                    <% } %>
 
 
 
-            </section>
-            <% } %>
+                        </section>
+                        <% } %>
     </main>
 
     <footer>
@@ -80,3 +85,4 @@
 </body>
 
 </html>
+ 

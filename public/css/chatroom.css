@@ -1,6 +1,6 @@
 /* chatroom */
 /* source: https://medium.com/@basukori8463/build-a-real-time-chat-app-from-scratch-with-node-js-and-socket-io-9714b7076372 */
-
+/* geen pixels!! em of rem of percent */
 @keyframes slideIn {
     from {
         opacity: 0;
@@ -11,7 +11,6 @@
         transform: translateY(0);
     }
 }
-
 
 .chat-list-item  {
    margin-bottom: 2em;
@@ -82,7 +81,6 @@
 
 .messageSent {
     background: #bbdefb;
-    
 }
 
 .messageReceived {
