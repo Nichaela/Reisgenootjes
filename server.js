@@ -198,8 +198,8 @@ function registerGetRoutes() {
     res.render('pages/create-post', { user: req.session.user })
   })
 
-    app.get('/post/:id', async (req, res) => {
-     try {
+  app.get('/post/:id', async (req, res) => {
+    try {
       const post = await discover.findOne({
               _id: new ObjectId(req.params.id),
       })
@@ -227,26 +227,23 @@ function registerGetRoutes() {
 app.get('/matchen', async (req, res) => {
   if (!req.session.user) return res.redirect('/login')
 
-  try {
-    if (!req.session.gezien) req.session.gezien = []
+    try {
+      if (!req.session.gezien) req.session.gezien = []
 
-    const mijnId = new ObjectId(req.session.user._id)
+      const mijnId = new ObjectId(req.session.user._id)
+      const voorkeur = req.session.genderPreference
+      const query = {
+        _id: {
+          $ne: mijnId,
+          $nin: req.session.gezien.map(id => new ObjectId(id))
+        }
+    }
 
-    const voorkeur = req.session.genderPreference //toegevoegd door annabel
+    if (voorkeur) {
+      query.gender = voorkeur
+    }
 
-const query = {
-  _id: {
-    $ne: mijnId,
-    $nin: req.session.gezien.map(id => new ObjectId(id))
-  }
-}
-
-// alleen filteren als er een voorkeur is
-if (voorkeur) {
-  query.gender = voorkeur
-}
-
-const matchUser = await users.findOne(query)
+    const matchUser = await users.findOne(query)
 
     if (!matchUser) {
       return res.render('pages/matchen', {
@@ -294,7 +291,6 @@ app.get('/logout', (req, res) => {
       console.error(err)
       return res.redirect('/')
     }
-
     res.clearCookie('connect.sid')
     res.redirect('/')
   })
@@ -325,18 +321,37 @@ app.get('/logout', (req, res) => {
     } catch (err) { console.error(err); res.status(500).send("Fout bij ophalen data"); }
   })
 
-   app.get('/chatroom', async (req, res) => {
+  app.get('/chatroom', async (req, res) => {
     if (!req.session.user) return res.redirect('/login')
 
     try {
-      const allUsers = await users.find().toArray()
-      const otherUsers = allUsers.filter(otherUser =>
-        otherUser._id.toString() !== req.session.user._id.toString()
-      )
+      const mijnId = req.session.user._id.toString()
+
+      const ingelogdeUser = await users.findOne({
+        _id: new ObjectId(req.session.user._id)
+      })
+
+      if (!ingelogdeUser) {
+        return res.status(404).send('Gebruiker niet gevonden')
+      }
+
+      const mijnLikes = ingelogdeUser.likes || []
+
+      if (mijnLikes.length === 0) {
+        return res.render('pages/chatroom', {
+          user: req.session.user,
+          users: []
+        })
+      }
+
+      const matchedUsers = await users.find({
+        _id: { $in: mijnLikes.map(id => new ObjectId(id)) },
+        likes: mijnId
+      }).toArray()
 
       res.render('pages/chatroom', {
         user: req.session.user,
-        users: otherUsers
+        users: matchedUsers
       })
     } catch (err) {
       console.error(err)
@@ -744,8 +759,8 @@ function registerPostRoutes() {
   } catch (err) {
     console.error('Fout in /likes:', err)
     return res.status(500).send('Fout bij verwerken van like')
-  }
-})  
+    }
+  })  
 }
 
 // =======================
