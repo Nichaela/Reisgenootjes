@@ -663,12 +663,16 @@ function registerPostRoutes() {
 
       // Leeftijd check
       if (post.age && post.age.length > 0) {
-        const userAge = req.session.user.age
+        const birthDate = new Date(req.session.user.birthday)
+        const today = new Date()
+        let userAge = today.getFullYear() - birthDate.getFullYear()
+        const month = today.getMonth() - birthDate.getMonth()
+        if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) userAge--
 
         const ranges = {
-          '18': (age) => age >= 18 && age < 21,
-          '21': (age) => age >= 21 && age < 26,
-          '26': (age) => age >= 26 && age < 30,
+          '18': (age) => age >= 18 && age <= 21,
+          '21': (age) => age >= 21 && age <= 26,
+          '26': (age) => age >= 26 && age <= 30,
           '30': (age) => age >= 30
         }
       

@@ -39,6 +39,7 @@
   }
   .hero p:nth-child(2) {
     font-family: 'indie-flower';
+    font-size: 1.5rem;
   }
   .hero p:nth-child(4) {
     background-image: var(--gradient-surface);
@@ -98,3 +99,17 @@ section:nth-child(2),main >section:nth-child(3)  {
         width: 100%;
     }
 
+
+.mederezigers {
+  display: flex;
+  gap: .5rem;
+}
+.mederezigers a {
+  width: 4rem;
+}
+.mederezigers a img{
+  width: 4rem;
+  aspect-ratio: 1/1;
+  object-fit: cover;
+  border-radius: 50%;
+}
