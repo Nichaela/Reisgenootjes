@@ -1,5 +1,5 @@
 // ==========================================
-// MULTI-STEP FORM
+// MULTI-STEP FORM (GENERIC)
 // ==========================================
 document.querySelectorAll(".multi-step-form").forEach(form => {
   const steps = form.querySelectorAll(".form-step")
@@ -23,35 +23,13 @@ document.querySelectorAll(".multi-step-form").forEach(form => {
       }
     })
 
-    // Password check alleen als de velden ook écht bestaan
-  if (allValid && index === 0) {
-    const password = form.querySelector('input[name="password"]')
-    const confirmPassword = form.querySelector('input[name="confirmPassword"]')
-
-    if (password && confirmPassword) { // ← null-check toegevoegd
-      if (password.value.length < 8) {
-        allValid = false
-        password.setCustomValidity("Wachtwoord moet minimaal 8 tekens bevatten")
-        password.reportValidity()
-        password.setCustomValidity("")
-      }
-
-      if (password.value !== confirmPassword.value) {
-        allValid = false
-        confirmPassword.setCustomValidity("Wachtwoorden komen niet overeen")
-        confirmPassword.reportValidity()
-        confirmPassword.setCustomValidity("")
-      }
-    }
-  }
-
     return allValid
   }
 
   // Volgende knop
   form.querySelectorAll("[data-next]").forEach(btn => {
     btn.addEventListener("click", () => {
-      if (!validateStep(currentStep)) return; // stop als niet geldig
+      if (!validateStep(currentStep)) return // stop als validatie niet goed is
       if (currentStep < steps.length - 1) {
         currentStep++
         showStep(currentStep)
@@ -133,15 +111,19 @@ let activeContinents = new Set()   // houdt geselecteerde continenten filters bi
 // Open en close menu
 // ==========================================
 
-toggleButton.addEventListener("click", () => {
-  filterMenu.classList.add("show")
-  toggleButton.style.display = "none"
-});
+if (toggleButton && filterMenu) {
+  toggleButton.addEventListener("click", () => {
+    filterMenu.classList.add("show")
+    toggleButton.style.display = "none"
+  })
+}
 
-closeButton.addEventListener("click", () => {
-  filterMenu.classList.remove("show")
-  toggleButton.style.display = "block"
-})
+if (closeButton && filterMenu && toggleButton) {
+  closeButton.addEventListener("click", () => {
+    filterMenu.classList.remove("show")
+    toggleButton.style.display = "block"
+  })
+}
 
 
 // ==========================================
@@ -257,7 +239,7 @@ continentButtons.forEach(btn => {
 })
 
 //Datum
-dateFilter.addEventListener("change", filterItems) // er wordt opnieuw gefilterd als de datum wordt veranderd
+dateFilter?.addEventListener("change", filterItems) // er wordt opnieuw gefilterd als de datum wordt veranderd
 
 
 // ==========================================
@@ -285,7 +267,7 @@ function calculateAge(birthday) { // hier staat eigenlijk: calculateAge("12-02-2
 
 const resetButton = document.querySelector(".reset-filters")
 
-resetButton.addEventListener("click", () => {
+resetButton?.addEventListener("click", () => {
   activeFilters.clear()
   activeContinents.clear()  //Alle actieve buttons verwijderen
 
@@ -328,17 +310,3 @@ searchInput?.addEventListener("input", (event) => { // is er input door de gebru
 
   checkNoResults() //laatste check of er resultaten zijn
 });
-
-// Oogje om wachtwoord zichtbaar te maken
-function togglePassword(fieldId, eyeSpan) {
-  const input = document.getElementById(fieldId)
-  const img = eyeSpan.querySelector('img')
-
-  if (input.type === 'password') {
-    input.type = 'text'
-    img.src = 'img/Eyeclose.svg' // wissel naar gesloten oog
-  } else {
-    input.type = 'password'
-    img.src = 'img/Eye.svg' // terug naar open oog
-  }
-}
