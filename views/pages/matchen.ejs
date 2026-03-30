@@ -225,12 +225,31 @@
           <a href="/post/<%= post._id %>">
             <%- include('../partials/reisoproep', { post: post }) %>
           </a>
+<<<<<<< HEAD
 =======
       <% if (!matchUser) { %>
         <p>Je hebt iedereen gezien!</p>
         <a href="/matchen/reset">Opnieuw beginnen</a>
 >>>>>>> 3eed8cc (error fix)
         <% } else { %>
+=======
+        <% } else { %>
+          <p>Geen geplande trip beschikbaar.</p>
+        <% } %>
+      </section>
+
+      <section>
+        <h2>Op zoek naar:</h2>
+        <p><%= matchUser.opzoek %></p>
+      </section>
+
+      <section>
+        <h2>Gallerij</h2>
+        <img src="/uploads/<%= matchUser.image1 %>" alt="Galerij foto 1">
+        <img src="/uploads/<%= matchUser.image2 %>" alt="Galerij foto 2">
+        <img src="/uploads/<%= matchUser.image3 %>" alt="Galerij foto 3">
+      </section>
+>>>>>>> 35eda40 (matchen fix)
 
           <section>
             <img src="/uploads/<%= matchUser.profileImg %>" alt="Account foto">
