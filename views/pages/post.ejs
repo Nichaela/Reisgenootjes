@@ -42,7 +42,7 @@
             <% mederezigers.forEach(reiziger => { %>
               <article>
                 <a href="/profiel/<%= reiziger._id %>">
-                  <img src="<%= reiziger.profilePicture %>" alt="<%= reiziger.name %>">
+                  <img src="<%= reiziger.profileImg %>" alt="<%= reiziger.name %>">
                 </a>
               </article>
             <% }) %>
@@ -84,7 +84,7 @@
         <h2>Gepost door</h2>
         <article class="profilecard">
           <a href="/profiel/<%= post.userId %>">
-            <img src="<%= postUser.profilePicture %>" alt="<%= postUser.name %>">
+            <img src="<%= postUser.profileImg %>" alt="<%= postUser.name %>">
             <p><%= postUser.name %></p>
             <p><%= postUser.gender %></p>
             <p><%= postUser.birthday %></p>
