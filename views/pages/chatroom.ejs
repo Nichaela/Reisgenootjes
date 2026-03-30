@@ -11,40 +11,42 @@
 
   <main>
     <h1 class="underline" >Chatroom</h1>
-    <atricle>
+    <section>
       <h2>Nieuwe match</h2>
-      <% users.forEach(otherUser => { %>
-        <a href="/chat-channel/<%= otherUser._id %>">
-          <%= otherUser.name %>
-        </a>
-      <% }) %>
-    </article>
-
-    <!-- horizontale lijst met profiel fotos -->
-    <h2>Recente gesprekken</h2>
-     <ul class="chat-list">
-      <% users.forEach(otherUser => { %>
-        <li class="chat-list-item">
+      <div class="new-match-list">
+        <% users.forEach(otherUser => { %>
           <a href="/chat-channel/<%= otherUser._id %>">
-            <!-- <img src="<%= otherUser.profilePicture %>" alt="<%= otherUser.name %>" class="chat-profile-pic"> -->
             <div class="profile-pic-wrapper">
-              <img src="/img/accounts/MarkvanFlied.jpg" class="profile-pic" alt="">
+              <img src="/uploads/<%= otherUser.profileImg %>" alt="<%= otherUser.name %>" class="profile-pic" alt="">
             </div>
-            <div class="chat-info">
-              <%= otherUser.name %>
-              <div class="last-chat">
-                <%= otherUser.lastMessage ? otherUser.lastMessage : 'Nog geen berichten' %>
-              </div>
-             </div>
+            <%= otherUser.name %>
           </a>
-        </li>
-      <% }) %>
+        <% }) %>
+      </div>
+    </section>
+    <section>
+      <h2>Recente gesprekken</h2>
+      <ul class="chat-list">
+        <% users.forEach(otherUser => { %>
+          <li class="chat-list-item">
+            <a href="/chat-channel/<%= otherUser._id %>">
+              <div class="profile-pic-wrapper">
+                <img src="/uploads/<%= otherUser.profileImg %>" alt="<%= otherUser.name %>" class="profile-pic" alt="">
+              </div>
+              <div class="chat-info">
+                <%= otherUser.name %>
+                <div class="last-chat">
+                  <%= otherUser.lastMessage ? otherUser.lastMessage : 'Nog geen berichten' %>
+                </div>
+              </div>
+            </a>
+          </li>
+        <% }) %>
       </ul>
+    </section>
   </main>
-  
   <footer>
     <%- include('../partials/bottom-nav'); %>
   </footer>
-
 </body>
 </html>
