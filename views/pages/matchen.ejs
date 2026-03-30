@@ -43,14 +43,17 @@
           <section>
             <h2>Interesse</h2>
             <ul class="hobbies">
-              <% let interestsList=[] if (Array.isArray(matchUser.interests)) { interestsList=matchUser.interests } else
-                if (typeof matchUser.interests==='string' ) { interestsList=matchUser.interests.split(',') } %>
-
-                <% interestsList.forEach(interesse=> { %>
-                  <li class="hobby">
-                    <%= interesse.trim() %>
-                  </li>
-                  <% }) %>
+              <%
+                let interestsList = [];
+                if (Array.isArray(matchUser.interests)) {
+                  interestsList = matchUser.interests;
+                } else if (typeof matchUser.interests === 'string') {
+                  interestsList = matchUser.interests.split(',');
+                }
+              %>
+              <% interestsList.forEach(interesse => { %>
+                <li class="hobby"><%= interesse.trim() %></li>
+              <% }) %>
             </ul>
           </section>
 

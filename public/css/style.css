@@ -86,7 +86,7 @@ textarea {
 
 main {
   padding-bottom: 5rem;
-  margin: 0.5rem;
+  margin: var(--space-side)
 }
 
 h1 {font-size: 2.25rem;}
@@ -196,7 +196,7 @@ button {
 .reizen {
   width: 100%;
   display: grid;
-  gap: 2rem;
+  gap: 1rem;
 }
 .reizen a {
   width: 100%;
