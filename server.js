@@ -26,7 +26,7 @@ const storage = multer.diskStorage({
     cb(null, Date.now() + ext)
   }
 })
-const upload = multer({ storage: storage })
+const upload = multer({ storage })
 
 
 // =======================
@@ -45,12 +45,12 @@ const io = socketIo(server)
 const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}/${process.env.DB_NAME}?retryWrites=true&w=majority`
 
 
-const MongoStore = require('connect-mongo').default
+const mongoStore = require('connect-mongo').default
 const sessionMiddleware = session({
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
-  store: MongoStore.create({ mongoUrl: uri })
+  store: mongoStore.create({ mongoUrl: uri })
 })
 
 app
@@ -58,7 +58,7 @@ app
   .use(express.static('public'))
   .set('view engine', 'ejs')
   .use(sessionMiddleware)
-  .use('/uploads', express.static(path.join(__dirname, 'uploads')));
+  .use('/uploads', express.static(path.join(__dirname, 'uploads')))
 
 io.engine.use(sessionMiddleware)
 
@@ -88,7 +88,7 @@ app.use((req, res, next) => {
 // xss sanitizing middleware
 app.use((req, res, next) => {
   if (req.body) {
-    for (let key in req.body) {
+    for (const key in req.body) {
       if (typeof req.body[key] === 'string') {
         req.body[key] = xss(req.body[key])
       }
@@ -150,18 +150,17 @@ function registerGetRoutes() {
         new Date(a.startDate) - new Date(b.startDate)
       )
 
-      const today = new Date();
-      const birthDate = new Date(req.session.user.birthday);
-      let age = today.getFullYear() - birthDate.getFullYear();
-      const month = today.getMonth() - birthDate.getMonth();
-      if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) age--;
+      const today = new Date()
+      const birthDate = new Date(req.session.user.birthday)
+      let age = today.getFullYear() - birthDate.getFullYear()
+      const month = today.getMonth() - birthDate.getMonth()
+      if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) age--
 
       res.render('pages/profile', {
         user: req.session.user,
-        alleReizen: alleReizen,
-        age: age
+        alleReizen,
+        age
       })
-
     } catch (err) {
       console.error(err)
       res.status(500).send('Fout bij ophalen van jouw reizen')
@@ -280,7 +279,7 @@ app.get('/matchen', async (req, res) => {
 })
 
   app.get('/matchen/reset', (req, res) => {
-  req.session.gezien = [];
+  req.session.gezien = []
   res.redirect('/matchen')
 })
 
@@ -299,26 +298,24 @@ app.get('/logout', (req, res) => {
   //Huidge route naar filter menu + werkende continent filter 
   app.get('/filter', async (req, res) => {
     try {
-      const db = client.db(process.env.DB_NAME);
-      const usersCollection = db.collection('users');
-      const discoverCollection = db.collection('discover');
-      const reizen = await discoverCollection.find({}).toArray();
+      const db = client.db(process.env.DB_NAME)
+      const usersCollection = db.collection('users')
+      const discoverCollection = db.collection('discover')
+      const reizen = await discoverCollection.find({}).toArray()
       const resultaat = []; for (const reis of reizen) {
-
-        //voor elke reis in de lijst reizen doe dit: 
         const user = await usersCollection.findOne({
-          _id: reis.userId //vind een reis 
+          _id: reis.userId
         })
-        resultaat.push({ //pusht deze data in die lege array genaamd resultaat 
-          reis: reis, 
-          user: user
+        resultaat.push({ 
+          reis, 
+          user
         })
       }
 
       res.render('pages/filter', {
-        reizen: resultaat //reizen = de array van de collection en resultaat is de array die ik heb gemaakt 
+        reizen: resultaat 
       })
-    } catch (err) { console.error(err); res.status(500).send("Fout bij ophalen data"); }
+    } catch (err) { console.error(err); res.status(500).send("Fout bij ophalen data") }
   })
 
   app.get('/chatroom', async (req, res) => {
@@ -560,16 +557,15 @@ function registerPostRoutes() {
     { name: 'image1', maxCount: 1 },
     { name: 'image2', maxCount: 1 },
     { name: 'image3', maxCount: 1 },
-  ]), async (req, res) => {
- 
+  ]), async (req, res) => { 
   const { name, lastName, email, password, birthday,
     tel, gender, status, bio, interests, opzoek
   } = req.body
  
-  const profileImg = req.files['profileImg'] ? req.files['profileImg'][0].filename : null
-  const image1 = req.files['image1'] ? req.files['image1'][0].filename : null
-  const image2 = req.files['image2'] ? req.files['image2'][0].filename : null
-  const image3 = req.files['image3'] ? req.files['image3'][0].filename : null
+  const profileImg = req.files.profileImg ? req.files.profileImg[0].filename : null
+  const image1 = req.files.image1 ? req.files.image1[0].filename : null
+  const image2 = req.files.image2 ? req.files.image2[0].filename : null
+  const image3 = req.files.image3 ? req.files.image3[0].filename : null
  
   const interestsArray = Array.isArray(interests)
     ? interests
@@ -828,7 +824,7 @@ function registerSocketHandlers() {
       await messages.insertOne({
         conversationId: roomName,
         fromUserId: myUserId,
-        toUserId: toUserId,
+        toUserId,
         fromName: user.name,
         text: cleanText,
         createdAt: new Date()
@@ -893,8 +889,7 @@ function registerErrorHandlers() {
     })
   })
 
-  // error handler
-  app.use(function (err, req, res) {
+  app.use((err, req, res, _next) => {
     console.error(err.stack)
     res.status(500).send('500: server error')
   })
