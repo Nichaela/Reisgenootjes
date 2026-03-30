@@ -105,10 +105,6 @@ function registerGetRoutes() {
     res.render('pages/index', { data: null })
   })
 
-  app.get('/welkom', (req, res) => {
-    res.render('pages/welkom', { error: null })
-  })
-
   app.get('/login', (req, res) => {
     res.render('pages/login', { error: null })
   })
@@ -197,7 +193,7 @@ function registerGetRoutes() {
   })
 
   app.get('/create-post', (req, res) => {
-    if (!req.session.user) return res.redirect('/welkom')
+    if (!req.session.user) return res.redirect('/')
     res.render('pages/create-post', { user: req.session.user })
   })
 
@@ -295,11 +291,11 @@ app.get('/logout', (req, res) => {
   req.session.destroy((err) => {
     if (err) {
       console.error(err)
-      return res.redirect('/discover')
+      return res.redirect('/')
     }
 
     res.clearCookie('connect.sid')
-    res.redirect('/welkom')
+    res.redirect('/')
   })
 })
 
@@ -326,6 +322,62 @@ app.get('/logout', (req, res) => {
         reizen: resultaat //reizen = de array van de collection en resultaat is de array die ik heb gemaakt 
       })
     } catch (err) { console.error(err); res.status(500).send("Fout bij ophalen data"); }
+  })
+
+   app.get('/chatroom', async (req, res) => {
+    if (!req.session.user) return res.redirect('/login')
+
+    try {
+      const allUsers = await users.find().toArray()
+      const otherUsers = allUsers.filter(otherUser =>
+        otherUser._id.toString() !== req.session.user._id.toString()
+      )
+
+      res.render('pages/chatroom', {
+        user: req.session.user,
+        users: otherUsers
+      })
+    } catch (err) {
+      console.error(err)
+      res.status(500).send('Fout bij ophalen van chatroom')
+    }
+  })
+    
+  app.get('/chat-channel/:userId', async (req, res) => {
+    if (!req.session.user) return res.redirect('/login')
+
+    try {
+      const chatPartnerId = req.params.userId
+      const myUserId = req.session.user._id.toString()
+
+      const chatPartner = await users.findOne({ _id: new ObjectId(chatPartnerId) })
+
+      if (!chatPartner) {
+        return res.status(404).render('pages/errorstate', {
+          status: 404,
+          message: 'Gebruiker niet gevonden'
+        })
+      }
+
+      const conversationId = getConversationRoom(myUserId, chatPartnerId)
+
+      const conversationHistory = await messages
+        .find({ conversationId })
+        .sort({ createdAt: 1 })
+        .toArray()
+
+      res.render('pages/chat-channel', {
+        user: req.session.user,
+        chatPartner: {
+          _id: chatPartner._id.toString(),
+          name: chatPartner.name
+        },
+        conversationHistory
+      })
+    } catch (err) {
+      console.error(err)
+      res.status(500).send('Fout bij ophalen van chatkanaal')
+    }
   })
 }
 
@@ -692,64 +744,7 @@ function registerPostRoutes() {
     console.error('Fout in /likes:', err)
     return res.status(500).send('Fout bij verwerken van like')
   }
-})
-
-  app.get('/chatroom', async (req, res) => {
-    if (!req.session.user) return res.redirect('/login')
-
-    try {
-      const allUsers = await users.find().toArray()
-      const otherUsers = allUsers.filter(otherUser =>
-        otherUser._id.toString() !== req.session.user._id.toString()
-      )
-
-      res.render('pages/chatroom', {
-        user: req.session.user,
-        users: otherUsers
-      })
-    } catch (err) {
-      console.error(err)
-      res.status(500).send('Fout bij ophalen van chatroom')
-    }
-  })
-    
-  app.get('/chat-channel/:userId', async (req, res) => {
-    if (!req.session.user) return res.redirect('/login')
-
-    try {
-      const chatPartnerId = req.params.userId
-      const myUserId = req.session.user._id.toString()
-
-      const chatPartner = await users.findOne({ _id: new ObjectId(chatPartnerId) })
-
-      if (!chatPartner) {
-        return res.status(404).render('pages/errorstate', {
-          status: 404,
-          message: 'Gebruiker niet gevonden'
-        })
-      }
-
-      const conversationId = getConversationRoom(myUserId, chatPartnerId)
-
-      const conversationHistory = await messages
-        .find({ conversationId })
-        .sort({ createdAt: 1 })
-        .toArray()
-
-      res.render('pages/chat-channel', {
-        user: req.session.user,
-        chatPartner: {
-          _id: chatPartner._id.toString(),
-          name: chatPartner.name
-        },
-        conversationHistory
-      })
-    } catch (err) {
-      console.error(err)
-      res.status(500).send('Fout bij ophalen van chatkanaal')
-    }
-  })
-  
+})  
 }
 
 // =======================
