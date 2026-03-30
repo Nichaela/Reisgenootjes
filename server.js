@@ -224,65 +224,72 @@ function registerGetRoutes() {
   })
 
 
-app.get('/matchen', async (req, res) => {
-  if (!req.session.user) return res.redirect('/login')
-
+  app.get('/matchen', async (req, res) => {
+    if (!req.session.user) return res.redirect('/login')
+  
     try {
       if (!req.session.gezien) req.session.gezien = []
-
+  
       const mijnId = new ObjectId(req.session.user._id)
-      const voorkeur = req.session.genderPreference
-      const query = {
-        _id: {
-          $ne: mijnId,
-          $nin: req.session.gezien.map(id => new ObjectId(id))
-        }
+  
+  
+      const voorkeur = req.session.genderPreference //er wordt gekeken of er een filter is geselecteerd
+  
+  const query = {
+    _id: {
+      $ne: mijnId,
+      $nin: req.session.gezien.map(id => new ObjectId(id))
     }
-
-    if (voorkeur) {
-      query.gender = voorkeur
-    }
-
-    const matchUser = await users.findOne(query)
-
-    if (!matchUser) {
+  }
+  
+  // als er voorkeur is opgegeven dan: voeg aan query de voorkeur toe
+  if (voorkeur) {
+    query.gender = voorkeur
+  }
+  
+  const matchUser = await users.findOne(query)
+  
+      if (!matchUser) {
+        return res.render('pages/matchen', {
+          user: req.session.user,
+          post: null,
+          matchUser: null,
+          age: null
+        })
+      }
+  
+      const post = await discover.findOne({
+        userId: matchUser._id
+      })
+  
+      const today = new Date()
+      const birthDate = new Date(matchUser.birthday)
+      let age = today.getFullYear() - birthDate.getFullYear()
+      const month = today.getMonth() - birthDate.getMonth()
+  
+      if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) {
+        age--
+      }
+  
       return res.render('pages/matchen', {
         user: req.session.user,
-        post: null,
-        matchUser: null,
-        age: null
+        post,
+        matchUser,
+        age
       })
+    } catch (err) {
+      console.error('Fout in /matchen:', err)
+      return res.status(500).send('Fout bij laden van matchen')
     }
-
-    const post = await discover.findOne({
-      userId: matchUser._id
-    })
-
-    const today = new Date()
-    const birthDate = new Date(matchUser.birthday)
-    let age = today.getFullYear() - birthDate.getFullYear()
-    const month = today.getMonth() - birthDate.getMonth()
-
-    if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) {
-      age--
-    }
-
-    return res.render('pages/matchen', {
-      user: req.session.user,
-      post,
-      matchUser,
-      age
-    })
-  } catch (err) {
-    console.error('Fout in /matchen:', err)
-    return res.status(500).send('Fout bij laden van matchen')
-  }
-})
+  }) 
+  
 
   app.get('/matchen/reset', (req, res) => {
-  req.session.gezien = [];
-  res.redirect('/matchen')
-})
+    req.session.gezien = [];
+    req.session.genderPreference = null 
+    res.redirect('/matchen')
+  })
+  
 
 
 app.get('/logout', (req, res) => {
@@ -741,7 +748,14 @@ function registerPostRoutes() {
     console.error('Fout in /likes:', err)
     return res.status(500).send('Fout bij verwerken van like')
     }
-  })  
+  }) 
+  
+  app.post('/set-preference', (req, res) => {
+    req.session.genderPreference = req.body.genderPreference
+    req.session.gezien = [] // optioneel: reset matches bij nieuwe filter
+    res.redirect('/matchen')
+  })
+  
 }
 
 // =======================
