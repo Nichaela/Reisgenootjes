@@ -21,6 +21,7 @@
   --space-gap: 2rem;
   --space-gap-s: 1rem;
   --space-gap-xs: .5rem;
+  --space-gap-xxs: .25rem;
 
   --border-radius: .3rem;
 }
@@ -90,7 +91,9 @@ main {
   margin: var(--space-side)
 }
 
-h1 {font-size: 2.25rem;}
+h1 {
+  font-size: 2.25rem;
+}
 
 h2 {
   font-family: 'indie-flower';

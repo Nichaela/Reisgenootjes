@@ -12,6 +12,10 @@
     }
 }
 
+#chatroom-page h2 {
+    margin-bottom: .5em;
+}
+
 #chat-channel-page {
     height: 100vh;
     overflow: hidden;
@@ -27,7 +31,7 @@
     gap: 1em;
     margin-bottom: 2em;
     overflow-x: auto;
-    
+
     a {
         display: flex;
         flex-direction: column;
@@ -37,10 +41,12 @@
 }
 
 .chat-list-item  {
-   margin-bottom: 2em;
+    padding: 1em 0;
+   border-bottom: 1px solid #e0e0e0;
    a {
     display: flex;
     flex-direction: row;
+    gap: 2em;
    }
 }
 
@@ -50,8 +56,8 @@
 }
 
 .profile-pic-wrapper { 
-    width: 100px;
-    height: 100px;
+    width: 4em;
+    height: 4em;
     border-radius: 100%; 
     overflow: hidden; 
     display: flex; 

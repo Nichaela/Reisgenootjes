@@ -51,7 +51,6 @@ const sessionMiddleware = session({
   resave: false,
   saveUninitialized: false,
   store: MongoStore.create({ mongoUrl: uri })
-
 })
 
 app
@@ -195,12 +194,12 @@ function registerGetRoutes() {
   })
 
   app.get('/create-post', (req, res) => {
-    if (!req.session.user) return res.redirect('/login')
+    if (!req.session.user) return res.redirect('/')
     res.render('pages/create-post', { user: req.session.user })
   })
 
-    app.get('/post/:id', async (req, res) => {
-     try {
+  app.get('/post/:id', async (req, res) => {
+    try {
       const post = await discover.findOne({
               _id: new ObjectId(req.params.id),
       })
@@ -228,27 +227,23 @@ function registerGetRoutes() {
 app.get('/matchen', async (req, res) => {
   if (!req.session.user) return res.redirect('/login')
 
-  try {
-    if (!req.session.gezien) req.session.gezien = []
+    try {
+      if (!req.session.gezien) req.session.gezien = []
 
-    const mijnId = new ObjectId(req.session.user._id)
+      const mijnId = new ObjectId(req.session.user._id)
+      const voorkeur = req.session.genderPreference
+      const query = {
+        _id: {
+          $ne: mijnId,
+          $nin: req.session.gezien.map(id => new ObjectId(id))
+        }
+    }
 
+    if (voorkeur) {
+      query.gender = voorkeur
+    }
 
-    const voorkeur = req.session.genderPreference //er wordt gekeken of er een filter is geselecteerd
-
-const query = {
-  _id: {
-    $ne: mijnId,
-    $nin: req.session.gezien.map(id => new ObjectId(id))
-  }
-}
-
-// als er voorkeur is opgegeven dan: voeg aan query de voorkeur toe
-if (voorkeur) {
-  query.gender = voorkeur
-}
-
-const matchUser = await users.findOne(query)
+    const matchUser = await users.findOne(query)
 
     if (!matchUser) {
       return res.render('pages/matchen', {
@@ -286,7 +281,6 @@ const matchUser = await users.findOne(query)
 
   app.get('/matchen/reset', (req, res) => {
   req.session.gezien = [];
-  req.session.genderPreference = null 
   res.redirect('/matchen')
 })
 
@@ -297,7 +291,6 @@ app.get('/logout', (req, res) => {
       console.error(err)
       return res.redirect('/')
     }
-
     res.clearCookie('connect.sid')
     res.redirect('/')
   })
@@ -328,18 +321,37 @@ app.get('/logout', (req, res) => {
     } catch (err) { console.error(err); res.status(500).send("Fout bij ophalen data"); }
   })
 
-   app.get('/chatroom', async (req, res) => {
+  app.get('/chatroom', async (req, res) => {
     if (!req.session.user) return res.redirect('/login')
 
     try {
-      const allUsers = await users.find().toArray()
-      const otherUsers = allUsers.filter(otherUser =>
-        otherUser._id.toString() !== req.session.user._id.toString()
-      )
+      const mijnId = req.session.user._id.toString()
+
+      const ingelogdeUser = await users.findOne({
+        _id: new ObjectId(req.session.user._id)
+      })
+
+      if (!ingelogdeUser) {
+        return res.status(404).send('Gebruiker niet gevonden')
+      }
+
+      const mijnLikes = ingelogdeUser.likes || []
+
+      if (mijnLikes.length === 0) {
+        return res.render('pages/chatroom', {
+          user: req.session.user,
+          users: []
+        })
+      }
+
+      const matchedUsers = await users.find({
+        _id: { $in: mijnLikes.map(id => new ObjectId(id)) },
+        likes: mijnId
+      }).toArray()
 
       res.render('pages/chatroom', {
         user: req.session.user,
-        users: otherUsers
+        users: matchedUsers
       })
     } catch (err) {
       console.error(err)
@@ -384,7 +396,6 @@ app.get('/logout', (req, res) => {
     }
   })
 }
-
 
 // =======================
 // POST ROUTES
@@ -610,11 +621,6 @@ function registerPostRoutes() {
   return res.redirect('/discover')
 })
  
-//gender voorkeur bij matchen, realtime update
-app.post('/set-preference', (req, res) => {
-  req.session.genderPreference = req.body.genderPreference
-  res.redirect('/matchen')
-})
 
   // create-post formulier
   app.post('/post', upload.single('postCoverImg'), async (req, res) => {
@@ -720,11 +726,16 @@ app.post('/set-preference', (req, res) => {
   try {
     const matchedUserId = req.body.matchedUser
     const actie = req.body.actie
+    const genderPreference = req.body.genderPreference
 
     if (!req.session.gezien) req.session.gezien = []
 
     if (matchedUserId && !req.session.gezien.includes(matchedUserId)) {
       req.session.gezien.push(matchedUserId)
+    }
+
+    if (genderPreference) {
+      req.session.genderPreference = genderPreference
     }
 
     if (actie === 'like') {
@@ -748,8 +759,8 @@ app.post('/set-preference', (req, res) => {
   } catch (err) {
     console.error('Fout in /likes:', err)
     return res.status(500).send('Fout bij verwerken van like')
-  }
-})  
+    }
+  })  
 }
 
 // =======================
