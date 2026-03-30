@@ -22,8 +22,14 @@ document.querySelectorAll(".multi-step-form").forEach(form => {
         input.reportValidity() // browser toont foutmelding
       }
     })
+    
+  // Extra custom validatie indien aanwezig
+  if (allValid && typeof window.customStepValidation === "function") {
+  allValid = window.customStepValidation(form, index)
+  }
 
-    return allValid
+  return allValid
+  
   }
 
   // Volgende knop

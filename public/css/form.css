@@ -191,7 +191,6 @@ button:disabled {
   position: relative;
   display: inline-block;
   width: 100%;
-  margin-bottom: 1em;
 }
 
 .password-wrapper input {
@@ -214,3 +213,9 @@ button:disabled {
   height: 24px;
 }
 
+/* small styling voor error melding */
+small{
+  color: var(--clr-primary);
+  font-size: 0.8rem;
+  margin-top: var(--space-gap-xs);
+}

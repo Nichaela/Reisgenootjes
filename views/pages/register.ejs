@@ -31,31 +31,31 @@
           <p>Hier iets van tekst nog</p>
           <h2>Account aanmaken</h2>
 
-          <label for="name">Voornaam</label>
+          <label for="name">Voornaam <span class="required">*</span> </label>
           <input type="text" id="name" name="name" placeholder="Je voornaam" required>
 
-          <label for="lastName">Achternaam</label>
+          <label for="lastName">Achternaam <span class="required">*</span> </label>
           <input type="text" id="lastName" name="lastName" placeholder="Je achternaam" required>
 
-          <label for="email">Email</label>
+          <label for="email">Email <span class="required">*</span> </label>
           <input type="email" id="email" name="email" placeholder="mail@mail.com" required>
-          <small id="emailError" class="email-error"></small>
+          <small id="emailError"></small>
 
           <div class="password-wrapper">
-            <label for="password">Wachtwoord</label>
+            <label for="password">Wachtwoord <span class="required">*</span> </label>
             <input type="password" id="password" name="password" placeholder="Wachtwoord" required minlength="8">
             <span class="toggle-password" onclick="togglePassword('password', this)">
-              <img src="img/Eye.svg" alt="Toon wachtwoord" class="eye-icon">
+              <img src="img/Eyeclose.svg" alt="Toon wachtwoord" class="eye-icon">
             </span>
           </div>
 
           <div class="password-wrapper">
-            <label for="confirmPassword">Herhaal wachtwoord</label>
+            <label for="confirmPassword">Herhaal wachtwoord <span class="required">*</span> </label>
             <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Herhaal wachtwoord" required>
             <span class="toggle-password" onclick="togglePassword('confirmPassword', this)">
-              <img src="img/Eye.svg" alt="Toon wachtwoord" class="eye-icon">
+              <img src="img/Eyeclose.svg" alt="Toon wachtwoord" class="eye-icon">
             </span>
-            <small id="passwordError" class="password-error"></small>
+            <small id="passwordError"></small>
           </div>
 
           <button type="button" class="gradient-btn" data-next>Volgende</button>
@@ -80,13 +80,13 @@
           <p>Hier iets van tekst nog</p>
           <h2>Persoonlijke gegevens</h2>
 
-          <label for="birthday">Verjaardag</label>
+          <label for="birthday">Verjaardag <span class="required">*</span> </label>
           <input type="date" id="birthday" name="birthday" required>
 
           <label for="tel">Telefoon</label>
           <input type="tel" id="tel" name="tel" placeholder="(06) 1234567890">
 
-          <label for="gender">Gender</label>
+          <label for="gender">Gender <span class="required">*</span> </label>
           <select id="gender" name="gender" required>
             <option value="" disabled selected hidden>Kies je gender</option>
             <option value="man">Man</option>
@@ -116,23 +116,24 @@
           <p>Hier iets van tekst nog</p>
           <h2>Profiel</h2>
 
-          <input type="file" id="profileImg" name="profileImg" accept="image/*">
+          <label for="profileImg">Profiel Afbeeldingen <span class="required">*</span> </label>
+          <input type="file" id="profileImg" name="profileImg" accept="image/*" required>
           <input type="file" id="image1" name="image1" accept="image/*">
           <input type="file" id="image2" name="image2" accept="image/*">
           <input type="file" id="image3" name="image3" accept="image/*">
 
-          <label for="status">Status</label>
+          <label for="status">Status <span class="required">*</span></label>
           <select id="status" name="status" required>
             <option value="" disabled selected hidden>Kies je status</option>
             <option value="opzoek">Op zoek naar reisgenootje</option>
             <option value="niet-opzoek">Niet op zoek</option>
           </select>
 
-          <label for="bio">Bio</label>
-          <input type="text" id="bio" name="bio" placeholder="Schrijf hier een bio">
+          <label for="bio">Bio <span class="required">*</span> </label>
+          <input type="text" id="bio" name="bio" placeholder="Schrijf hier een bio" required>
 
-          <label for="opzoek">Op zoek naar</label>
-          <input type="text" id="opzoek" name="opzoek" placeholder="Naar wie ben je op zoek">
+          <label for="opzoek">Op zoek naar <span class="required">*</span></label>
+          <input type="text" id="opzoek" name="opzoek" placeholder="Naar wie ben je op zoek" required>
 
           <button type="button" class="gradient-btn" data-next>Volgende</button>
         </section>
