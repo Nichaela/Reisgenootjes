@@ -126,16 +126,6 @@ continentButtons.forEach(btn => {
   });
 });
 
-
-// =======================
-// Datum & dagen filters
-// =======================
-dateFilter.addEventListener("change", filterItems); // er wordt opnieuw gefilterd als de datum wordt veranderd
-if (daysFilter) {
-  daysFilter.addEventListener("input", filterItems);
-}
-
-
 // =======================
 // Birthday naar leeftijd berekenen
 // =======================
