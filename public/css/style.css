@@ -13,6 +13,7 @@
   --gradient-surface: linear-gradient(180deg, var(--clr-surface) 0%, #F5FCFFB2 60%);
 
   /* spacing */
+  --bottom-nav-height: 5.5rem;
   --space-side: 1.5rem;
   --space-side-s: 1.25rem;
 
@@ -152,14 +153,16 @@ button {
 }
 
 .bottom-nav {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: var(--clr-neutral);
-  border-top: 1px solid rgba(0, 0, 0, 0.1);
-  padding: 0rem 0.5rem;
-  z-index: 10;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: var(--bottom-nav-height);
+    background: var(--clr-neutral);
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 0rem 0.5rem;
+    z-index: 10;
+    box-sizing: border-box;
 }
 
 .bottom-nav ul {
