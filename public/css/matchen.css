@@ -1,29 +1,17 @@
-main {
-  min-height: 100vh;
-  margin: 0.5rem;
-}
 
-section {
-  margin: 1.5rem 0 1.5rem 0;
-}
 
-section h2 {
-  font-family: 'indie-flower';
-  font-size: 1.5rem;
-}
 
 section:nth-of-type(1) {
   position: relative;
 }
 
-  section:nth-of-type(1)::after {
+section:nth-of-type(1)::after {
   content: '';
   position: absolute;
   inset: 0;
   background: linear-gradient(to top, rgba(0, 0, 0, 0.6) 0%, transparent 50%);
   border-radius: 0.5rem;
 }  
-
 
 section:nth-of-type(1) > img:nth-of-type(1) {
   display: block;
@@ -61,19 +49,6 @@ main li img {
   height: 1rem;
 
 }
-
-.hobbies {
-  display: flex;
-  flex-wrap: wrap;
-}
-
-.hobby {
-  border: .05rem solid var(--clr-primary);
-  border-radius: 5rem;
-  padding: 0.5rem;
-  margin: 0.5rem;
-}
-
 
 /* Gallerij voor het profiel*/
 /* Grid gemaakt met gridgenerator */
@@ -124,11 +99,42 @@ section:last-of-type form {
   justify-content: space-between;
 }
 
-
 section:last-of-type button {
   margin-bottom: 5rem;
   padding: 1rem;
   background-color: var(--clr-text);
   border-radius: 4rem;
   border-style: none;
+}
+
+
+/* Filter buttons gender */
+
+.voorkeur-buttons {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-top: 2em;
+}
+
+.voorkeur-buttons input[type="radio"] {
+  display: none;
+}
+
+.voorkeur-buttons label {
+  margin: 0.5em 0;
+  padding: 0.5em .8em;
+  border: .05em solid var(--clr-text);
+  border-radius: 10em;
+  cursor: pointer;
+  font-size: 1em;
+  color: var(--clr-text);
+  transition: all 0.2s ease;
+}
+
+/* geselecteerd */
+.voorkeur-buttons input[type="radio"]:checked + label {
+  background: var(--gradient-primary);
+  color: var(--clr-neutral);
+  border: none;
 }
