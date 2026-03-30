@@ -59,6 +59,7 @@ app
   .use(express.static('public'))
   .set('view engine', 'ejs')
   .use(sessionMiddleware)
+  .use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 io.engine.use(sessionMiddleware)
 
@@ -292,7 +293,7 @@ app.get('/logout', (req, res) => {
   req.session.destroy((err) => {
     if (err) {
       console.error(err)
-      return res.redirect('/discover')
+      return res.redirect('/')
     }
 
     res.clearCookie('connect.sid')
@@ -300,6 +301,86 @@ app.get('/logout', (req, res) => {
   })
 })
 
+  //Huidge route naar filter menu + werkende continent filter 
+  app.get('/filter', async (req, res) => {
+    try {
+      const db = client.db(process.env.DB_NAME);
+      const usersCollection = db.collection('users');
+      const discoverCollection = db.collection('discover');
+      const reizen = await discoverCollection.find({}).toArray();
+      const resultaat = []; for (const reis of reizen) {
+
+        //voor elke reis in de lijst reizen doe dit: 
+        const user = await usersCollection.findOne({
+          _id: reis.userId //vind een reis 
+        })
+        resultaat.push({ //pusht deze data in die lege array genaamd resultaat 
+          reis: reis, 
+          user: user
+        })
+      }
+
+      res.render('pages/filter', {
+        reizen: resultaat //reizen = de array van de collection en resultaat is de array die ik heb gemaakt 
+      })
+    } catch (err) { console.error(err); res.status(500).send("Fout bij ophalen data"); }
+  })
+
+   app.get('/chatroom', async (req, res) => {
+    if (!req.session.user) return res.redirect('/login')
+
+    try {
+      const allUsers = await users.find().toArray()
+      const otherUsers = allUsers.filter(otherUser =>
+        otherUser._id.toString() !== req.session.user._id.toString()
+      )
+
+      res.render('pages/chatroom', {
+        user: req.session.user,
+        users: otherUsers
+      })
+    } catch (err) {
+      console.error(err)
+      res.status(500).send('Fout bij ophalen van chatroom')
+    }
+  })
+    
+  app.get('/chat-channel/:userId', async (req, res) => {
+    if (!req.session.user) return res.redirect('/login')
+
+    try {
+      const chatPartnerId = req.params.userId
+      const myUserId = req.session.user._id.toString()
+
+      const chatPartner = await users.findOne({ _id: new ObjectId(chatPartnerId) })
+
+      if (!chatPartner) {
+        return res.status(404).render('pages/errorstate', {
+          status: 404,
+          message: 'Gebruiker niet gevonden'
+        })
+      }
+
+      const conversationId = getConversationRoom(myUserId, chatPartnerId)
+
+      const conversationHistory = await messages
+        .find({ conversationId })
+        .sort({ createdAt: 1 })
+        .toArray()
+
+      res.render('pages/chat-channel', {
+        user: req.session.user,
+        chatPartner: {
+          _id: chatPartner._id.toString(),
+          name: chatPartner.name
+        },
+        conversationHistory
+      })
+    } catch (err) {
+      console.error(err)
+      res.status(500).send('Fout bij ophalen van chatkanaal')
+    }
+  })
 }
 
 
@@ -666,64 +747,7 @@ function registerPostRoutes() {
     console.error('Fout in /likes:', err)
     return res.status(500).send('Fout bij verwerken van like')
   }
-})
-
-  app.get('/chatroom', async (req, res) => {
-    if (!req.session.user) return res.redirect('/login')
-
-    try {
-      const allUsers = await users.find().toArray()
-      const otherUsers = allUsers.filter(otherUser =>
-        otherUser._id.toString() !== req.session.user._id.toString()
-      )
-
-      res.render('pages/chatroom', {
-        user: req.session.user,
-        users: otherUsers
-      })
-    } catch (err) {
-      console.error(err)
-      res.status(500).send('Fout bij ophalen van chatroom')
-    }
-  })
-    
-  app.get('/chat-channel/:userId', async (req, res) => {
-    if (!req.session.user) return res.redirect('/login')
-
-    try {
-      const chatPartnerId = req.params.userId
-      const myUserId = req.session.user._id.toString()
-
-      const chatPartner = await users.findOne({ _id: new ObjectId(chatPartnerId) })
-
-      if (!chatPartner) {
-        return res.status(404).render('pages/errorstate', {
-          status: 404,
-          message: 'Gebruiker niet gevonden'
-        })
-      }
-
-      const conversationId = getConversationRoom(myUserId, chatPartnerId)
-
-      const conversationHistory = await messages
-        .find({ conversationId })
-        .sort({ createdAt: 1 })
-        .toArray()
-
-      res.render('pages/chat-channel', {
-        user: req.session.user,
-        chatPartner: {
-          _id: chatPartner._id.toString(),
-          name: chatPartner.name
-        },
-        conversationHistory
-      })
-    } catch (err) {
-      console.error(err)
-      res.status(500).send('Fout bij ophalen van chatkanaal')
-    }
-  })
-  
+})  
 }
 
 // =======================
