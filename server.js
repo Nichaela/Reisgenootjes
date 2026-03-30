@@ -58,6 +58,7 @@ app
   .use(express.static('public'))
   .set('view engine', 'ejs')
   .use(sessionMiddleware)
+  .use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 io.engine.use(sessionMiddleware)
 
@@ -663,16 +664,12 @@ function registerPostRoutes() {
 
       // Leeftijd check
       if (post.age && post.age.length > 0) {
-        const birthDate = new Date(req.session.user.birthday)
-        const today = new Date()
-        let userAge = today.getFullYear() - birthDate.getFullYear()
-        const month = today.getMonth() - birthDate.getMonth()
-        if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) userAge--
+        const userAge = req.session.user.age
 
         const ranges = {
-          '18': (age) => age >= 18 && age <= 21,
-          '21': (age) => age >= 21 && age <= 26,
-          '26': (age) => age >= 26 && age <= 30,
+          '18': (age) => age >= 18 && age < 21,
+          '21': (age) => age >= 21 && age < 26,
+          '26': (age) => age >= 26 && age < 30,
           '30': (age) => age >= 30
         }
       

@@ -511,3 +511,12 @@ margin-top: 12em;
   font-size: 1.2em;
 }
 
+.error{
+   display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding-top: 3rem;
+  gap: 1.5rem;
+}
+
