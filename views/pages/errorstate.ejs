@@ -2,23 +2,20 @@
 <html lang="en">
 <head>
   <%- include('../partials/head'); %>
+  <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
   <header>
    
   </header>
 
-  <main>
-
+  <main class="error">
   <h1 class="underline" >Oeps!</h1>
   <p>Heee, De pagina die je zoekt 
 kan niet gevonden worden...!</p>
   <img src="img/404.svg" alt="pagina niet gevonden">
-   <a href="/">Terug naar home</a>
-  <% if (user) { %>
-  <p>Welkom <%= user.name %></p>
-  <% } %> 
 
+   <a class="gradient-btn" href="/">Terug naar home</a>
   </main> 
   
   <footer>
