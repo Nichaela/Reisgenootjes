@@ -51,6 +51,7 @@ const sessionMiddleware = session({
   resave: false,
   saveUninitialized: false,
   store: MongoStore.create({ mongoUrl: uri })
+
 })
 
 app
@@ -194,7 +195,7 @@ function registerGetRoutes() {
   })
 
   app.get('/create-post', (req, res) => {
-    if (!req.session.user) return res.redirect('/')
+    if (!req.session.user) return res.redirect('/login')
     res.render('pages/create-post', { user: req.session.user })
   })
 
@@ -232,7 +233,8 @@ app.get('/matchen', async (req, res) => {
 
     const mijnId = new ObjectId(req.session.user._id)
 
-    const voorkeur = req.session.genderPreference //toegevoegd door annabel
+
+    const voorkeur = req.session.genderPreference //er wordt gekeken of er een filter is geselecteerd
 
 const query = {
   _id: {
@@ -241,7 +243,7 @@ const query = {
   }
 }
 
-// alleen filteren als er een voorkeur is
+// als er voorkeur is opgegeven dan: voeg aan query de voorkeur toe
 if (voorkeur) {
   query.gender = voorkeur
 }
@@ -284,6 +286,7 @@ const matchUser = await users.findOne(query)
 
   app.get('/matchen/reset', (req, res) => {
   req.session.gezien = [];
+  req.session.genderPreference = null 
   res.redirect('/matchen')
 })
 
@@ -381,6 +384,7 @@ app.get('/logout', (req, res) => {
     }
   })
 }
+
 
 // =======================
 // POST ROUTES
@@ -606,6 +610,11 @@ function registerPostRoutes() {
   return res.redirect('/discover')
 })
  
+//gender voorkeur bij matchen, realtime update
+app.post('/set-preference', (req, res) => {
+  req.session.genderPreference = req.body.genderPreference
+  res.redirect('/matchen')
+})
 
   // create-post formulier
   app.post('/post', upload.single('postCoverImg'), async (req, res) => {
@@ -711,16 +720,11 @@ function registerPostRoutes() {
   try {
     const matchedUserId = req.body.matchedUser
     const actie = req.body.actie
-    const genderPreference = req.body.genderPreference
 
     if (!req.session.gezien) req.session.gezien = []
 
     if (matchedUserId && !req.session.gezien.includes(matchedUserId)) {
       req.session.gezien.push(matchedUserId)
-    }
-
-    if (genderPreference) {
-      req.session.genderPreference = genderPreference
     }
 
     if (actie === 'like') {
