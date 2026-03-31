@@ -88,6 +88,32 @@ checkboxes.forEach(box => {
   })
 })
 
+
+
+
+// ==========================================
+// JOIN REIS CHECK MELDING
+// ==========================================
+const joinForm = document.querySelector('form[action*="join"]')
+
+if (joinForm) {
+  joinForm.addEventListener('submit', async (e) => {
+    e.preventDefault()
+
+    const res = await fetch(joinForm.action, {
+      method: 'POST',
+    })
+
+    if (res.ok) {
+      window.location.href = joinForm.action.replace('/join', '')
+    } else {
+      const text = await res.text()
+      alert(text)
+    }
+  })
+}
+
+
 // ==========================================
 // DROPDOWN MENU (leeftijd of opties)
 // ==========================================
