@@ -10,12 +10,26 @@
 <body>
   <main>
     <h1 class="underline">Matchen</h1>
-    <%- include('../partials/filtermenu'); %>
 
       <% if (!matchUser) { %>
         <p>Je hebt iedereen gezien!</p>
         <a href="/matchen/reset">Opnieuw beginnen</a>
         <% } else { %>
+
+          <div class="voorkeur-buttons">
+            <form action="/set-preference" method="POST">
+          
+              <input type="radio" id="man" name="genderPreference" value="man" onchange="this.form.submit()">
+              <label for="man">Man</label>
+          
+              <input type="radio" id="vrouw" name="genderPreference" value="vrouw" onchange="this.form.submit()">
+              <label for="vrouw">Vrouw</label>
+          
+              <input type="radio" id="anders" name="genderPreference" value="anders" onchange="this.form.submit()">
+              <label for="anders">Anders</label>
+          
+            </form>
+          </div>
 
           <section>
             <img src="/uploads/<%= matchUser.profileImg %>" alt="Account foto">
@@ -41,22 +55,22 @@
           </section>
 
           <section>
-            <h2>Interesse</h2>
-            <ul class="hobbies">
-              <%
-                let interestsList = [];
-                if (Array.isArray(matchUser.interests)) {
-                  interestsList = matchUser.interests;
-                } else if (typeof matchUser.interests === 'string') {
-                  interestsList = matchUser.interests.split(',');
-                }
-              %>
-              <% interestsList.forEach(interesse => { %>
-                <li class="hobby"><%= interesse.trim() %></li>
-              <% }) %>
-            </ul>
-          </section>
-
+        <h2>Interesse</h2>
+        <ul class="hobbies">
+          <%
+            let interestsList = [];
+            if (Array.isArray(matchUser.interests)) {
+              interestsList = matchUser.interests;
+            } else if (typeof matchUser.interests === 'string') {
+              interestsList = matchUser.interests.split(',');
+            }
+          %>
+          <% interestsList.forEach(interesse => { %>
+            <li class="hobby"><%= interesse.trim() %></li>
+          <% }) %>
+        </ul>
+      </section>
+      
           <section>
             <h2>Geplande trip</h2>
             <% if (post) { %>
@@ -83,7 +97,7 @@
           </section>
 
           <section>
-            <form action="/likes" method="POST">
+            <form id="likeForm" action="/likes" method="POST">
               <% if (post) { %>
                 <input type="hidden" name="postId" value="<%= post._id %>">
                 <% } %>
@@ -104,7 +118,6 @@
 
   <%- include('../partials/bottom-nav'); %>
 
-    <script defer src="/javascript/filter.js"></script>
 </body>
 
 </html>

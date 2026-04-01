@@ -55,10 +55,8 @@ export default defineConfig([
       "dot-notation": "error"
     }
   },
-  {
-    files: ["**/*.js"],
-    languageOptions: {
-      sourceType: "commonjs"
-    }
-  }
-])
+  {files: ["**/*.js"], languageOptions: { sourceType: "commonjs" }},
+  {rules:{"semi": [ "error", "never" ]}}
+
+
+]);
