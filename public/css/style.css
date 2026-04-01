@@ -374,7 +374,7 @@ svg.line path{
   position: fixed;
   top: var(--space-side-s);
   right: var(--space-side-s);
-  padding: 0.5em 1em;
+  padding: 0.5em 0;
   border: none;
   cursor: pointer;
   border-radius: 4px;
