@@ -1,6 +1,6 @@
 :root {
   /* core colors */
-  --clr-primary: #FC9B5E;
+  --clr-primary: #c1510b;
   --clr-primary-dark: #F9AC72;
   --clr-text: #154159;
   --clr-surface: #E9F8FF;
@@ -490,7 +490,7 @@ margin-top: 12em;
   font-size: 1.2em;
 }
 
-.error{
+#error{
    display: flex;
   flex-direction: column;
   align-items: center;
