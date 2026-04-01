@@ -95,17 +95,6 @@
   font-weight: bold;
 }
 
-.hero-img {
-  position: absolute;
-  top: 0;
-  left: 0; 
-  width: 100%;
-  height: 100%;
-  aspect-ratio: 1/1;
-  object-fit: cover;
-  z-index: 0;
-  background-color: var(--clr-primary-dark);
-}
 
 h2 {
   font-family: 'indie-flower';

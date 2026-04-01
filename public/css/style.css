@@ -317,27 +317,31 @@ svg.line path{
   justify-content: center;
   align-items: center;
 }
+
 .profilecard a {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  text-decoration: none;
 }
+
 .profilecard p:first-of-type {
   color: var(--clr-primary);
   font-size: 1.5rem;
   margin-top: 1rem;
 }
+
 .profilecard img {
   width: 70%;
   aspect-ratio: 1/1;
   object-fit: cover;
   border-radius: 50%;
 }
+
 .profilecard .gradient-btn {
   margin-top: 1rem;
 }
-
 
 /* FILTER & ZOEKEN */
 .filter-menu h2 {
@@ -368,7 +372,6 @@ svg.line path{
   margin-top: -.6em;
 }
 
-
 /* Filter knop */
 .toggleFilter {
   position: fixed;
@@ -379,7 +382,6 @@ svg.line path{
   cursor: pointer;
   border-radius: 4px;
   z-index: 2000;
-
 }
 
 /* Fullscreen menu */
@@ -517,11 +519,11 @@ svg.line path{
 }
 
 #noResults {
-display: flex;
-flex-direction: column;
-align-items: center;
-text-align: center;
-margin-top: 12em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-top: 12em;
 }
 
 #noResults p {
