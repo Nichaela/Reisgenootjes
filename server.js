@@ -26,7 +26,7 @@ const storage = multer.diskStorage({
     cb(null, Date.now() + ext)
   }
 })
-const upload = multer({ storage })
+const upload = multer({ storage: storage })
 
 
 // =======================
@@ -45,12 +45,13 @@ const io = socketIo(server)
 const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}/${process.env.DB_NAME}?retryWrites=true&w=majority`
 
 
-const mongoStore = require('connect-mongo').default
+const MongoStore = require('connect-mongo').default
 const sessionMiddleware = session({
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
-  store: mongoStore.create({ mongoUrl: uri })
+  store: MongoStore.create({ mongoUrl: uri })
+
 })
 
 app
@@ -158,9 +159,10 @@ function registerGetRoutes() {
 
       res.render('pages/profile', {
         user: req.session.user,
-        alleReizen,
-        age
+        alleReizen: alleReizen,
+        age: age
       })
+
     } catch (err) {
       console.error(err)
       res.status(500).send('Fout bij ophalen van jouw reizen')
@@ -193,12 +195,12 @@ function registerGetRoutes() {
   })
 
   app.get('/create-post', (req, res) => {
-    if (!req.session.user) return res.redirect('/')
+    if (!req.session.user) return res.redirect('/login')
     res.render('pages/create-post', { user: req.session.user })
   })
 
-  app.get('/post/:id', async (req, res) => {
-    try {
+    app.get('/post/:id', async (req, res) => {
+     try {
       const post = await discover.findOne({
               _id: new ObjectId(req.params.id),
       })
@@ -226,23 +228,27 @@ function registerGetRoutes() {
 app.get('/matchen', async (req, res) => {
   if (!req.session.user) return res.redirect('/login')
 
-    try {
-      if (!req.session.gezien) req.session.gezien = []
+  try {
+    if (!req.session.gezien) req.session.gezien = []
 
-      const mijnId = new ObjectId(req.session.user._id)
-      const voorkeur = req.session.genderPreference
-      const query = {
-        _id: {
-          $ne: mijnId,
-          $nin: req.session.gezien.map(id => new ObjectId(id))
-        }
-    }
+    const mijnId = new ObjectId(req.session.user._id)
 
-    if (voorkeur) {
-      query.gender = voorkeur
-    }
 
-    const matchUser = await users.findOne(query)
+    const voorkeur = req.session.genderPreference //er wordt gekeken of er een filter is geselecteerd
+
+const query = {
+  _id: {
+    $ne: mijnId,
+    $nin: req.session.gezien.map(id => new ObjectId(id))
+  }
+}
+
+// als er voorkeur is opgegeven dan: voeg aan query de voorkeur toe
+if (voorkeur) {
+  query.gender = voorkeur
+}
+
+const matchUser = await users.findOne(query)
 
     if (!matchUser) {
       return res.render('pages/matchen', {
@@ -280,6 +286,7 @@ app.get('/matchen', async (req, res) => {
 
   app.get('/matchen/reset', (req, res) => {
   req.session.gezien = []
+  req.session.genderPreference = null 
   res.redirect('/matchen')
 })
 
@@ -290,6 +297,7 @@ app.get('/logout', (req, res) => {
       console.error(err)
       return res.redirect('/')
     }
+
     res.clearCookie('connect.sid')
     res.redirect('/')
   })
@@ -302,20 +310,25 @@ app.get('/logout', (req, res) => {
       const usersCollection = db.collection('users')
       const discoverCollection = db.collection('discover')
       const reizen = await discoverCollection.find({}).toArray()
-      const resultaat = []; for (const reis of reizen) {
+      const resultaat = [] 
+      for (const reis of reizen) {
+
+        //voor elke reis in de lijst reizen doe dit: 
         const user = await usersCollection.findOne({
-          _id: reis.userId
+          _id: reis.userId //vind een reis 
         })
-        resultaat.push({ 
+        resultaat.push({ //pusht deze data in die lege array genaamd resultaat 
           reis, 
           user
         })
       }
 
       res.render('pages/filter', {
-        reizen: resultaat 
+        reizen: resultaat //reizen = de array van de collection en resultaat is de array die ik heb gemaakt 
       })
-    } catch (err) { console.error(err); res.status(500).send("Fout bij ophalen data") }
+    } catch (err) { console.error(err)
+        res.status(500).send("Fout bij ophalen data") 
+      }
   })
 
   app.get('/chatroom', async (req, res) => {
@@ -393,6 +406,7 @@ app.get('/logout', (req, res) => {
     }
   })
 }
+
 
 // =======================
 // POST ROUTES
@@ -557,7 +571,8 @@ function registerPostRoutes() {
     { name: 'image1', maxCount: 1 },
     { name: 'image2', maxCount: 1 },
     { name: 'image3', maxCount: 1 },
-  ]), async (req, res) => { 
+  ]), async (req, res) => {
+ 
   const { name, lastName, email, password, birthday,
     tel, gender, status, bio, interests, opzoek
   } = req.body
@@ -569,7 +584,7 @@ function registerPostRoutes() {
  
   const interestsArray = Array.isArray(interests)
     ? interests
-    : (interests ? [interests] : []);
+    : (interests ? [interests] : [])
  
   if (!validator.isEmail(email)) {
     return res.status(400).render('pages/register', { error: 'Ongeldig emailadres' })
@@ -617,6 +632,11 @@ function registerPostRoutes() {
   return res.redirect('/discover')
 })
  
+//gender voorkeur bij matchen, realtime update
+app.post('/set-preference', (req, res) => {
+  req.session.genderPreference = req.body.genderPreference
+  res.redirect('/matchen')
+})
 
   // create-post formulier
   app.post('/post', upload.single('postCoverImg'), async (req, res) => {
@@ -722,16 +742,11 @@ function registerPostRoutes() {
   try {
     const matchedUserId = req.body.matchedUser
     const actie = req.body.actie
-    const genderPreference = req.body.genderPreference
 
     if (!req.session.gezien) req.session.gezien = []
 
     if (matchedUserId && !req.session.gezien.includes(matchedUserId)) {
       req.session.gezien.push(matchedUserId)
-    }
-
-    if (genderPreference) {
-      req.session.genderPreference = genderPreference
     }
 
     if (actie === 'like') {
@@ -755,8 +770,8 @@ function registerPostRoutes() {
   } catch (err) {
     console.error('Fout in /likes:', err)
     return res.status(500).send('Fout bij verwerken van like')
-    }
-  })  
+  }
+})  
 }
 
 // =======================
@@ -889,6 +904,7 @@ function registerErrorHandlers() {
     })
   })
 
+  // error handler
   app.use((err, req, res, _next) => {
     console.error(err.stack)
     res.status(500).send('500: server error')
