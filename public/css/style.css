@@ -1,11 +1,12 @@
 :root {
   /* core colors */
+  color-scheme: light dark;
   --clr-primary: #FC9B5E;
   --clr-primary-dark: #F9AC72;
-  --clr-text: #154159;
+  --clr-text: light-dark(#154159, #fff);
   --clr-surface: #E9F8FF;
-  --clr-neutral: #FFFFFF;
-  --clr-input-text: #BBBBBB;
+  --clr-neutral: light-dark(#fff, #154159);
+  --clr-input-text: #939393;
 
   /* gradients */
   --gradient-primary: linear-gradient(66deg, var(--clr-primary) -12.56%, rgba(249, 172, 114, 0.60) 120.1%);
@@ -79,13 +80,13 @@
 body,
 textarea {
   color: var(--clr-text);
-  background: var(--clr-neutral);
+  background-color: var(--clr-neutral);
   font-family: 'inter';
 }
 
 main {
   padding-bottom: 5rem;
-  margin: 0.5rem;
+  margin: var(--space-side)
 }
 
 h1 {font-size: 2.25rem;}
@@ -98,6 +99,10 @@ h2 {
 h3 {
   font-size: 1em;
   font-weight: 400;
+}
+
+svg{
+  fill: var(--clr-text);
 }
 
 .filter-menu h2 {
@@ -151,6 +156,7 @@ button {
   border-radius: 2rem;
 }
 
+/* bottom nav */
 .bottom-nav {
   position: fixed;
   left: 0;
@@ -175,19 +181,37 @@ button {
   color: var(--clr-text);
   display: flex;
   flex-direction: column;
+  align-items: center;
+}
+
+.bottom-nav svg {
+  order: -1;
+  padding-bottom: .4rem;
+}
+
+.bottom-nav p{
+  font-weight: 200;
+  font-size: .9rem;
 }
 
 .bottom-nav a.active {
   color: var(--clr-primary);
 }
 
-.bottom-nav img {
-  order: -1;
-  /* een idee voor de nav (zodat ze niet enorm worden bij vergroten scherm */
-  /* min-width: 2.5em;
-  max-width: 2.5em; */
+.bottom-nav a.active svg.line path {
+  stroke: var(--clr-primary);
+  fill: none;
 }
 
+.bottom-nav a.active svg{
+  fill: var(--clr-primary);
+}
+
+svg.line path{
+  stroke: var(--clr-text);
+  fill: none;
+  stroke-width: 2;
+}
 
 /* reisoproep */
 .reizen {
@@ -264,7 +288,10 @@ button {
   width: 2rem;
   height: 2rem;
   cursor: pointer;
-  font-size: 1rem;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 /* Hobbies */
@@ -272,11 +299,12 @@ button {
   display: flex;
   flex-wrap: wrap;
 }
+
 .hobby {
   border: .05rem solid var(--clr-primary);
   border-radius: 5rem;
-  padding: 0.5rem;
-  margin: 0.5rem;
+  padding: .4rem .8rem;
+  margin: 0 .8rem .8rem 0;
 }
 
 .profilecard {
@@ -323,10 +351,9 @@ button {
 /* Filter knop */
 .toggleFilter {
   position: fixed;
-  top: 20px;
-  right: 20px;
+  top: var(--space-side-s);
+  right: var(--space-side-s);
   padding: 0.5em 1em;
-  color: white;
   border: none;
   cursor: pointer;
   border-radius: 4px;
@@ -339,9 +366,9 @@ button {
   position: fixed;
   top: 0;
   right: 0;
-  width: 100vw;       /* kan breder als je wilt */
+  width: 100vw;
   height: 100vh;
-  background: white;
+  background: var(--clr-neutral);
   padding: 2em 2em; /* meer padding-top */
   box-sizing: border-box;
   z-index: 1000;
@@ -363,17 +390,11 @@ button {
 /* Close knop linksboven */
 .close-menu {
   position: absolute;
-  top: 20px;
-  right: 20px;
+  top: var(--space-side-s);
+  right: var(--space-side-s);
   cursor: pointer;
   background: none;
   border: none;
-}
-
-.close-menu img {
-  width: 30px;
-  height: auto;
-  margin-top: 1.5em;
 }
 
 /* Filter buttons styling */
@@ -416,7 +437,6 @@ button {
   max-width: 8em;
 }
 
-
 /* Alle labels boven hun input plaatsen */
 .filter-menu label {
   display: block;         /* Zorgt dat label op een nieuwe regel staat */
@@ -437,8 +457,8 @@ button {
   border-radius: .5em;
   border: none;
   background-color: var(--clr-surface);
-  color: var(--clr-input-text);
   max-width: 30em;
+  color: var(--clr-input-text);
 }
 
 .reset-filters {
@@ -456,16 +476,14 @@ button {
   margin-top: 3em;
 }
 
-
-
 /* zoekbalk */
-
 .search input {
   border:solid .1em var(--clr-text);
   border-radius: 2em;
-  padding:7px 14px;
-  margin-bottom:10px;
+  padding: 0.5rem 1rem;
+  margin-bottom: var(--space-gap-xs);
   width: 100%;
+  background-color: var(--clr-neutral);
 }
 
 #searchInput::placeholder {
@@ -494,6 +512,7 @@ margin-top: 12em;
   color: var(--clr-primary);
   font-family: indie flower;
 }
+
 .error{
    display: flex;
   flex-direction: column;
@@ -503,7 +522,13 @@ margin-top: 12em;
   gap: 1.5rem;
 }
 
-.required {
-  color: var(--clr-primary);
-  font-family: indie flower;
+.arrow{
+  transform: rotate(180deg);
+}
+
+.log-out{
+  position: fixed;
+  right: 1.5rem;
+  padding-top: 0.5em;
+  z-index: -2;
 }

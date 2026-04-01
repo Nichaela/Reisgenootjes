@@ -11,8 +11,8 @@ export default defineConfig([
       }
     }
   },
-  {
-    files: ["**/*.js"],
-    languageOptions: { sourceType: "commonjs" }
-  }
+  {files: ["**/*.js"], languageOptions: { sourceType: "commonjs" }},
+  {rules:{"semi": [ "error", "never" ]}}
+
+
 ]);

@@ -58,7 +58,7 @@ app
   .use(express.static('public'))
   .set('view engine', 'ejs')
   .use(sessionMiddleware)
-  .use('/uploads', express.static(path.join(__dirname, 'uploads')));
+  .use('/uploads', express.static(path.join(__dirname, 'uploads')))
 
 io.engine.use(sessionMiddleware)
 
@@ -150,11 +150,11 @@ function registerGetRoutes() {
         new Date(a.startDate) - new Date(b.startDate)
       )
 
-      const today = new Date();
-      const birthDate = new Date(req.session.user.birthday);
-      let age = today.getFullYear() - birthDate.getFullYear();
-      const month = today.getMonth() - birthDate.getMonth();
-      if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) age--;
+      const today = new Date()
+      const birthDate = new Date(req.session.user.birthday)
+      let age = today.getFullYear() - birthDate.getFullYear()
+      const month = today.getMonth() - birthDate.getMonth()
+      if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) age--
 
       res.render('pages/profile', {
         user: req.session.user,
@@ -285,7 +285,7 @@ function registerGetRoutes() {
   
 
   app.get('/matchen/reset', (req, res) => {
-    req.session.gezien = [];
+    req.session.gezien = []
     req.session.genderPreference = null 
     res.redirect('/matchen')
   })
@@ -306,10 +306,10 @@ app.get('/logout', (req, res) => {
   //Huidge route naar filter menu + werkende continent filter 
   app.get('/filter', async (req, res) => {
     try {
-      const db = client.db(process.env.DB_NAME);
-      const usersCollection = db.collection('users');
-      const discoverCollection = db.collection('discover');
-      const reizen = await discoverCollection.find({}).toArray();
+      const db = client.db(process.env.DB_NAME)
+      const usersCollection = db.collection('users')
+      const discoverCollection = db.collection('discover')
+      const reizen = await discoverCollection.find({}).toArray()
       const resultaat = []; for (const reis of reizen) {
 
         //voor elke reis in de lijst reizen doe dit: 
@@ -325,7 +325,7 @@ app.get('/logout', (req, res) => {
       res.render('pages/filter', {
         reizen: resultaat //reizen = de array van de collection en resultaat is de array die ik heb gemaakt 
       })
-    } catch (err) { console.error(err); res.status(500).send("Fout bij ophalen data"); }
+    } catch (err) { console.error(err); res.status(500).send("Fout bij ophalen data") }
   })
 
   app.get('/chatroom', async (req, res) => {
@@ -561,7 +561,7 @@ function registerPostRoutes() {
 
   const interestsArray = Array.isArray(interests)
     ? interests
-    : (interests ? [interests] : []);
+    : (interests ? [interests] : [])
 
   if (!validator.isEmail(email)) {
     return res.status(400).render('pages/register', { error: 'Ongeldig emailadres' })
