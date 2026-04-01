@@ -140,3 +140,16 @@ section:nth-child(2) img {
   object-fit: cover;
   border-radius: 50%;
 }
+
+.more{
+  background-color: var(--clr-primary);
+  color: var(--clr-surface);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  width: 4rem;
+  height: 4rem;
+  font-weight: 800;
+  font-size: 1.2rem;
+}
