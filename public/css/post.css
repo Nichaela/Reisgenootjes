@@ -47,7 +47,7 @@
 }
 
 .hero p:nth-child(2) {
-  font-family: 'indie-flower';
+  font-family: 'inter';
 }
 
 .hero p:nth-child(4) {
@@ -58,7 +58,6 @@
   border-radius: 1rem;
   font-size: .8rem;
 }
-
 
 .hero ul {
   position: absolute;
@@ -108,51 +107,6 @@
   background-color: var(--clr-primary-dark);
 }
 
-/* overlay met gradient */
-.hero::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: var(--gradient-dark);
-  z-index: 1;
-  pointer-events: none;
-}
-
-/* tekst boven overlay */
-.hero p,
-.hero h1,
-.hero ul {
-  position: relative;
-  z-index: 2;
-  color: var(--clr-neutral);
-  margin-left: var(--space-side);
-}
-
-.hero p:nth-child(2) {
-  font-family: 'indie-flower';
-  font-size: 1.5rem;
-}
-
-.hero p:nth-child(4) {
-  background-image: var(--gradient-surface);
-  padding: .5rem 1rem;
-  width: fit-content;
-  color: var(--clr-text);
-  border-radius: 1rem;
-}
-
-
-.hero ul {
-  position: absolute;
-  bottom: -1.5rem;
-  right: var(--space-side);
-  display: flex;
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-
 h2 {
   font-family: 'indie-flower';
   color: var(--clr-primary);
@@ -171,16 +125,16 @@ section:nth-child(2) img {
   width: 100%;
 }
 
-.mederezigers {
+.medereizigers {
   display: flex;
   gap: .5rem;
 }
 
-.mederezigers a {
+.medereizigers a {
   width: 4rem;
 }
 
-.mederezigers a img {
+.medereizigers a img {
   width: 4rem;
   aspect-ratio: 1/1;
   object-fit: cover;
