@@ -312,9 +312,30 @@ svg.line path{
   margin-bottom: var(--space-gap);
   padding: var(--space-gap-xs);
   border-radius: 5px;
-  display: grid;
+  display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
+}
+.profilecard a {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.profilecard p:first-of-type {
+  color: var(--clr-primary);
+  font-size: 1.5rem;
+  margin-top: 1rem;
+}
+.profilecard img {
+  width: 70%;
+  aspect-ratio: 1/1;
+  object-fit: cover;
+  border-radius: 50%;
+}
+.profilecard .gradient-btn {
+  margin-top: 1rem;
 }
 
 

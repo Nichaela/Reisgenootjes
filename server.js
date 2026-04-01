@@ -51,6 +51,7 @@ const sessionMiddleware = session({
   resave: false,
   saveUninitialized: false,
   store: MongoStore.create({ mongoUrl: uri })
+
 })
 
 app
@@ -58,7 +59,7 @@ app
   .use(express.static('public'))
   .set('view engine', 'ejs')
   .use(sessionMiddleware)
-  .use('/uploads', express.static(path.join(__dirname, 'uploads')))
+  .use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 io.engine.use(sessionMiddleware)
 
@@ -120,11 +121,11 @@ function registerGetRoutes() {
       resetToken: req.params.token,
       resetTokenExpiry: { $gt: Date.now() }
     })
-
+  
     if (!user) {
       return res.send('Link is ongeldig of verlopen')
     }
-
+  
     res.render('pages/reset-password', { token: req.params.token })
   })
 
@@ -145,16 +146,16 @@ function registerGetRoutes() {
       const gejoindePosts = await discover.find({
         reizigers: new ObjectId(req.session.user._id)
       }).toArray()
-
+      
       const alleReizen = [...mijnPosts, ...gejoindePosts].sort((a, b) => 
         new Date(a.startDate) - new Date(b.startDate)
       )
 
-      const today = new Date()
-      const birthDate = new Date(req.session.user.birthday)
-      let age = today.getFullYear() - birthDate.getFullYear()
-      const month = today.getMonth() - birthDate.getMonth()
-      if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) age--
+      const today = new Date();
+      const birthDate = new Date(req.session.user.birthday);
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const month = today.getMonth() - birthDate.getMonth();
+      if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) age--;
 
       res.render('pages/profile', {
         user: req.session.user,
@@ -194,12 +195,12 @@ function registerGetRoutes() {
   })
 
   app.get('/create-post', (req, res) => {
-    if (!req.session.user) return res.redirect('/')
+    if (!req.session.user) return res.redirect('/login')
     res.render('pages/create-post', { user: req.session.user })
   })
 
-  app.get('/post/:id', async (req, res) => {
-    try {
+    app.get('/post/:id', async (req, res) => {
+     try {
       const post = await discover.findOne({
               _id: new ObjectId(req.params.id),
       })
@@ -207,9 +208,9 @@ function registerGetRoutes() {
       if (!post) {
         return res.status(404).send('Post niet gevonden')
       }
-
+  
       const postUser = await users.findOne({ _id: post.userId })
-
+  
       // haal alle mederezigers op
       const reizigersIds = post.reizigers || []
       const mederezigers = await users.find({ 
@@ -224,72 +225,70 @@ function registerGetRoutes() {
   })
 
 
-  app.get('/matchen', async (req, res) => {
-    if (!req.session.user) return res.redirect('/login')
-  
-    try {
-      if (!req.session.gezien) req.session.gezien = []
-  
-      const mijnId = new ObjectId(req.session.user._id)
-  
-  
-      const voorkeur = req.session.genderPreference //er wordt gekeken of er een filter is geselecteerd
-  
-  const query = {
-    _id: {
-      $ne: mijnId,
-      $nin: req.session.gezien.map(id => new ObjectId(id))
-    }
+app.get('/matchen', async (req, res) => {
+  if (!req.session.user) return res.redirect('/login')
+
+  try {
+    if (!req.session.gezien) req.session.gezien = []
+
+    const mijnId = new ObjectId(req.session.user._id)
+
+
+    const voorkeur = req.session.genderPreference //er wordt gekeken of er een filter is geselecteerd
+
+const query = {
+  _id: {
+    $ne: mijnId,
+    $nin: req.session.gezien.map(id => new ObjectId(id))
   }
-  
-  // als er voorkeur is opgegeven dan: voeg aan query de voorkeur toe
-  if (voorkeur) {
-    query.gender = voorkeur
-  }
-  
-  const matchUser = await users.findOne(query)
-  
-      if (!matchUser) {
-        return res.render('pages/matchen', {
-          user: req.session.user,
-          post: null,
-          matchUser: null,
-          age: null
-        })
-      }
-  
-      const post = await discover.findOne({
-        userId: matchUser._id
-      })
-  
-      const today = new Date()
-      const birthDate = new Date(matchUser.birthday)
-      let age = today.getFullYear() - birthDate.getFullYear()
-      const month = today.getMonth() - birthDate.getMonth()
-  
-      if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) {
-        age--
-      }
-  
+}
+
+// als er voorkeur is opgegeven dan: voeg aan query de voorkeur toe
+if (voorkeur) {
+  query.gender = voorkeur
+}
+
+const matchUser = await users.findOne(query)
+
+    if (!matchUser) {
       return res.render('pages/matchen', {
         user: req.session.user,
-        post,
-        matchUser,
-        age
+        post: null,
+        matchUser: null,
+        age: null
       })
-    } catch (err) {
-      console.error('Fout in /matchen:', err)
-      return res.status(500).send('Fout bij laden van matchen')
     }
-  }) 
-  
+
+    const post = await discover.findOne({
+      userId: matchUser._id
+    })
+
+    const today = new Date()
+    const birthDate = new Date(matchUser.birthday)
+    let age = today.getFullYear() - birthDate.getFullYear()
+    const month = today.getMonth() - birthDate.getMonth()
+
+    if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) {
+      age--
+    }
+
+    return res.render('pages/matchen', {
+      user: req.session.user,
+      post,
+      matchUser,
+      age
+    })
+  } catch (err) {
+    console.error('Fout in /matchen:', err)
+    return res.status(500).send('Fout bij laden van matchen')
+  }
+})
 
   app.get('/matchen/reset', (req, res) => {
-    req.session.gezien = []
-    req.session.genderPreference = null 
-    res.redirect('/matchen')
-  })
-  
+  req.session.gezien = [];
+  req.session.genderPreference = null 
+  res.redirect('/matchen')
+})
 
 
 app.get('/logout', (req, res) => {
@@ -298,6 +297,7 @@ app.get('/logout', (req, res) => {
       console.error(err)
       return res.redirect('/')
     }
+
     res.clearCookie('connect.sid')
     res.redirect('/')
   })
@@ -306,10 +306,10 @@ app.get('/logout', (req, res) => {
   //Huidge route naar filter menu + werkende continent filter 
   app.get('/filter', async (req, res) => {
     try {
-      const db = client.db(process.env.DB_NAME)
-      const usersCollection = db.collection('users')
-      const discoverCollection = db.collection('discover')
-      const reizen = await discoverCollection.find({}).toArray()
+      const db = client.db(process.env.DB_NAME);
+      const usersCollection = db.collection('users');
+      const discoverCollection = db.collection('discover');
+      const reizen = await discoverCollection.find({}).toArray();
       const resultaat = []; for (const reis of reizen) {
 
         //voor elke reis in de lijst reizen doe dit: 
@@ -325,10 +325,10 @@ app.get('/logout', (req, res) => {
       res.render('pages/filter', {
         reizen: resultaat //reizen = de array van de collection en resultaat is de array die ik heb gemaakt 
       })
-    } catch (err) { console.error(err); res.status(500).send("Fout bij ophalen data") }
+    } catch (err) { console.error(err); res.status(500).send("Fout bij ophalen data"); }
   })
 
-  app.get('/chatroom', async (req, res) => {
+   app.get('/chatroom', async (req, res) => {
     if (!req.session.user) return res.redirect('/login')
 
     try {
@@ -346,7 +346,7 @@ app.get('/logout', (req, res) => {
       res.status(500).send('Fout bij ophalen van chatroom')
     }
   })
-
+    
   app.get('/chat-channel/:userId', async (req, res) => {
     if (!req.session.user) return res.redirect('/login')
 
@@ -384,6 +384,7 @@ app.get('/logout', (req, res) => {
     }
   })
 }
+
 
 // =======================
 // POST ROUTES
@@ -549,20 +550,20 @@ function registerPostRoutes() {
     { name: 'image2', maxCount: 1 },
     { name: 'image3', maxCount: 1 },
   ]), async (req, res) => {
-
+ 
   const { name, lastName, email, password, birthday,
     tel, gender, status, bio, interests, opzoek
   } = req.body
-
+ 
   const profileImg = req.files['profileImg'] ? req.files['profileImg'][0].filename : null
   const image1 = req.files['image1'] ? req.files['image1'][0].filename : null
   const image2 = req.files['image2'] ? req.files['image2'][0].filename : null
   const image3 = req.files['image3'] ? req.files['image3'][0].filename : null
-
+ 
   const interestsArray = Array.isArray(interests)
     ? interests
-    : (interests ? [interests] : [])
-
+    : (interests ? [interests] : []);
+ 
   if (!validator.isEmail(email)) {
     return res.status(400).render('pages/register', { error: 'Ongeldig emailadres' })
   }
@@ -573,9 +574,9 @@ function registerPostRoutes() {
   if (existingUser) {
     return res.status(409).render('pages/register', { error: 'Email bestaat al' })
   }
-
+ 
   const hashedPassword = await bcrypt.hash(password, 10)
-
+ 
   const result = await users.insertOne({
     name,
     lastName,
@@ -593,7 +594,7 @@ function registerPostRoutes() {
     interests: interestsArray,
     opzoek
   })
-
+ 
   const nieuweUser = await users.findOne({ _id: result.insertedId })
   req.session.user = {
     _id: nieuweUser._id,
@@ -608,7 +609,12 @@ function registerPostRoutes() {
   }
   return res.redirect('/discover')
 })
-
+ 
+//gender voorkeur bij matchen, realtime update
+app.post('/set-preference', (req, res) => {
+  req.session.genderPreference = req.body.genderPreference
+  res.redirect('/matchen')
+})
 
   // create-post formulier
   app.post('/post', upload.single('postCoverImg'), async (req, res) => {
@@ -675,9 +681,9 @@ function registerPostRoutes() {
           '26': (age) => age >= 26 && age < 30,
           '30': (age) => age >= 30
         }
-
+      
         const voldoet = post.age.some(min => ranges[min]?.(userAge))
-
+      
         if (!voldoet) {
           return res.status(403).send('Je voldoet niet aan de leeftijdseis voor deze reis')
         }
@@ -714,16 +720,11 @@ function registerPostRoutes() {
   try {
     const matchedUserId = req.body.matchedUser
     const actie = req.body.actie
-    const genderPreference = req.body.genderPreference
 
     if (!req.session.gezien) req.session.gezien = []
 
     if (matchedUserId && !req.session.gezien.includes(matchedUserId)) {
       req.session.gezien.push(matchedUserId)
-    }
-
-    if (genderPreference) {
-      req.session.genderPreference = genderPreference
     }
 
     if (actie === 'like') {
@@ -747,15 +748,8 @@ function registerPostRoutes() {
   } catch (err) {
     console.error('Fout in /likes:', err)
     return res.status(500).send('Fout bij verwerken van like')
-    }
-  }) 
-  
-  app.post('/set-preference', (req, res) => {
-    req.session.genderPreference = req.body.genderPreference
-    req.session.gezien = [] // optioneel: reset matches bij nieuwe filter
-    res.redirect('/matchen')
-  })
-  
+  }
+})  
 }
 
 // =======================
@@ -819,7 +813,7 @@ function registerSocketHandlers() {
       if (!cleanText) return
 
       const roomName = getConversationRoom(myUserId, toUserId)
-
+      
       await messages.insertOne({
         conversationId: roomName,
         fromUserId: myUserId,
@@ -828,7 +822,7 @@ function registerSocketHandlers() {
         text: cleanText,
         createdAt: new Date()
       })
-
+      
       const payloadForReceiver = {
         fromUserId: myUserId,
         fromName: user.name,
@@ -926,4 +920,3 @@ async function start() {
 }
 
 start()
- 
