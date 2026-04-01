@@ -3,7 +3,6 @@
 form {
   display: grid;
   grid-template-rows: auto 1fr;
-  margin: var(--space-side);
   position: relative;
 }
 

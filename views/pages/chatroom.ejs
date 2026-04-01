@@ -9,42 +9,52 @@
     
   </header>
 
-  <main>
+  <main id="chatroom-page">
     <h1 class="underline" >Chatroom</h1>
-    <atricle>
-      <h2>Nieuwe match</h2>
+    <section>
+  <h2>Nieuwe match</h2>
+  <div class="new-match-list">
+    <% if (users && users.length > 0) { %>
       <% users.forEach(otherUser => { %>
         <a href="/chat-channel/<%= otherUser._id %>">
+          <div class="profile-pic-wrapper">
+            <img
+              src="/uploads/<%= otherUser.profileImg %>"
+              alt="<%= otherUser.name %>"
+              class="profile-pic"
+            >
+          </div>
           <%= otherUser.name %>
         </a>
       <% }) %>
-    </article>
-
-    <!-- horizontale lijst met profiel fotos -->
-    <h2>Recente gesprekken</h2>
-     <ul class="chat-list">
-      <% users.forEach(otherUser => { %>
-        <li class="chat-list-item">
-          <a href="/chat-channel/<%= otherUser._id %>">
-            <!-- <img src="<%= otherUser.profilePicture %>" alt="<%= otherUser.name %>" class="chat-profile-pic"> -->
-            <div class="profile-pic-wrapper">
-              <img src="/img/accounts/MarkvanFlied.jpg" class="profile-pic" alt="">
-            </div>
-            <div class="chat-info">
-              <%= otherUser.name %>
-              <div class="last-chat">
-                <%= otherUser.lastMessage ? otherUser.lastMessage : 'Nog geen berichten' %>
+    <% } else { %>
+      <p>Geen nieuwe matches gevonden.</p>
+    <% } %>
+  </div>
+</section>
+    <section>
+      <h2>Recente gesprekken</h2>
+      <ul class="chat-list">
+        <% users.forEach(otherUser => { %>
+          <li class="chat-list-item">
+            <a href="/chat-channel/<%= otherUser._id %>">
+              <div class="profile-pic-wrapper">
+                <img src="/uploads/<%= otherUser.profileImg %>" alt="<%= otherUser.name %>" class="profile-pic" alt="">
               </div>
-             </div>
-          </a>
-        </li>
-      <% }) %>
+              <div class="chat-info">
+                <%= otherUser.name %>
+                <div class="last-chat">
+                  <%= otherUser.lastMessage ? otherUser.lastMessage : 'Nog geen berichten' %>
+                </div>
+              </div>
+            </a>
+          </li>
+        <% }) %>
       </ul>
+    </section>
   </main>
-  
   <footer>
     <%- include('../partials/bottom-nav'); %>
   </footer>
-
 </body>
 </html>
