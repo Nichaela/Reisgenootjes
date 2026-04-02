@@ -159,10 +159,9 @@ function registerGetRoutes() {
 
       res.render('pages/profile', {
         user: req.session.user,
-        alleReizen: alleReizen,
-        age: age
+        alleReizen,
+        age
       })
-
     } catch (err) {
       console.error(err)
       res.status(500).send('Fout bij ophalen van jouw reizen')
@@ -312,7 +311,6 @@ app.get('/logout', (req, res) => {
       const reizen = await discoverCollection.find({}).toArray()
       const resultaat = [] 
       for (const reis of reizen) {
-
         //voor elke reis in de lijst reizen doe dit: 
         const user = await usersCollection.findOne({
           _id: reis.userId //vind een reis 
@@ -572,8 +570,7 @@ function registerPostRoutes() {
     { name: 'image2', maxCount: 1 },
     { name: 'image3', maxCount: 1 },
   ]), async (req, res) => {
- 
-  const { name, lastName, email, password, birthday,
+    const { name, lastName, email, password, birthday,
     tel, gender, status, bio, interests, opzoek
   } = req.body
  
