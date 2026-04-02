@@ -1,5 +1,5 @@
 // ==========================================
-// MULTI-STEP FORM
+// MULTI-STEP FORM (GENERIC)
 // ==========================================
 document.querySelectorAll(".multi-step-form").forEach(form => {
   const steps = form.querySelectorAll(".form-step")
@@ -22,36 +22,20 @@ document.querySelectorAll(".multi-step-form").forEach(form => {
         input.reportValidity() // browser toont foutmelding
       }
     })
-
-    // Password check alleen als de velden ook écht bestaan
-  if (allValid && index === 0) {
-    const password = form.querySelector('input[name="password"]')
-    const confirmPassword = form.querySelector('input[name="confirmPassword"]')
-
-    if (password && confirmPassword) { // ← null-check toegevoegd
-      if (password.value.length < 8) {
-        allValid = false
-        password.setCustomValidity("Wachtwoord moet minimaal 8 tekens bevatten")
-        password.reportValidity()
-        password.setCustomValidity("")
-      }
-
-      if (password.value !== confirmPassword.value) {
-        allValid = false
-        confirmPassword.setCustomValidity("Wachtwoorden komen niet overeen")
-        confirmPassword.reportValidity()
-        confirmPassword.setCustomValidity("")
-      }
-    }
+    
+  // Extra custom validatie indien aanwezig
+  if (allValid && typeof window.customStepValidation === "function") {
+  allValid = window.customStepValidation(form, index)
   }
 
-    return allValid
+  return allValid
+  
   }
 
   // Volgende knop
   form.querySelectorAll("[data-next]").forEach(btn => {
     btn.addEventListener("click", () => {
-      if (!validateStep(currentStep)) return; // stop als niet geldig
+      if (!validateStep(currentStep)) return // stop als validatie niet goed is
       if (currentStep < steps.length - 1) {
         currentStep++
         showStep(currentStep)

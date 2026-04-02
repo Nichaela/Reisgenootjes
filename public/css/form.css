@@ -3,7 +3,6 @@
 form {
   display: grid;
   grid-template-rows: auto 1fr;
-  margin: var(--space-side);
   position: relative;
 }
 
@@ -42,6 +41,10 @@ select {
   padding: var(--space-gap-xs);
 }
 
+input::placeholder{
+  color: var(--clr-input-text);
+}
+
 #birthday{
   background: var(--clr-surface);
 }
@@ -67,6 +70,7 @@ form p:first-of-type {
 }
 
 form h2 {
+  font-family: inter;
   font-weight: 300;
   text-align: center;
   font-size: 1.1rem;
@@ -110,8 +114,6 @@ input.gradient-btn {
   top: 0;
   right: 0;
 }
-
-
 
 /* multipage form */
 .form-step {
@@ -191,7 +193,6 @@ button:disabled {
   position: relative;
   display: inline-block;
   width: 100%;
-  margin-bottom: 1em;
 }
 
 .password-wrapper input {
@@ -214,3 +215,9 @@ button:disabled {
   height: 24px;
 }
 
+/* small styling voor error melding */
+small{
+  color: var(--clr-primary);
+  font-size: 0.8rem;
+  margin-top: var(--space-gap-xs);
+}
