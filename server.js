@@ -47,7 +47,6 @@ const io = socketIo(server)
 // Construct URL used to connect to database from info in the .env file
 const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}/${process.env.DB_NAME}?retryWrites=true&w=majority`
 
-
 const MongoStore = require('connect-mongo').default
 const sessionMiddleware = session({
   secret: process.env.SESSION_SECRET,
@@ -63,13 +62,15 @@ app
   .use(sessionMiddleware)
   .use('/uploads', express.static(path.join(__dirname, 'public/uploads')))
   .use(helmet({
-  contentSecurityPolicy: false,
-  xDownloadOptions: false,
-  strictTransportSecurity: isDevelopment ? false : undefined
+    contentSecurityPolicy: {
+      directives: {
+        'upgrade-insecure-requests': isDevelopment ? null : []
+      }
+    },
+    strictTransportSecurity: isDevelopment ? false : undefined
 }))
 
 io.engine.use(sessionMiddleware)
-
 
 // Create a MongoClient
 const client = new MongoClient(uri, {
