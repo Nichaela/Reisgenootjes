@@ -4,6 +4,7 @@
 require('dotenv').config()
 
 const express = require('express')
+const helmet = require('helmet')
 const session = require('express-session')
 const http = require('http')
 const socketIo = require('socket.io')
@@ -11,6 +12,7 @@ const socketIo = require('socket.io')
 const xss = require('xss')
 const validator = require('validator')
 const bcrypt = require('bcryptjs')
+
 
 const crypto = require('crypto')
 const nodemailer = require('nodemailer')
@@ -33,6 +35,7 @@ const upload = multer({ storage: storage })
 // APP, SERVER SOCKET.IO
 // =======================
 const app = express()
+const isDevelopment = process.env.NODE_ENV === 'development'
 const server = http.createServer(app)
 const io = socketIo(server)
 
@@ -51,7 +54,6 @@ const sessionMiddleware = session({
   resave: false,
   saveUninitialized: false,
   store: MongoStore.create({ mongoUrl: uri })
-
 })
 
 app
@@ -59,7 +61,12 @@ app
   .use(express.static('public'))
   .set('view engine', 'ejs')
   .use(sessionMiddleware)
-  .use('/uploads', express.static(path.join(__dirname, 'uploads')))
+  .use('/uploads', express.static(path.join(__dirname, 'public/uploads')))
+  .use(helmet({
+  contentSecurityPolicy: false,
+  xDownloadOptions: false,
+  strictTransportSecurity: isDevelopment ? false : undefined
+}))
 
 io.engine.use(sessionMiddleware)
 
