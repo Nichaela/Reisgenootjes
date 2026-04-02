@@ -28,7 +28,7 @@ const storage = multer.diskStorage({
     cb(null, Date.now() + ext)
   }
 })
-const upload = multer({ storage: storage })
+const upload = multer({ storage })
 
 
 // =======================
@@ -47,6 +47,7 @@ const io = socketIo(server)
 // Construct URL used to connect to database from info in the .env file
 const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}/${process.env.DB_NAME}?retryWrites=true&w=majority`
 
+// eslint-disable-next-line id-match
 const MongoStore = require('connect-mongo').default
 const sessionMiddleware = session({
   secret: process.env.SESSION_SECRET,
@@ -271,6 +272,7 @@ function registerGetRoutes() {
 
       const postUser = await users.findOne({ _id: post.userId })
 
+      // haal alle mederezigers op
       const reizigersIds = post.reizigers || []
       const mederezigers = await users.find({
         _id: { $in: reizigersIds.map((reizigerId) => toObjectId(reizigerId)) }
@@ -903,7 +905,7 @@ function registerSocketHandlers() {
       if (!cleanText) return
 
       const roomName = getConversationRoom(myUserId, toUserId)
-      
+
       await messages.insertOne({
         conversationId: roomName,
         fromUserId: myUserId,
@@ -912,7 +914,7 @@ function registerSocketHandlers() {
         text: cleanText,
         createdAt: new Date()
       })
-      
+
       const payloadForReceiver = {
         fromUserId: myUserId,
         fromName: user.name,
@@ -1010,3 +1012,4 @@ async function start() {
 }
 
 start()
+ 

@@ -29,7 +29,6 @@ document.querySelectorAll(".multi-step-form").forEach(form => {
   }
 
   return allValid
-  
   }
 
   // Volgende knop
@@ -73,8 +72,6 @@ checkboxes.forEach(box => {
 })
 
 
-
-
 // ==========================================
 // JOIN REIS CHECK MELDING
 // ==========================================
@@ -113,15 +110,26 @@ dropdowns.forEach(dropdown => {
 
 
 // Oogje om wachtwoord zichtbaar te maken
-function togglePassword(fieldId, eyeSpan) {
-  const input = document.getElementById(fieldId)
-  const img = eyeSpan.querySelector('img')
+ 
+const toggles = document.querySelectorAll('.toggle-password')
 
-  if (input.type === 'password') {
-    input.type = 'text'
-    img.src = 'img/Eyeclose.svg' // wissel naar gesloten oog
-  } else {
-    input.type = 'password'
-    img.src = 'img/Eye.svg' // terug naar open oog
-  }
-}
+toggles.forEach(toggle => {
+  toggle.addEventListener('click', function () {
+    const wrapper = this.parentElement
+
+    const input = wrapper.querySelector('input')
+
+    const img = this.querySelector('img')
+
+    if (input.type === 'password') {
+      input.type = 'text'
+
+      img.src = 'img/Eye.svg'
+    } else {
+      input.type = 'password'
+
+      img.src = 'img/Eyeclose.svg'
+    }
+  })
+})
+

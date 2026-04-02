@@ -9,66 +9,75 @@ const toggleButton = document.getElementById("toggleFilter")
 const filterMenu = document.getElementById("filterMenu")
 const closeButton = document.getElementById("closeMenu")
 
-let items; //aanmaken van een variabele
-if (document.querySelectorAll(".reizen li").length > 0) { //zoekt alle list items in de reizen lijst, length controleert of er minstens 1 in de lijst staat
-  items = document.querySelectorAll(".reizen li") // zo ja, items wordt alle list elementen in de lijst reizen
-} else if (document.querySelectorAll(".match-card").length > 0) { //als  er geen reizen lijst is, maar wel minstens 1 match card
-  items = document.querySelectorAll(".match-card") // zo ja, items wordt alle match card elementen
-}
+const items = document.querySelectorAll(".reizen li") // alle list elementen in de lijst reizen
 
 const dateFilter = document.getElementById("dateFilter")
 
 const birthdaySlider = document.getElementById("birthday")
 const birthdayValue = document.getElementById("birthdayValue")
 
-let activeFilters = new Set()      // houdt geselecteerde gender filters bij
-let activeContinents = new Set()   // houdt geselecteerde continenten filters bij
+const activeFilters = new Set()      // houdt geselecteerde gender filters bij
+const activeContinents = new Set()   // houdt geselecteerde continenten filters bij
 
+const resetButton = document.querySelector(".reset-filters")
+const searchInput = document.getElementById("searchInput")
+const noResults = document.getElementById("noResults") // het element voor de boodschap
 
 // ==========================================
-// Open en close menu
+// Open en close filter menu
 // ==========================================
 
 toggleButton.addEventListener("click", () => {
   filterMenu.classList.add("show")
   toggleButton.style.display = "none"
-});
+})
 
 closeButton.addEventListener("click", () => {
   filterMenu.classList.remove("show")
   toggleButton.style.display = "block"
 })
 
-
 // ==========================================
 // Controle van resultaten
 // ==========================================
 
 function checkNoResults() {
-  const allItems = document.querySelectorAll(".reizen li") //alle reizen elementen worden geselecteerd
-  const visibleItems = Array.from(allItems).filter(item => { //er wordt een array gemaakt van de list
+  const visibleItems = Array.from(items).filter(item => { //array van list, controleer wat NIET verborgen is
     return item.style.display !== "none"
   })
 
-  noResults.style.display = visibleItems.length === 0 ? "block" : "none"
+  noResults.style.display = visibleItems.length === 0 ? "block" : "none" //het tonen of verbergen van afbeelding 'noResults'
 }
-
 
 // ==========================================
 // Leeftijd slider
 // ==========================================
 
-if (birthdaySlider && birthdayValue) {
+birthdayValue.textContent = birthdaySlider.value // startwaarde laten zien (18)
 
-  birthdayValue.textContent = birthdaySlider.value // startwaarde laten zien
+birthdaySlider.addEventListener("input", () => {
+  birthdayValue.textContent = birthdaySlider.value // realtime nummer updaten
+  filterItems() // filter meteen updaten bij slider beweging
+})
 
-  birthdaySlider.addEventListener("input", () => {
-    birthdayValue.textContent = birthdaySlider.value // realtime nummer updaten
-    filterItems() // filter meteen updaten bij slider beweging
-  })
+// ==========================================
+// Birthday naar leeftijd
+// ==========================================
 
+function calculateAge(birthday) { // hier staat eigenlijk: calculateAge("12-02-2004")
+  if (!birthday) return null // geen birthday = geen filtering
+  const today = new Date() // geeft de datum van vandaag 
+  const birthDate = new Date(birthday) // maakt van een string een echte datum om mee te rekenen
+
+  let age = today.getFullYear() - birthDate.getFullYear() // age = datumvandaag en jaar - geboortedatum en jaar, niet altijd correct dus:
+  const month = today.getMonth() - birthDate.getMonth() // berekent of verjaardag nog moet komen (negatieve uitkomst = verjaardag moet nog komen)
+
+  if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) {
+    age-- // als verjaardagmaand nog moet komen OF de verjaardagdag moet nog komen, dan wordt er 1 jaar afgetrokken van leeftijd
+  }
+
+  return age // geeft berekende leeftijd terug
 }
-
 
 // ==========================================
 // Filter functie
@@ -76,7 +85,7 @@ if (birthdaySlider && birthdayValue) {
 
 function filterItems() {
   const selectedDate = dateFilter.value //haalt data op uit input
-  const selectedAge = birthdaySlider ? parseInt(birthdaySlider.value) : null
+  const selectedAge = parseInt(birthdaySlider.value) // sliderwaarde gebruiken
 
   items.forEach(item => {
     const gender = item.dataset.gender
@@ -100,9 +109,9 @@ function filterItems() {
       if (itemDate < selected) showItem = false
     }
 
-    // Leeftijd
+    // Leeftijd filter: ±5 jaar marge
     const ageMargin = 5
-    if (selectedAge !== null && (age < selectedAge - ageMargin || age > selectedAge + ageMargin)) {
+    if (age !== null && (age < selectedAge - ageMargin || age > selectedAge + ageMargin)) {
       showItem = false
     }
 
@@ -110,9 +119,7 @@ function filterItems() {
   })
 
   checkNoResults() //laatste check of er resultaten zijn
-
 }
-
 
 // ==========================================
 // Eventlisteners voor de knoppen
@@ -155,31 +162,9 @@ continentButtons.forEach(btn => {
 //Datum
 dateFilter.addEventListener("change", filterItems) // er wordt opnieuw gefilterd als de datum wordt veranderd
 
-
-// ==========================================
-// Birthday naar leeftijd
-// ==========================================
-
-function calculateAge(birthday) { // hier staat eigenlijk: calculateAge("12-02-2004")
-  const today = new Date() // geeft de datum van vandaag 
-  const birthDate = new Date(birthday) // maakt van een string een echte datum om mee te rekenen
-
-  let age = today.getFullYear() - birthDate.getFullYear() // age = datumvandaag en jaar - geboortedatum en jaar, niet altijd correct dus:
-  const month = today.getMonth() - birthDate.getMonth() // berekent of verjaardag nog moet komen (negatieve uitkomst = verjaardag moet nog komen)
-
-  if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) {
-    age--; // als verjaardagmaand nog moet komen OF de verjaardagdag moet nog komen, dan wordt er 1 jaar afgetrokken van leeftijd
-  }
-
-  return age; // geeft berekende leeftijd terug
-}
-
-
 // ==========================================
 // Filter reset + eventlisteners
 // ==========================================
-
-const resetButton = document.querySelector(".reset-filters")
 
 resetButton.addEventListener("click", () => {
   activeFilters.clear()
@@ -189,29 +174,24 @@ resetButton.addEventListener("click", () => {
     btn.classList.remove("active") //Active class verwijderen (style)
   })
 
-  if (dateFilter) dateFilter.value = "" //Datum resetten
+  dateFilter.value = "" //Datum resetten
 
-  if (birthdaySlider) { //Kijkt of leeftijd slider bestaat op de pagina
-    birthdaySlider.value = birthdaySlider.min //zet slider weer op de minimale leeftijd (18)
-    birthdayValue.textContent = birthdaySlider.min//de text boven de slider ook weer naar 18
-  }
+  birthdaySlider.value = birthdaySlider.min //zet slider weer op de minimale leeftijd (18)
+  birthdayValue.textContent = birthdaySlider.min //de text boven de slider ook weer naar 18
 
-  filterItems() //Alles weer zichtbaar maken
+  items.forEach(item => item.style.display = "block") // alles zichtbaar maken bij reset
+
+  checkNoResults() //check of alles zichtbaar is, zodat afbeelding 'noResults' verdwijnt
 })
-
 
 // ==========================================
 // ZOEKBALK (browsen door reizen)
 // ==========================================
 
-const searchInput = document.getElementById("searchInput")
-const reizen = document.querySelectorAll(".reizen li")
-const noResults = document.getElementById("noResults") // het element voor de boodschap
-
 searchInput?.addEventListener("input", (event) => { // is er input door de gebruiker, dan het volgende event
   const zoekTerm = event.target.value.toLowerCase() // gebruiker kan in zowel lower als uppercase typen
 
-  reizen.forEach(li => {
+  items.forEach(li => {
     const titel = li.querySelector(".post-title")?.textContent.toLowerCase() || "" // Haalt de titel op en maakt er kleinletters van OF lege string om fout te voorkomen
     const locatie = li.querySelector(".post-location")?.textContent.toLowerCase() || "" //Hetzelde geldt voor locatie
 
