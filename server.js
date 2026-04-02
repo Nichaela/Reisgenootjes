@@ -572,7 +572,6 @@ function registerPostRoutes() {
     { name: 'image2', maxCount: 1 },
     { name: 'image3', maxCount: 1 },
   ]), async (req, res) => {
- 
   const { name, lastName, email, password, birthday,
     tel, gender, status, bio, interests, opzoek
   } = req.body
