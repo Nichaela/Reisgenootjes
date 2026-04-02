@@ -117,7 +117,7 @@ svg{
 section {
   margin-bottom: 1.5rem;
 }
-F.heading {
+.heading {
   margin-bottom: var(--space-gap-s);
 }
 
@@ -224,15 +224,18 @@ svg.line path{
   display: grid;
   gap: 1rem;
 }
+
 .reizen a {
   width: 100%;
 }
+
 .reisoproep {
   position: relative;
   height: 25vh;
   background-color: var(--clr-primary-dark);
   border-radius: 0.5rem;
 }
+
 .reisoproep::after {
   position: absolute;
   border-radius: 0.5rem;
@@ -242,6 +245,7 @@ svg.line path{
   z-index: 1;
   overflow: hidden;
 }
+
 .reisoproep>img {
   height: 25vh;
   width: 100%;
@@ -250,6 +254,7 @@ svg.line path{
   z-index: -1;
   display: block;
 }
+
 .reisoproep span {
   position: absolute;
   top: 0.75rem;
@@ -322,23 +327,27 @@ svg.line path{
   justify-content: center;
   align-items: center;
 }
+
 .profilecard a {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 }
+
 .profilecard p:first-of-type {
   color: var(--clr-primary);
   font-size: 1.5rem;
   margin-top: 1rem;
 }
+
 .profilecard img {
   width: 70%;
   aspect-ratio: 1/1;
   object-fit: cover;
   border-radius: 50%;
 }
+
 .profilecard .gradient-btn {
   margin-top: 1rem;
 }
