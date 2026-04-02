@@ -9,7 +9,7 @@ const toggleButton = document.getElementById("toggleFilter")
 const filterMenu = document.getElementById("filterMenu")
 const closeButton = document.getElementById("closeMenu")
 
-let items; //aanmaken van een variabele
+let items //aanmaken van een variabele
 if (document.querySelectorAll(".reizen li").length > 0) { //zoekt alle list items in de reizen lijst, length controleert of er minstens 1 in de lijst staat
   items = document.querySelectorAll(".reizen li") // zo ja, items wordt alle list elementen in de lijst reizen
 } else if (document.querySelectorAll(".match-card").length > 0) { //als  er geen reizen lijst is, maar wel minstens 1 match card
@@ -21,8 +21,8 @@ const dateFilter = document.getElementById("dateFilter")
 const birthdaySlider = document.getElementById("birthday")
 const birthdayValue = document.getElementById("birthdayValue")
 
-let activeFilters = new Set()      // houdt geselecteerde gender filters bij
-let activeContinents = new Set()   // houdt geselecteerde continenten filters bij
+const activeFilters = new Set()      // houdt geselecteerde gender filters bij
+const activeContinents = new Set()   // houdt geselecteerde continenten filters bij
 
 
 // ==========================================
@@ -32,7 +32,7 @@ let activeContinents = new Set()   // houdt geselecteerde continenten filters bi
 toggleButton.addEventListener("click", () => {
   filterMenu.classList.add("show")
   toggleButton.style.display = "none"
-});
+})
 
 closeButton.addEventListener("click", () => {
   filterMenu.classList.remove("show")
@@ -59,14 +59,12 @@ function checkNoResults() {
 // ==========================================
 
 if (birthdaySlider && birthdayValue) {
-
   birthdayValue.textContent = birthdaySlider.value // startwaarde laten zien
 
   birthdaySlider.addEventListener("input", () => {
     birthdayValue.textContent = birthdaySlider.value // realtime nummer updaten
     filterItems() // filter meteen updaten bij slider beweging
   })
-
 }
 
 
@@ -110,7 +108,6 @@ function filterItems() {
   })
 
   checkNoResults() //laatste check of er resultaten zijn
-
 }
 
 
@@ -168,10 +165,10 @@ function calculateAge(birthday) { // hier staat eigenlijk: calculateAge("12-02-2
   const month = today.getMonth() - birthDate.getMonth() // berekent of verjaardag nog moet komen (negatieve uitkomst = verjaardag moet nog komen)
 
   if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) {
-    age--; // als verjaardagmaand nog moet komen OF de verjaardagdag moet nog komen, dan wordt er 1 jaar afgetrokken van leeftijd
+    age-- // als verjaardagmaand nog moet komen OF de verjaardagdag moet nog komen, dan wordt er 1 jaar afgetrokken van leeftijd
   }
 
-  return age; // geeft berekende leeftijd terug
+  return age // geeft berekende leeftijd terug
 }
 
 

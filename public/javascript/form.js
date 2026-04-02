@@ -29,7 +29,6 @@ document.querySelectorAll(".multi-step-form").forEach(form => {
   }
 
   return allValid
-  
   }
 
   // Volgende knop
@@ -71,8 +70,6 @@ checkboxes.forEach(box => {
     }
   })
 })
-
-
 
 
 // ==========================================
@@ -117,9 +114,7 @@ dropdowns.forEach(dropdown => {
 const toggles = document.querySelectorAll('.toggle-password')
 
 toggles.forEach(toggle => {
-
   toggle.addEventListener('click', function () {
-
     const wrapper = this.parentElement
 
     const input = wrapper.querySelector('input')
@@ -127,20 +122,14 @@ toggles.forEach(toggle => {
     const img = this.querySelector('img')
 
     if (input.type === 'password') {
-
       input.type = 'text'
 
       img.src = 'img/Eye.svg'
-
     } else {
-
       input.type = 'password'
 
       img.src = 'img/Eyeclose.svg'
-
     }
-
   })
-
 })
 
