@@ -119,15 +119,20 @@ document.addEventListener("DOMContentLoaded", () => {
 })
 
 // Oogje om wachtwoord zichtbaar te maken
-function togglePassword(fieldId, eyeSpan) {
-    const input = document.getElementById(fieldId)
-    const img = eyeSpan.querySelector('img')
-  
+const toggles = document.querySelectorAll('.toggle-password')
+
+toggles.forEach(toggle => {
+  toggle.addEventListener('click', function () {
+    const wrapper = this.parentElement
+    const input = wrapper.querySelector('input')
+    const img = this.querySelector('img')
+
     if (input.type === 'password') {
       input.type = 'text'
-      img.src = 'img/Eye.svg' // wissel naar gesloten oog
+      img.src = 'img/Eye.svg'
     } else {
       input.type = 'password'
-      img.src = 'img/Eyeclose.svg' // terug naar open oog
+      img.src = 'img/Eyeclose.svg'
     }
-  }
+  })
+})
