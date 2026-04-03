@@ -78,10 +78,12 @@
         </section>
 
         <h2>Omschrijving</h2>
-        <p><%= post.description %> </p>
+        <p><%= post.discription %> </p>
 
-        <h2>De route</h2>
-        <!-- <img src="  " alt="route <%= post.title %>"> -->
+        <% if (post.route) { %>
+          <h2>De route</h2>
+          <img src="/uploads/<%= post.route %>" alt="<%= post.title %>" >
+        <% } %>
 
         <h2>Benodigdheden</h2>
         <ul>
