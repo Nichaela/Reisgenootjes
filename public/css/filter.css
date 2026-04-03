@@ -2,6 +2,7 @@
 #birthday {
   width: 100%;
   -webkit-appearance: none;
+  appearance: none;
   background: transparent;
   margin-top: 2em;
 }
@@ -108,7 +109,7 @@
   max-width: 8em;
 }
 
-/* Alle labels boven hun input plaatsen */
+/* Alle labels boven input plaatsen */
 .filter-menu label {
   display: block; 
   margin-top: 1em;        
@@ -117,7 +118,7 @@
   font-size: 1em;
 }
 
-/* Inputs onder hun label */
+/* Inputs onder label */
 .filter-menu input {
   border: solid var(--clr-text) 0.05em;
   display: block;    

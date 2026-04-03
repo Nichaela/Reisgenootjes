@@ -3,7 +3,6 @@
 // ==========================================
 
 // Variabelen
-const filterButtons = document.querySelectorAll(".genders .filter-btn") // Alleen gender knoppen
 const continentButtons = document.querySelectorAll(".continents .filter-btn") // Continent knoppen
 const toggleButton = document.getElementById("toggleFilter")
 const filterMenu = document.getElementById("filterMenu")
@@ -16,7 +15,6 @@ const dateFilter = document.getElementById("dateFilter")
 const birthdaySlider = document.getElementById("birthday")
 const birthdayValue = document.getElementById("birthdayValue")
 
-const activeFilters = new Set()      // houdt geselecteerde gender filters bij
 const activeContinents = new Set()   // houdt geselecteerde continenten filters bij
 
 const resetButton = document.querySelector(".reset-filters")
@@ -87,27 +85,13 @@ function filterItems() {
   const selectedDate = dateFilter.value 
   const selectedAge = parseInt(birthdaySlider.value) 
 
-  // Maak een uniforme set van actieve genders (lowercase + trim)
-  const activeGenders = new Set(Array.from(activeFilters).map(f => f.toLowerCase().trim()))
-
   items.forEach(item => {
-    const gender = item.dataset.gender?.toLowerCase().trim() // "man", "vrouw" of "gemengd"
     const continent = item.dataset.continent?.toLowerCase().trim()
     const date = item.dataset.date
     const itemBirthday = item.dataset.birthday
     const age = calculateAge(itemBirthday)
 
     let showItem = true
-
-    // ----------------------
-    // Gender filter
-    // ----------------------
-    if (activeGenders.size > 0) {
-      // gemengd verschijnt altijd bij man of vrouw filter
-      if (!activeGenders.has(gender) && gender !== "gemengd") {
-        showItem = false
-      }
-    }
 
     // ----------------------
     // Continent filter
@@ -144,23 +128,6 @@ function filterItems() {
 // Eventlisteners voor de knoppen
 // ==========================================
 
-//Gender
-filterButtons.forEach(btn => {
-  btn.addEventListener("click", () => {
-    const filter = btn.dataset.gender?.toLowerCase().trim() // "man" of "vrouw"
-
-    if (activeFilters.has(filter)) {
-      activeFilters.delete(filter) // als filter al actief is -> verwijder filter
-      btn.classList.remove("active") // active class wordt verwijderd
-    } else {
-      activeFilters.add(filter) // filter toevoegen
-      btn.classList.add("active") // krijgt active class
-    }
-
-    filterItems() // opnieuw filteren
-  })
-})
-
 //Continenten
 continentButtons.forEach(btn => {
   btn.addEventListener("click", () => {
@@ -186,7 +153,6 @@ dateFilter.addEventListener("change", filterItems)
 // ==========================================
 
 resetButton.addEventListener("click", () => {
-  activeFilters.clear()
   activeContinents.clear() 
 
   document.querySelectorAll(".filter-btn").forEach(btn => {
