@@ -1,12 +1,8 @@
-.filter-menu h2 {
-  position: absolute;
-  top: 0;
-}
-
-/* Target het input element */
+/* slider */
 #birthday {
   width: 100%;
   -webkit-appearance: none;
+  appearance: none;
   background: transparent;
   margin-top: 2em;
 }
@@ -26,11 +22,11 @@
   margin-top: -0.6em;
 }
 
-/* Filter knop */
+/* Open filter menu knop*/
 .toggleFilter {
-  position: fixed;
-  top: 1.25em;   /* 20px */
-  right: 1.25em; /* 20px */
+  position: absolute;
+  top: 1.25em;
+  right: 1.25em; 
   padding: 0.5em 1em;
   color: white;
   border: none;
@@ -44,7 +40,7 @@
   position: fixed;
   top: 0;
   right: 0;
-  width: 100vw;       /* kan breder als je wilt */
+  width: 100vw;
   height: 100vh;
   background: var(--clr-neutral);
   padding: 2em 2em; /* meer padding-top */
@@ -76,9 +72,9 @@
 }
 
 .close-menu img {
-  width: 1.875em; /* 30px */
+  width: 1.875em;
   height: auto;
-  margin-top: 1.5em;
+  margin-top: 2em;
 }
 
 /* Filter buttons styling */
@@ -99,20 +95,13 @@
   border: none;
 }
 
-/* gender buttons */
-.genders {
-  display: flex;
-  flex-direction: column;
-  margin-top: 5em;
-}
-
-.genders .buttons, .continents .buttons {
+.buttons {
   display: flex;
   gap: 0.5em;
   flex-wrap: wrap;
 }
 
-.genders .buttons .filter-btn, .continents .buttons .filter-btn {
+.buttons .filter-btn, .continents .filter-btn {
   flex: 1 1 20%;      
   text-align: center;    
   padding: 0.5em 1em;     
@@ -120,7 +109,7 @@
   max-width: 8em;
 }
 
-/* Alle labels boven hun input plaatsen */
+/* Alle labels boven input plaatsen */
 .filter-menu label {
   display: block; 
   margin-top: 1em;        
@@ -129,7 +118,7 @@
   font-size: 1em;
 }
 
-/* Inputs onder hun label */
+/* Inputs onder label */
 .filter-menu input {
   border: solid var(--clr-text) 0.05em;
   display: block;    
@@ -162,7 +151,8 @@
   border: solid 0.1em var(--clr-text);
   border-radius: 2em;
   padding: 0.5rem 1rem;
-  margin-bottom: var(--space-gap-xs);
+  margin-top: 1em;
+  margin-bottom: 2em;
   width: 100%;
   background-color: var(--clr-neutral);
 }
@@ -188,4 +178,13 @@
 #noResults p {
   margin-bottom: 2em;
   font-size: 1.2em;
+}
+
+/* witruimte boven filtermenu */
+
+.discover-menu {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-top: 5em;
 }
