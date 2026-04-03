@@ -151,10 +151,6 @@ function getSessionUserIds(req) {
   }
 }
 
-function toObjectIdArray(ids = []) {
-  return ids.map((id) => toObjectId(id))
-}
-
 // =======================
 // MIDDELWARE (ALGEMEEN)
 // =======================
@@ -229,28 +225,28 @@ function registerGetRoutes() {
       console.log('profile/:id aangeroepen met id:', req.params.id)
 
       const profielUser = await users.findOne({ _id: new ObjectId(req.params.id) })
-  
+
       if (!profielUser) {
         return res.status(404).send('Gebruiker niet gevonden')
       }
-  
+
       const mijnPosts = await discover.find({
         userId: new ObjectId(profielUser._id),
       }).toArray()
       const gejoindePosts = await discover.find({
         reizigers: new ObjectId(profielUser._id)
       }).toArray()
-  
+
       const alleReizen = [...mijnPosts, ...gejoindePosts].sort((a, b) =>
         new Date(a.startDate) - new Date(b.startDate)
       )
-  
+
       const today = new Date()
       const birthDate = new Date(profielUser.birthday)
       let age = today.getFullYear() - birthDate.getFullYear()
       const month = today.getMonth() - birthDate.getMonth()
       if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) age--
-  
+
       res.render('pages/profile', {
         user: req.session.user || null,
         profielUser,
@@ -392,7 +388,10 @@ function registerGetRoutes() {
       const age = calculateAge(matchUser.birthday)
 
       return res.render('pages/matchen', {
-        user: req.session.user,
+        user: {
+          ...req.session.user,
+          genderPreference: req.session.genderPreference
+        },
         post,
         matchUser,
         age
@@ -405,7 +404,7 @@ function registerGetRoutes() {
 
   app.get('/matchen/reset', (req, res) => {
     req.session.gezien = []
-    req.session.genderPreference = null 
+    req.session.genderPreference = null
     res.redirect('/matchen')
   })
 
@@ -421,106 +420,79 @@ function registerGetRoutes() {
     })
   })
 
-  //Huidge route naar filter menu + werkende continent filter 
-  app.get('/filter', async (req, res) => {
+  app.get('/chatroom', requireLogin, async (req, res) => {
     try {
-      const db = client.db(process.env.DB_NAME)
-      const usersCollection = db.collection('users')
-      const discoverCollection = db.collection('discover')
-      const reizen = await discoverCollection.find({}).toArray()
-      const resultaat = [] 
-      for (const reis of reizen) {
-        //voor elke reis in de lijst reizen doe dit: 
-        const user = await usersCollection.findOne({
-          _id: reis.userId //vind een reis 
-        })
-        resultaat.push({ //pusht deze data in die lege array genaamd resultaat 
-          reis, 
-          user
-        })
-      }
+      const currentUserId = req.session.user._id.toString()
 
-      res.render('pages/filter', {
-        reizen: resultaat //reizen = de array van de collection en resultaat is de array die ik heb gemaakt 
+      const currentUser = await users.findOne({
+        _id: toObjectId(req.session.user._id)
       })
-    } catch (err) { console.error(err)
-        res.status(500).send("Fout bij ophalen data") 
+
+      if (!currentUser) {
+        return res.status(404).send('Gebruiker niet gevonden')
       }
-  })
 
- app.get('/chatroom', requireLogin, async (req, res) => {
-  try {
-    const currentUserId = req.session.user._id.toString()
+      const likedUserIds = currentUser.likes || []
 
-    const currentUser = await users.findOne({
-      _id: toObjectId(req.session.user._id)
-    })
+      if (likedUserIds.length === 0) {
+        return res.render('pages/chatroom', {
+          user: req.session.user,
+          newMatches: [],
+          recentChats: []
+        })
+      }
 
-    if (!currentUser) {
-      return res.status(404).send('Gebruiker niet gevonden')
-    }
+      const matchedUsers = await users.find({
+        _id: { $in: likedUserIds.map((id) => toObjectId(id)) },
+        likes: currentUserId
+      }).toArray()
+      // chatgptPrompt: sorteer deze lijst van recentChats op basis van de datum van het laatste bericht, zodat de meest recente chats bovenaan staan. Zorg ervoor dat chats zonder berichten onderaan komen te staan.
+      const matchedUsersWithMessages = await Promise.all(
+        matchedUsers.map(async (matchedUser) => {
+          const conversationId = getConversationRoom(
+            currentUserId,
+            matchedUser._id.toString()
+          )
 
-    const likedUserIds = currentUser.likes || []
+          const lastMessage = await messages.findOne(
+            { conversationId },
+            { sort: { createdAt: -1 } }
+          )
 
-    if (likedUserIds.length === 0) {
-      return res.render('pages/chatroom', {
+          return {
+            ...matchedUser,
+            lastMessage: lastMessage ? lastMessage.text : null,
+            lastMessageDate: lastMessage ? lastMessage.createdAt : null
+          }
+        })
+      )
+
+      matchedUsersWithMessages.sort((a, b) => {
+        if (!a.lastMessageDate && !b.lastMessageDate) return 0
+        if (!a.lastMessageDate) return 1
+        if (!b.lastMessageDate) return -1
+        return b.lastMessageDate - a.lastMessageDate
+      })
+
+      const newMatches = matchedUsersWithMessages.filter((matchedUser) =>
+        !matchedUser.lastMessage
+      )
+
+      const recentChats = matchedUsersWithMessages.filter((matchedUser) =>
+        matchedUser.lastMessage
+      )
+
+      res.render('pages/chatroom', {
         user: req.session.user,
-        newMatches: [],
-        recentChats: []
+        newMatches,
+        recentChats
       })
-    }
-
-    const matchedUsers = await users.find({
-      _id: { $in: likedUserIds.map((id) => toObjectId(id)) },
-      likes: currentUserId
-    }).toArray()
-    // chatgptPrompt: sorteer deze lijst van recentChats op basis van de datum van het laatste bericht, zodat de meest recente chats bovenaan staan. Zorg ervoor dat chats zonder berichten onderaan komen te staan.
-    const matchedUsersWithMessages = await Promise.all(
-    matchedUsers.map(async (matchedUser) => {
-      const conversationId = getConversationRoom(
-        currentUserId,
-        matchedUser._id.toString()
-      )
-
-      const lastMessage = await messages.findOne(
-        { conversationId },
-        { sort: { createdAt: -1 } }
-      )
-
-      return {
-        ...matchedUser,
-        lastMessage: lastMessage ? lastMessage.text : null,
-        lastMessageDate: lastMessage ? lastMessage.createdAt : null
-      }
-    })
-  )
-
-  matchedUsersWithMessages.sort((a, b) => {
-    if (!a.lastMessageDate && !b.lastMessageDate) return 0
-    if (!a.lastMessageDate) return 1
-    if (!b.lastMessageDate) return -1
-    return b.lastMessageDate - a.lastMessageDate
-  })
-
-  const newMatches = matchedUsersWithMessages.filter((matchedUser) =>
-    !matchedUser.lastMessage
-  )
-
-  const recentChats = matchedUsersWithMessages.filter((matchedUser) =>
-    matchedUser.lastMessage
-  )
-
-  res.render('pages/chatroom', {
-    user: req.session.user,
-    newMatches,
-    recentChats
-  })
-  } catch (err) {
-    console.error(err)
-    res.status(500).send('Fout bij ophalen van chatroom')
+    } catch (err) {
+      console.error(err)
+      res.status(500).send('Fout bij ophalen van chatroom')
     }
   })
-    
+
   app.get('/chat-channel/:userId', requireLogin, async (req, res) => {
     try {
       const { currentUserIdString } = getSessionUserIds(req)
@@ -556,8 +528,8 @@ function registerGetRoutes() {
         conversationHistory
       })
     } catch (err) {
-        console.error(err)
-        res.status(500).send('Fout bij ophalen van chatkanaal')
+      console.error(err)
+      res.status(500).send('Fout bij ophalen van chatkanaal')
     }
   })
 }
@@ -595,7 +567,7 @@ function registerPostRoutes() {
 
       req.session.user = createSessionUser(user)
 
-      return res.redirect('/discover')
+      return res.redirect('/matchen')
     } catch (err) {
       console.error(err)
       return res.status(500).render('pages/login', {
@@ -792,7 +764,7 @@ function registerPostRoutes() {
 
     return res.redirect('/discover')
   })
- 
+
   //gender voorkeur bij matchen, realtime update
   app.post('/set-preference', (req, res) => {
     req.session.genderPreference = req.body.genderPreference
@@ -834,8 +806,8 @@ function registerPostRoutes() {
         : []
 
       const interestsArray = Array.isArray(req.body.interests)
-      ? req.body.interests
-      : (req.body.interests ? [req.body.interests] : [])
+        ? req.body.interests
+        : (req.body.interests ? [req.body.interests] : [])
 
       const result = await discover.insertOne({
         userId: toObjectId(req.session.user._id),
@@ -1019,10 +991,10 @@ function registerSocketHandlers() {
       console.log(`${user.name} left room: ${roomName}`)
     })
 
-    socket.on('private message', async({ toUserId, text }) => {
+    socket.on('private message', async ({ toUserId, text }) => {
       if (!toUserId || !text) return
 
-      const cleanText = xss(String(text).trim()) 
+      const cleanText = xss(String(text).trim())
       if (!cleanText) return
 
       const roomName = getConversationRoom(myUserId, toUserId)
@@ -1133,4 +1105,3 @@ async function start() {
 }
 
 start()
- 
