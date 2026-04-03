@@ -677,13 +677,17 @@ app.post('/set-preference', (req, res) => {
 })
 
   // create-post formulier
-  app.post('/post', upload.single('postCoverImg'), async (req, res) => {
+  app.post('/post', upload.fields([
+    { name: 'postCoverImg', maxCount: 1 },
+    { name: 'route', maxCount: 1 },
+  ]), async (req, res) => {
     try {
       if (!req.session.user) return res.redirect('/login')
 
       const { title, startDate, endDate, location, continent, persons, discription, gender } = req.body
 
-      const postCoverImg = req.file ? req.file.filename : null
+      const postCoverImg = req.files.postCoverImg ? req.files.postCoverImg[0].filename : null
+      const route = req.files.route ? req.files.route[0].filename : null
 
       let age = req.body.age
       if (!Array.isArray(age)) {
@@ -693,6 +697,10 @@ app.post('/set-preference', (req, res) => {
       const supplies = req.body.supplies
         ? req.body.supplies.split('\n').map(item => item.trim()).filter(Boolean)
         : []
+
+      const interestsArray = Array.isArray(req.body.interests)
+      ? req.body.interests
+      : (req.body.interests ? [req.body.interests] : [])
 
       const result = await discover.insertOne({
         userId: new ObjectId(req.session.user._id),
@@ -704,9 +712,11 @@ app.post('/set-preference', (req, res) => {
         continent,
         persons: Number(persons),
         discription,
+        route,
         supplies,
         age,
-        gender
+        gender,
+        interests: interestsArray
       })
 
       return res.redirect(`/post/${result.insertedId}`)
