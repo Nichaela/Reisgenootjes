@@ -9,7 +9,6 @@
 
   <main>
 
-    <!-- multer toevoegen voor fotos -->
     <form method="POST" action="/post" class="multi-step-form" enctype="multipart/form-data">
       <h1 class="underline" >Maak je reis</h1> 
 
@@ -30,23 +29,24 @@
         <h2>Algemene informatie</h2>
 
         <!-- cover foto -->
-        <label for="postCoverImg"></label>
-        <input type="file" name="postCoverImg" accept="image/*">
+        <label for="postCoverImg"> <span class="required">*</span></label>
+        <input type="file" name="postCoverImg" accept="image/*" required />
          
 
-        <label>Titel</label>
-        <input type="text" placeholder="Titel van de reis"  name="title"/>
+        <label for="title">Titel <span class="required">*</span></label>
+        <input type="text" placeholder="Titel van de reis"  name="title" required>
 
-        <label>Datum</label>
+        <label for="date">Datum <span class="required" required>*</span></label>
         <div>
           <input type="date" placeholder="Van" name="startDate" />
           <input type="date" placeholder="Tot" name="endDate" />
         </div>
 
-        <label>Locatie</label>
+        <label for="location">Locatie <span class="required" required>*</span></label>
         <input type="text" placeholder="Locatie" name="location" />
-        <label>Continent</label>
-        <select name="continent" id="continent">
+
+        <label for="continent">Continent <span class="required">*</span></label>
+        <select name="continent" id="continent" required>
           <option value="" disabled selected>Kies een optie</option>
           <option value="europa">Europa</option>
           <option value="azie">Azie</option>
@@ -55,8 +55,8 @@
           <option value="afrika">Afrika</option>
         </select>
 
-        <label>Hoeveel personen</label>
-        <input type="number" placeholder="personen" name="persons" />
+        <label for="persons">Hoeveel personen <span class="required">*</span></label>
+        <input type="number" placeholder="personen" name="persons" required />
 
         <button type="button" class="gradient-btn" data-next>Volgende</button>
       </section>
@@ -78,17 +78,17 @@
         <p>Vertel wat meer over de reis</p>
         <h2>Details over de reis</h2>
 
-        <label>Korte omschrijving</label>
+        <label for="description">Korte omschrijving <span class="required">*</span></label>
         <input type="text" placeholder="Omschrijving van de reis" name="description" />
 
         <!-- route foto -->
 
-        <label>Benodigdheden</label>
+        <label for="supplies">Benodigdheden</label>
         <textarea name="supplies" placeholder="Wat heb je nodig voor deze reis? (druk Enter voor nieuw item)"></textarea>
 
         <!-- iput type welke???? -->
-        <label>Leeftijd categorie</label>
-          <select name="age[]" id="age" multiple>
+        <label for="age">Leeftijd categorie <span class="required">*</span></label>
+          <select name="age[]" id="age" multiple required>
             <option value="" disabled selected>Kies een optie</option>
             <option value="18">18 - 21</option>
             <option value="21">21 - 26</option>
@@ -98,8 +98,8 @@
           
 
         <!-- met css nog aanpassen als je klikt!!!!!! -->
-        <label for="gender">Gender</label>
-        <select name="gender" id="gender">
+        <label for="gender">Gender <span class="required">*</span></label>
+        <select name="gender" id="gender" required>
           <option value="" disabled selected>Kies een optie</option>
           <option value="man">Alleen man</option>
           <option value="vrouw">Alleen vrouw</option>
@@ -127,77 +127,77 @@
         <h2>Wat voor soort reis is het?</h2>
 
         <div class="options">
-          <label class="option">
+          <label for="interests" class="option">
             <input type="checkbox" name="interests" value="Backpacken">
             <span>Backpacken</span>
           </label>
 
-          <label class="option">
+          <label for="interests" class="option">
             <input type="checkbox" name="interests" value="Kanoën">
             <span>Kanoën</span>
           </label>
 
-          <label class="option">
+          <label for="interests" class="option">
             <input type="checkbox" name="interests" value="Zeilen">
             <span>Zeilen</span>
           </label>
 
-          <label class="option">
+          <label for="interests" class="option">
             <input type="checkbox" name="interests" value="Auto">
             <span>Auto</span>
           </label>
 
-          <label class="option">
+          <label for="interests" class="option">
             <input type="checkbox" name="interests" value="Trein">
             <span>Trein</span>
           </label>
 
-          <label class="option">
+          <label for="interests" class="option">
             <input type="checkbox" name="interests" value="Huttentocht">
             <span>Huttentocht</span>
           </label>
 
-          <label class="option">
+          <label for="interests" class="option">
             <input type="checkbox" name="interests" value="Kamperen">
             <span>Kamperen</span>
           </label>
 
-          <label class="option">
+          <label for="interests" class="option">
             <input type="checkbox" name="interests" value="Stedentrip">
             <span>Stedentrip</span>
           </label>
 
-          <label class="option">
+          <label for="interests" class="option">
             <input type="checkbox" name="interests" value="Liften">
             <span>Liften</span>
           </label>
 
-          <label class="option">
+          <label for="interests" class="option">
             <input type="checkbox" name="interests" value="Fietsen">
             <span>Fietsen</span>
           </label>
 
-          <label class="option">
+          <label for="interests" class="option">
             <input type="checkbox" name="interests" value="Camper">
             <span>Camper</span>
           </label>
 
-          <label class="option">
+          <label for="interests" class="option">
             <input type="checkbox" name="interests" value="Roadtrip">
             <span>Roadtrip</span>
           </label>
 
-          <label class="option">
+          <label for="interests" class="option">
             <input type="checkbox" name="interests" value="Duiken">
             <span>Duiken</span>
           </label>
 
-          <label class="option">
+          <label for="interests" class="option">
             <input type="checkbox" name="interests" value="Hiken">
             <span>Hiken</span>
           </label>
 
-          <label class="option">
+          <label for="interests" class="option">
             <input type="checkbox" name="interests" value="Zuipen">
             <span>Zuipen</span>
           </label>
@@ -206,10 +206,6 @@
         <input class="gradient-btn" type="submit" value="Volgende">
       </section>
     </form>
-
-    
-
-
 
   </main>
 

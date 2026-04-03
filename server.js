@@ -134,12 +134,52 @@ function registerGetRoutes() {
     res.render('pages/register', { error: null })
   })
 
+
+  // profiel van iemand anders
+  app.get('/profile/:id', async (req, res) => {
+    try {
+      console.log('profile/:id aangeroepen met id:', req.params.id)
+
+      const profielUser = await users.findOne({ _id: new ObjectId(req.params.id) })
+  
+      if (!profielUser) {
+        return res.status(404).send('Gebruiker niet gevonden')
+      }
+  
+      const mijnPosts = await discover.find({
+        userId: new ObjectId(profielUser._id),
+      }).toArray()
+      const gejoindePosts = await discover.find({
+        reizigers: new ObjectId(profielUser._id)
+      }).toArray()
+  
+      const alleReizen = [...mijnPosts, ...gejoindePosts].sort((a, b) =>
+        new Date(a.startDate) - new Date(b.startDate)
+      )
+  
+      const today = new Date()
+      const birthDate = new Date(profielUser.birthday)
+      let age = today.getFullYear() - birthDate.getFullYear()
+      const month = today.getMonth() - birthDate.getMonth()
+      if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) age--
+  
+      res.render('pages/profile', {
+        user: req.session.user || null,
+        profielUser,
+        alleReizen,
+        age
+      })
+    } catch (err) {
+      console.error(err)
+      res.status(500).send('Fout bij laden van profiel')
+    }
+  })
+
+  //eigen profiel
   app.get('/profile', async (req, res) => {
     if (!req.session.user) return res.redirect('/login')
 
     try {
-      const { ObjectId } = require('mongodb')
-
       // haal de gemaakte en gejoinde reizen van de gebruiker op
       const mijnPosts = await discover.find({
         userId: new ObjectId(req.session.user._id),
@@ -693,7 +733,11 @@ app.post('/set-preference', (req, res) => {
 
       // Leeftijd check
       if (post.age && post.age.length > 0) {
-        const userAge = req.session.user.age
+        const birthDate = new Date(req.session.user.birthday)
+        const today = new Date()
+        let userAge = today.getFullYear() - birthDate.getFullYear()
+        const month = today.getMonth() - birthDate.getMonth()
+        if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) userAge--
 
         const ranges = {
           '18': (age) => age >= 18 && age < 21,
