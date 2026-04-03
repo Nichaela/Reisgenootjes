@@ -243,8 +243,7 @@ const query = {
   }
 }
 
-// als er voorkeur is opgegeven dan: voeg aan query de voorkeur toe
-if (voorkeur) {
+if (voorkeur) { // als er voorkeur is opgegeven dan: voeg aan query de voorkeur toe
   query.gender = voorkeur
 }
 
@@ -302,33 +301,6 @@ app.get('/logout', (req, res) => {
     res.redirect('/')
   })
 })
-
-  //Huidge route naar filter menu + werkende continent filter 
-  app.get('/filter', async (req, res) => {
-    try {
-      const db = client.db(process.env.DB_NAME)
-      const usersCollection = db.collection('users')
-      const discoverCollection = db.collection('discover')
-      const reizen = await discoverCollection.find({}).toArray()
-      const resultaat = [] 
-      for (const reis of reizen) {
-        //voor elke reis in de lijst reizen doe dit: 
-        const user = await usersCollection.findOne({
-          _id: reis.userId //vind een reis 
-        })
-        resultaat.push({ //pusht deze data in die lege array genaamd resultaat 
-          reis, 
-          user
-        })
-      }
-
-      res.render('pages/filter', {
-        reizen: resultaat //reizen = de array van de collection en resultaat is de array die ik heb gemaakt 
-      })
-    } catch (err) { console.error(err)
-        res.status(500).send("Fout bij ophalen data") 
-      }
-  })
 
   app.get('/chatroom', async (req, res) => {
     if (!req.session.user) return res.redirect('/login')
@@ -448,7 +420,7 @@ function registerPostRoutes() {
         opzoek: user.opzoek
       }
 
-      return res.redirect('/discover')
+      return res.redirect('/matchen')
     } catch (err) {
       console.error(err)
       return res.status(500).render('pages/login', { error: 'Er ging iets mis bij inloggen' })
@@ -627,7 +599,7 @@ function registerPostRoutes() {
     interests: nieuweUser.interests,
     opzoek: nieuweUser.opzoek
   }
-  return res.redirect('/discover')
+  return res.redirect('/matchen')
 })
 
 //gender voorkeur bij matchen, realtime update
