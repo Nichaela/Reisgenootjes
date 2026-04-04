@@ -1,5 +1,6 @@
 :root {
   /* core colors */
+  color-scheme: light dark;
   --clr-primary: #c1510b;
   --clr-primary-dark: #F9AC72;
   --clr-text: light-dark(#154159, #fff);
