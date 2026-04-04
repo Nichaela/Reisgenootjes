@@ -110,24 +110,27 @@ dropdowns.forEach(dropdown => {
 
 
 // Oogje om wachtwoord zichtbaar te maken
-function togglePassword(fieldId, eyeSpan) {
-  const input = document.getElementById(fieldId)
-  const img = eyeSpan.querySelector('img')
-
-  if (input.type === 'password') {
-    input.type = 'text'
-    img.src = 'img/Eyeclose.svg' // wissel naar gesloten oog
-  } else {
-    input.type = 'password'
-    img.src = 'img/Eye.svg' // terug naar open oog
-  }
-}
+const toggles = document.querySelectorAll('.toggle-password')
+toggles.forEach(toggle => {
+  toggle.addEventListener('click', function () {
+    const wrapper = this.parentElement
+    const input = wrapper.querySelector('input')
+    const img = this.querySelector('img')
+    if (input.type === 'password') {
+      input.type = 'text'
+      img.src = 'img/Eye.svg'
+    } else {
+      input.type = 'password'
+      img.src = 'img/Eyeclose.svg'
+    }
+  })
+})
 
 // form textarea auto-resize
 const textareas = document.querySelectorAll(".form-textarea")
 
 textareas.forEach(textarea => {
-    textarea.addEventListener("input", function () {
+    textarea.addEventListener("input", () => {
         textarea.style.height = "auto"
         textarea.style.height = textarea.scrollHeight + "px"
     })

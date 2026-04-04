@@ -30,50 +30,10 @@ window.customStepValidation = function (form, index) {
 }
 
 // ==============================
-// INIT REGISTRATIE FORM
+// INIT NA LADEN VAN DE PAGINA
 // ==============================
 document.addEventListener("DOMContentLoaded", () => {
-
-    const form = document.querySelector(".multi-step-form")
-    if (!form) return // Stop als geen form aanwezig
-
-    const steps = form.querySelectorAll(".form-step")
-    let currentStep = 0
-
-    // ==============================
-    // FUNCTIE: Toon huidige stap
-    // ==============================
-    function showStep(index) {
-        steps.forEach(step => step.classList.remove("form-active"))
-        steps[index].classList.add("form-active")
-    }
-
-    // ==============================
-    // FUNCTIE: Validatie van stap
-    // ==============================
-    function validateStep(index) {
-        const step = steps[index]
-        const inputs = step.querySelectorAll("input[required], select[required], textarea[required]")
-        let allValid = true
-
-        inputs.forEach(input => {
-            if (!input.checkValidity()) {
-                allValid = false;
-                input.reportValidity();
-            }
-        });
-
-        // Extra custom validatie indien aanwezig
-        if (allValid && typeof window.customStepValidation === "function") {
-            allValid = window.customStepValidation(form, index)
-        }
-
-        return allValid
-    }
-
-    // ==============================
-    // LIVE PASSWORD CHECK
-    // ==============================
+    // LIVE WACHTWOORD CHECK
     const passwordInput = document.getElementById("password")
     const confirmPasswordInput = document.getElementById("confirmPassword")
     const passwordError = document.getElementById("passwordError")
@@ -86,6 +46,11 @@ document.addEventListener("DOMContentLoaded", () => {
             return
         }
 
+        if (passwordInput.value.length < 8) {
+            passwordError.textContent = "Wachtwoord moet minimaal 8 tekens bevatten"
+            return
+        }
+
         passwordError.textContent =
             passwordInput.value !== confirmPasswordInput.value
                 ? "Wachtwoorden komen niet overeen"
@@ -95,9 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
     passwordInput?.addEventListener("input", checkPasswordsLive)
     confirmPasswordInput?.addEventListener("input", checkPasswordsLive)
 
-    // ==============================
     // LIVE EMAIL CHECK
-    // ==============================
     const emailInput = document.getElementById("email")
     const emailError = document.getElementById("emailError")
 
@@ -116,41 +79,26 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     emailInput?.addEventListener("input", checkEmailLive)
-})
 
-// Oogje om wachtwoord zichtbaar te maken
-const toggles = document.querySelectorAll('.toggle-password')
+    // AFBEELDING PREVIEW
+    function previewImage(inputId) {
+        const input = document.getElementById(inputId)
+        const preview = document.getElementById("preview-" + inputId)
 
-toggles.forEach(toggle => {
-    toggle.addEventListener('click', function () {
-        const wrapper = this.parentElement
-        const input = wrapper.querySelector('input')
-        const img = this.querySelector('img')
+        if (!input || !preview) return
 
-        if (input.type === 'password') {
-            input.type = 'text'
-            img.src = 'img/Eye.svg'
-        } else {
-            input.type = 'password'
-            img.src = 'img/Eyeclose.svg'
+        if (input.files && input.files[0]) {
+            const reader = new FileReader()
+            reader.onload = function (e) {
+                preview.src = e.target.result
+                preview.hidden = false
+            }
+            reader.readAsDataURL(input.files[0])
         }
-    })
-})
-
-function previewImage(inputId) {
-    const input = document.getElementById(inputId)
-    const preview = document.getElementById('preview-' + inputId)
-
-    if (input.files && input.files[0]) {
-        const reader = new FileReader()
-        reader.onload = function(e) {
-            preview.src = e.target.result
-            preview.hidden = false
-        }
-        reader.readAsDataURL(input.files[0])
     }
-}
 
-['profileImg','image1','image2','image3'].forEach(id => {
-    document.getElementById(id).addEventListener('change', () => previewImage(id))
+    ["profileImg", "image1", "image2", "image3"].forEach(id => {
+        const el = document.getElementById(id)
+        el?.addEventListener("change", () => previewImage(id))
+    })
 })

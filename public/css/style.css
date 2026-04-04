@@ -1,7 +1,6 @@
 :root {
   /* core colors */
-  color-scheme: light dark;
-  --clr-primary: #FC9B5E;
+  --clr-primary: #c1510b;
   --clr-primary-dark: #F9AC72;
   --clr-text: light-dark(#154159, #fff);
   --clr-surface: #E9F8FF;
@@ -31,41 +30,49 @@
   font-family: 'inter';
   src: url(../font/inter/inter-ExtraLight.ttf) format('woff2');
   font-weight: 200;
+   font-display: swap;
 }
 
 @font-face {
   font-family: 'inter';
   src: url(../font/inter/inter-Light.ttf) format('woff2');
   font-weight: 300;
+   font-display: swap;
 }
 
 @font-face {
   font-family: 'inter';
   src: url(../font/inter/inter-Regular.ttf) format('woff2');
   font-weight: 400;
+   font-display: swap;
 }
 
 @font-face {
   font-family: 'inter';
   src: url(../font/inter/inter-Medium.ttf) format('woff2');
   font-weight: 500;
+   font-display: swap;
 }
 
 @font-face {
   font-family: 'inter';
   src: url(../font/inter/inter-SemiBold.ttf) format('woff2');
   font-weight: 600;
+   font-display: swap;
 }
 
 @font-face {
   font-family: 'inter';
   src: url(../font/inter/inter-Bold.ttf) format('woff2');
   font-weight: 700;
+   font-display: swap;
 }
 
 @font-face {
   font-family: 'indie-flower';
   src: url(../font/indie-flower/indieFlower-Regular.ttf) format('woff2');
+  font-weight: 400;
+  font-display: swap;
 }
 
 *,
@@ -112,6 +119,8 @@ svg{
 .filter-menu h2 {
   font-size: 2.25rem;
   font-family: 'inter';
+  color: var(--clr-text);
+  font-weight: 800;
 }
 
 section {
@@ -358,7 +367,7 @@ svg.line path{
   font-family: indie flower;
 }
 
-.error{
+#error{
    display: flex;
   flex-direction: column;
   align-items: center;
