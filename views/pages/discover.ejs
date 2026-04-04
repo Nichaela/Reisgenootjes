@@ -8,17 +8,12 @@
   <body>
     <main>
       <h1 class="underline" >Ontdek</h1>
-      <!-- filterknop -->
-      <!-- onderweg -->
-      <!-- opzoek -->
-
       <%- include('../partials/ontdekfiltermenu') %>
 
       <%- include('../partials/zoekbalk') %>
 
-
   <!-- Nieuw stukje, dat de pagina niet crasht als er geen posts zijn -->
-      <ul class="reizen">
+      <ul class="trips">
         <% if (posts && posts.length > 0) { %>
           <% posts.forEach(post => { %>
             <li
@@ -41,7 +36,7 @@
 
       <div id="noResults" style="display:none;">
         <p>Geen resultaten gevonden</p>
-        <img src="/img/404.svg" alt="">
+        <img src="/img/404.svg" alt="error 404 afbeelding">
       </div>
 
     </main>

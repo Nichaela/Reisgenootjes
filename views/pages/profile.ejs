@@ -55,11 +55,11 @@
             </section>
             <section>
             <h2>Planning</h2>
-            <% if (alleReizen.length===0) { %>
+            <% if (allTrips.length===0) { %>
                 <p>Je hebt nog geen reizen.</p>
                 <% } else { %>
-                    <ul class="reizen">
-                        <% alleReizen.forEach(post=> { %>
+                    <ul class="trips">
+                        <% allTrips.forEach(post=> { %>
                             <li>
                                 <a href="/post/<%= post._id %>">
                                     <%- include('../partials/reisoproep', { post: post }) %>

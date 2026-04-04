@@ -19,14 +19,14 @@
           <div class="voorkeur-buttons">
             <form action="/set-preference" method="POST">
           
-              <input type="radio" id="man" name="genderPreference" value="man" onchange="this.form.submit()">
-              <label for="man">Man</label>
+              <input type="radio" id="male" name="genderPreference" value="male" onchange="this.form.submit()">
+              <label for="male">Man</label>
           
-              <input type="radio" id="vrouw" name="genderPreference" value="vrouw" onchange="this.form.submit()">
-              <label for="vrouw">Vrouw</label>
+              <input type="radio" id="female" name="genderPreference" value="female" onchange="this.form.submit()">
+              <label for="female">Vrouw</label>
           
-              <input type="radio" id="anders" name="genderPreference" value="anders" onchange="this.form.submit()">
-              <label for="anders">Anders</label>
+              <input type="radio" id="other" name="genderPreference" value="other" onchange="this.form.submit()">
+              <label for="other">Anders</label>
           
             </form>
           </div>
@@ -85,7 +85,7 @@
           <section>
             <h2>Op zoek naar:</h2>
             <p>
-              <%= matchUser.opzoek %>
+              <%= matchUser.lookingFor %>
             </p>
           </section>
 
@@ -103,11 +103,11 @@
                 <% } %>
                   <input type="hidden" name="matchedUser" value="<%= matchUser._id %>">
 
-                  <button type="submit" name="actie" value="dislike">
+                  <button type="submit" name="action" value="dislike">
                     <img src="/img/matcheniconen/kruis.svg" alt="Dislike">
                   </button>
 
-                  <button type="submit" name="actie" value="like">
+                  <button type="submit" name="action" value="like">
                     <img src="/img/matcheniconen/Heart.svg" alt="Like">
                   </button>
             </form>

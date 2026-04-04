@@ -6,9 +6,7 @@
 </head>
 
 <body>
-
   <main>
-
     <form method="POST" action="/post" class="multi-step-form" enctype="multipart/form-data">
       <h1 class="underline" >Maak je reis</h1> 
 
@@ -19,10 +17,10 @@
           </svg>
         </a>
 
-        <div class="voortgangsbalk">
-            <div class="voortgangsbalk-active"></div>
-            <div class="voortgangsbalk-inactive"></div>
-            <div class="voortgangsbalk-inactive"></div>
+        <div class="progressbar">
+            <div class="progressbar-active"></div>
+            <div class="progressbar-inactive"></div>
+            <div class="progressbar-inactive"></div>
         </div>
     
         <p>Reis gegevens</p>
@@ -38,12 +36,12 @@
 
         <label for="date">Datum <span class="required" required>*</span></label>
         <div>
-          <input type="date" placeholder="Van" name="startDate" />
-          <input type="date" placeholder="Tot" name="endDate" />
+          <input type="date" placeholder="Van" name="startDate" required />
+          <input type="date" placeholder="Tot" name="endDate" required />
         </div>
 
         <label for="location">Locatie <span class="required" required>*</span></label>
-        <input type="text" placeholder="Locatie" name="location" />
+        <input type="text" placeholder="Locatie" name="location" required />
 
         <label for="continent">Continent <span class="required">*</span></label>
         <select name="continent" id="continent" required>
@@ -68,10 +66,10 @@
           </svg>
         </button>
 
-        <div class="voortgangsbalk">
-            <div class="voortgangsbalk-active"></div>
-            <div class="voortgangsbalk-active"></div>            
-            <div class="voortgangsbalk-inactive"></div>
+        <div class="progressbar">
+            <div class="progressbar-active"></div>
+            <div class="progressbar-active"></div>            
+            <div class="progressbar-inactive"></div>
         </div>
     
 
@@ -99,8 +97,8 @@
         <label for="gender">Gender <span class="required">*</span></label>
         <select name="gender" id="gender" required>
           <option value="" disabled selected>Kies een optie</option>
-          <option value="man">Alleen man</option>
-          <option value="vrouw">Alleen vrouw</option>
+          <option value="male">Alleen man</option>
+          <option value="female">Alleen vrouw</option>
           <option value="gemengd">Gemengd</option>
         </select>
 
@@ -114,10 +112,10 @@
           </svg>
         </button>
 
-        <div class="voortgangsbalk">
-            <div class="voortgangsbalk-active"></div>
-            <div class="voortgangsbalk-active"></div>
-            <div class="voortgangsbalk-active"></div>
+        <div class="progressbar">
+            <div class="progressbar-active"></div>
+            <div class="progressbar-active"></div>
+            <div class="progressbar-active"></div>
         </div>
     
 

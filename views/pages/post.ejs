@@ -33,21 +33,21 @@
         <p><%= post.gender %> | <%= post.age %> jaar</p>
 
         <section>
-          <h2>Mederezigers</h2>
+          <h2>Medereizigers</h2>
         
-          <!-- mederezigers lijst -->
-          <% if (mederezigers.length === 0) { %>
-            <p>Nog geen mederezigers</p>
+          <!-- medereizigers lijst -->
+          <% if (travelBuddies.length === 0) { %>
+            <p>Nog geen medereizigers</p>
           <% } else { %>
-            <ul class="medereizigers">
+            <ul class="travelBuddies"> 
               <% 
                 const maxVisible = 1;
-                const extraCount = mederezigers.length - maxVisible;
-                mederezigers.slice(0, maxVisible).forEach(reiziger => { 
+                const extraCount = travelBuddies.length - maxVisible;
+                travelBuddies.slice(0, maxVisible).forEach(traveller => { 
               %>
                 <li>
-                  <a href="/profile/<%= reiziger._id %>">
-                    <img src="/uploads/<%= reiziger.profileImg %>" alt="<%= reiziger.name %>">
+                  <a href="/profile/<%= traveller._id %>">
+                    <img src="/uploads/<%= traveller.profileImg %>" alt="<%= traveller.name %>">
                   </a>
                 </li>
               <% }) %>
@@ -61,9 +61,9 @@
           
           <!-- JOIN knop -->
           <% if (user && user._id.toString() !== post.userId.toString()) { %>
-            <% const isJoined = post.reizigers && post.reizigers.some(id => id.toString() === user._id.toString()) %>
-            <% const aantalReizigers = post.reizigers ? post.reizigers.length : 0 %>
-            <% const isPlek = aantalReizigers < post.persons %>
+            <% const isJoined = post.travellers && post.travellers.some(id => id.toString() === user._id.toString()) %>
+            <% const aantaltravellers = post.travellers ? post.travellers.length : 0 %>
+            <% const isPlek = aantaltravellers < post.persons %>
         
             <% if (isJoined) { %>
               <p>Je doet al mee aan deze reis!</p>

@@ -85,22 +85,22 @@ input.gradient-btn {
   bottom: var(--space-gap-s);
 }
 
-.voortgangsbalk {
+.progressbar {
   display: flex;
   gap: var(--space-gap-xs);
 }
 
-.voortgangsbalk div {
+.progressbar div {
   height: .3rem;
   width: 100%;
   border-radius: var(--border-radius);
 }
 
-.voortgangsbalk-active {
+.progressbar-active {
   background-color: var(--clr-primary);
 }
 
-.voortgangsbalk-inactive {
+.progressbar-inactive {
   background-color: var(--clr-surface);
 }
 
