@@ -143,6 +143,20 @@ function createSessionUser(user) {
 // =======================
 // MIDDELWARE (ALGEMEEN)
 // =======================
+
+function sanitizeBodyFields(body) {
+  for (const key in body) {
+    if (typeof body[key] === 'string') {
+      body[key] = xss(body[key])
+    } else if (Array.isArray(body[key])) {
+      body[key] = body[key].map((value) =>
+        // chatgpt prompt: sanitize strings in arrays, laat andere waarden ongewijzigd
+        typeof value === 'string' ? xss(value) : value
+      )
+    }
+  }
+}
+
 app.use((req, res, next) => {
   res.locals.user = req.session.user || null
   next()
@@ -151,16 +165,7 @@ app.use((req, res, next) => {
 // xss sanitizing middleware
 app.use((req, res, next) => {
   if (req.body) {
-    for (const key in req.body) {
-      if (typeof req.body[key] === 'string') {
-        req.body[key] = xss(req.body[key])
-      } else if (Array.isArray(req.body[key])) {
-        req.body[key] = req.body[key].map(value =>
-          // chatgpt prompt: sanitize strings in arrays, laat andere waarden ongewijzigd
-          typeof value === 'string' ? xss(value) : value
-        )
-      }
-    }
+    sanitizeBodyFields(req.body)
   }
   next()
 })
@@ -617,6 +622,8 @@ function registerPostRoutes() {
     { name: 'image2', maxCount: 1 },
     { name: 'image3', maxCount: 1 },
   ]), async (req, res) => {
+    sanitizeBodyFields(req.body)
+
     const {
       name,
       lastName,
@@ -697,6 +704,8 @@ function registerPostRoutes() {
   // create-post formulier
   app.post('/post', requireLogin, upload.single('postCoverImg'), async (req, res) => {
     try {
+      sanitizeBodyFields(req.body)
+
       const {
         title,
         startDate,
@@ -739,8 +748,8 @@ function registerPostRoutes() {
 
       return res.redirect(`/post/${result.insertedId}`)
     } catch (err) {
-        console.error(err)
-        return res.status(500).send('Er ging iets mis bij het aanmaken van de post')
+      console.error(err)
+      return res.status(500).send('Er ging iets mis bij het aanmaken van de post')
     }
   })
 
@@ -901,7 +910,7 @@ function registerSocketHandlers() {
     socket.on('private message', async({ toUserId, text }) => {
       if (!toUserId || !text) return
 
-      const cleanText = xss(String(text).trim())
+      const cleanText = xss(String(text).trim()) 
       if (!cleanText) return
 
       const roomName = getConversationRoom(myUserId, toUserId)
