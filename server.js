@@ -511,8 +511,8 @@ function registerGetRoutes() {
         conversationHistory
       })
     } catch (err) {
-      console.error(err)
-      res.status(500).send('Fout bij ophalen van chatkanaal')
+        console.error(err)
+        res.status(500).send('Fout bij ophalen van chatkanaal')
     }
   })
 }
@@ -739,11 +739,11 @@ function registerPostRoutes() {
       opzoek
     })
 
-    const nieuweUser = await users.findOne({
+    const newUser = await users.findOne({
       _id: result.insertedId
     })
 
-    req.session.user = createSessionUser(nieuweUser)
+    req.session.user = createSessionUser(newUser)
 
     return res.redirect('/discover')
   })
