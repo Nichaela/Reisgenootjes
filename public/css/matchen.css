@@ -153,13 +153,3 @@ section:last-of-type button {
   color: var(--clr-neutral);
   border: none;
 }
-
-.voorkeur-buttons form {
-  display: flex;
-  width: 100%;
-  gap: 10px;
-}
-
-form button>svg{
-  fill: var(--clr-icon);
-}
