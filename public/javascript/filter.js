@@ -110,7 +110,7 @@ function filterItems() {
     }
 
     // ----------------------
-    // Leeftijd filter: ±5 jaar marge
+    // Leeftijd filter 5 jaar marge
     // ----------------------
     const ageMargin = 5
     if (age !== null && (age < selectedAge - ageMargin || age > selectedAge + ageMargin)) {

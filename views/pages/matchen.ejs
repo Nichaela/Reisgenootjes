@@ -13,19 +13,19 @@
 
       <% if (!matchUser) { %>
         <p>Je hebt iedereen gezien!</p>
-        <a href="/matchen/reset">Opnieuw beginnen</a>
+        <a class="start-over-link" href="/matchen/reset">Opnieuw beginnen</a>
         <% } else { %>
 
-          <div class="voorkeur-buttons">
-            <form action="/set-preference" method="POST">
+          <div class="preference-buttons">
+            <form id="genderFilterForm" action="/set-preference" method="POST">
           
-              <input type="radio" id="man" name="genderPreference" value="man" onchange="this.form.submit()">
+              <input type="radio" id="man" name="genderPreference" value="man">
               <label for="man">Man</label>
           
-              <input type="radio" id="vrouw" name="genderPreference" value="vrouw" onchange="this.form.submit()">
+              <input type="radio" id="vrouw" name="genderPreference" value="vrouw">
               <label for="vrouw">Vrouw</label>
           
-              <input type="radio" id="anders" name="genderPreference" value="anders" onchange="this.form.submit()">
+              <input type="radio" id="anders" name="genderPreference" value="anders">
               <label for="anders">Anders</label>
           
             </form>
@@ -121,7 +121,7 @@
   </main>
 
   <%- include('../partials/bottom-nav'); %>
-
+  <script defer src="/javascript/genderfilter.js"></script>
 </body>
 
 </html>
