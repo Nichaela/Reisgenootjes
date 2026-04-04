@@ -189,3 +189,4 @@ searchInput?.addEventListener("input", (event) => {
 
   checkNoResults() 
 })
+

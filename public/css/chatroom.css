@@ -167,7 +167,7 @@
     margin-left: 10px;
     padding: 12px 20px;
     background: var( --clr-primary);
-    color:  var(--clr-neutral);
+    color:  var(--clr-button-text);
     border: none;
     border-radius: 1.8em;
     cursor: pointer;
