@@ -125,3 +125,13 @@ function togglePassword(fieldId, eyeSpan) {
     img.src = 'img/Eye.svg' // terug naar open oog
   }
 }
+
+// form textarea auto-resize
+const textareas = document.querySelectorAll(".form-textarea")
+
+textareas.forEach(textarea => {
+    textarea.addEventListener("input", function () {
+        textarea.style.height = "auto"
+        textarea.style.height = textarea.scrollHeight + "px"
+    })
+})
