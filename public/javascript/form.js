@@ -29,7 +29,6 @@ document.querySelectorAll(".multi-step-form").forEach(form => {
   }
 
   return allValid
-  
   }
 
   // Volgende knop
@@ -71,8 +70,6 @@ checkboxes.forEach(box => {
     }
   })
 })
-
-
 
 
 // ==========================================

@@ -1,18 +1,14 @@
-.filter-menu h2 {
-  position: absolute;
-  top: 0;
-}
-
-/* Target het input element */
+/* slider */
 #birthday {
   width: 100%;
   -webkit-appearance: none;
+  appearance: none;
   background: transparent;
   margin-top: 2em;
 }
 
 #birthday::-webkit-slider-runnable-track {
-  height: .1em;
+  height: 0.1em;
   background: var(--clr-text);
   border-radius: 1em;
 }
@@ -23,21 +19,20 @@
   height: 1.3em;
   background: var(--clr-primary);
   border-radius: 50%;
-  margin-top: -.6em;
+  margin-top: -0.6em;
 }
 
-/* Filter knop */
+/* Open filter menu knop*/
 .toggleFilter {
-  position: fixed;
-  top: 20px;
-  right: 20px;
+  position: absolute;
+  top: 1.25em;
+  right: 1.25em; 
   padding: 0.5em 1em;
   color: white;
   border: none;
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: 0.25em;
   z-index: 2000;
-
 }
 
 /* Fullscreen menu */
@@ -45,9 +40,9 @@
   position: fixed;
   top: 0;
   right: 0;
-  width: 100vw;       /* kan breder als je wilt */
+  width: 100vw;
   height: 100vh;
-  background: white;
+  background: var(--clr-neutral);
   padding: 2em 2em; /* meer padding-top */
   box-sizing: border-box;
   z-index: 1000;
@@ -69,25 +64,25 @@
 /* Close knop linksboven */
 .close-menu {
   position: absolute;
-  top: 20px;
-  right: 20px;
+  top: 1.25em;
+  right: 1.25em;
   cursor: pointer;
   background: none;
   border: none;
 }
 
 .close-menu img {
-  width: 30px;
+  width: 1.875em;
   height: auto;
-  margin-top: 1.5em;
+  margin-top: 2em;
 }
 
 /* Filter buttons styling */
 .filter-btn{
   display: block;
   margin: 0.5em 0;
-  padding: 0.3em .5em;
-  border: .05em solid var(--clr-text);
+  padding: 0.3em 0.5em;
+  border: 0.05em solid var(--clr-text);
   border-radius: 10em;
   cursor: pointer;
   font-size: 1em;
@@ -100,62 +95,96 @@
   border: none;
 }
 
-/* gender buttons */
-.genders {
+.buttons {
   display: flex;
-  flex-direction: column;
-  
-  margin-top: 5em;
+  gap: 0.5em;
+  flex-wrap: wrap;
 }
 
-.genders .buttons, .continents .buttons {
-  display: flex;
-  gap: .5em;
-  flex-wrap: wrap;         /* zodat knoppen op kleinere schermen netjes doorlopen */
-}
-
-.genders .buttons .filter-btn, .continents .buttons .filter-btn {
-  flex: 1 1 20%;           /* groeit en krimpt, minimum 30% breedte */
-  text-align: center;      /* knoppen tekst gecentreerd */
-  padding: 0.5em 1em;      /* behoud padding */
-  box-sizing: border-box;  /* zodat padding bij flex-breedte blijft */
+.buttons .filter-btn, .continents .filter-btn {
+  flex: 1 1 20%;      
+  text-align: center;    
+  padding: 0.5em 1em;     
+  box-sizing: border-box;  
   max-width: 8em;
 }
 
-
-/* Alle labels boven hun input plaatsen */
+/* Alle labels boven input plaatsen */
 .filter-menu label {
-  display: block;         /* Zorgt dat label op een nieuwe regel staat */
-  margin-top: 1em;        /* Ruimte boven label, voor overzicht */
-  margin-bottom: 0.5em;   /* Ruimte tussen label en input */
-  font-weight: 400;       /* Optioneel: iets opvallender */
+  display: block; 
+  margin-top: 1em;        
+  margin-bottom: 0.5em;  
+  font-weight: 400;       
   font-size: 1em;
 }
 
-/* Inputs onder hun label */
+/* Inputs onder label */
 .filter-menu input {
-  border: solid var(--clr-text) .05em;
+  border: solid var(--clr-text) 0.05em;
   display: block;    
   width: 100%;           
   padding: 0.7em;
   box-sizing: border-box;
   margin-bottom: 1em;  
-  border-radius: .5em;
+  border-radius: 0.5em;
   border: none;
   background-color: var(--clr-surface);
-  color: var(--clr-input-text);
   max-width: 30em;
+  color: var(--clr-input-text);
 }
 
 .reset-filters {
   justify-self: center;
   display: block;
   margin: 0.5em 0;
-  padding: 0.5em .8em;
+  padding: 0.5em 0.8em;
   border-radius: 10em;
   cursor: pointer;
   font-size: 1em;
   color: var(--clr-neutral);
   background: var(--gradient-primary);
   margin-top: 3em;
+}
+
+/* zoekbalk */
+.search input {
+  border: solid 0.1em var(--clr-text);
+  border-radius: 2em;
+  padding: 0.5rem 1rem;
+  margin-top: 1em;
+  margin-bottom: 2em;
+  width: 100%;
+  background-color: var(--clr-neutral);
+}
+
+#searchInput::placeholder {
+  color: var(--clr-input-text);
+}
+
+.search input:focus {
+  outline: none;
+  border: solid 0.1em var(--clr-text);
+}
+
+/* Bij geen resultaten */
+#noResults {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-top: 12em;
+}
+
+#noResults p {
+  margin-bottom: 2em;
+  font-size: 1.2em;
+}
+
+/* witruimte boven filtermenu */
+
+.discover-menu {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-top: 5em;
 }

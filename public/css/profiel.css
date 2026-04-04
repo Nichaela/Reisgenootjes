@@ -1,3 +1,8 @@
+section h2 {
+  font-family: 'indie-flower';
+  font-size: 1.5rem;
+}
+
 /* Gallerij voor het profiel*/
 /* Grid gemaakt met gridgenerator */
 .profile-pictures {
