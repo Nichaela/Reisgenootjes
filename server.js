@@ -140,6 +140,21 @@ function createSessionUser(user) {
     opzoek: user.opzoek
   }
 }
+
+function getSessionUserIds(req) {
+  const sessionUserId = req.session.user._id
+
+  return {
+    sessionUserId,
+    currentUserIdString: sessionUserId.toString(),
+    currentUserObjectId: toObjectId(sessionUserId)
+  }
+}
+
+function toObjectIdArray(ids = []) {
+  return ids.map((id) => toObjectId(id))
+}
+
 // =======================
 // MIDDELWARE (ALGEMEEN)
 // =======================
@@ -296,7 +311,6 @@ function registerGetRoutes() {
     }
   })
 
-
   app.get('/matchen', requireLogin, async (req, res) => {
     try {
       if (!req.session.gezien) req.session.gezien = []
@@ -350,18 +364,17 @@ function registerGetRoutes() {
     res.redirect('/matchen')
   })
 
+  app.get('/logout', (req, res) => {
+    req.session.destroy((err) => {
+      if (err) {
+        console.error(err)
+        return res.redirect('/')
+      }
 
-app.get('/logout', (req, res) => {
-  req.session.destroy((err) => {
-    if (err) {
-      console.error(err)
-      return res.redirect('/')
-    }
-
-    res.clearCookie('connect.sid')
-    res.redirect('/')
+      res.clearCookie('connect.sid')
+      res.redirect('/')
+    })
   })
-})
 
   //Huidge route naar filter menu + werkende continent filter 
   app.get('/filter', async (req, res) => {
@@ -390,49 +403,86 @@ app.get('/logout', (req, res) => {
       }
   })
 
-  app.get('/chatroom', requireLogin, async (req, res) => {
-    try {
-      const mijnId = req.session.user._id.toString()
+ app.get('/chatroom', requireLogin, async (req, res) => {
+  try {
+    const currentUserId = req.session.user._id.toString()
 
-      const ingelogdeUser = await users.findOne({
-        _id: toObjectId(req.session.user._id)
-      })
+    const currentUser = await users.findOne({
+      _id: toObjectId(req.session.user._id)
+    })
 
-      if (!ingelogdeUser) {
-        return res.status(404).send('Gebruiker niet gevonden')
-      }
+    if (!currentUser) {
+      return res.status(404).send('Gebruiker niet gevonden')
+    }
 
-      const mijnLikes = ingelogdeUser.likes || []
+    const likedUserIds = currentUser.likes || []
 
-      if (mijnLikes.length === 0) {
-        return res.render('pages/chatroom', {
-          user: req.session.user,
-          users: []
-        })
-      }
-
-      const matchedUsers = await users.find({
-        _id: { $in: mijnLikes.map((id) => toObjectId(id)) },
-        likes: mijnId
-      }).toArray()
-
-      res.render('pages/chatroom', {
+    if (likedUserIds.length === 0) {
+      return res.render('pages/chatroom', {
         user: req.session.user,
-        users: matchedUsers
+        newMatches: [],
+        recentChats: []
       })
-    } catch (err) {
-      console.error(err)
-      res.status(500).send('Fout bij ophalen van chatroom')
+    }
+
+    const matchedUsers = await users.find({
+      _id: { $in: likedUserIds.map((id) => toObjectId(id)) },
+      likes: currentUserId
+    }).toArray()
+    // chatgptPrompt: sorteer deze lijst van recentChats op basis van de datum van het laatste bericht, zodat de meest recente chats bovenaan staan. Zorg ervoor dat chats zonder berichten onderaan komen te staan.
+    const matchedUsersWithMessages = await Promise.all(
+    matchedUsers.map(async (matchedUser) => {
+      const conversationId = getConversationRoom(
+        currentUserId,
+        matchedUser._id.toString()
+      )
+
+      const lastMessage = await messages.findOne(
+        { conversationId },
+        { sort: { createdAt: -1 } }
+      )
+
+      return {
+        ...matchedUser,
+        lastMessage: lastMessage ? lastMessage.text : null,
+        lastMessageDate: lastMessage ? lastMessage.createdAt : null
       }
+    })
+  )
+
+  matchedUsersWithMessages.sort((a, b) => {
+    if (!a.lastMessageDate && !b.lastMessageDate) return 0
+    if (!a.lastMessageDate) return 1
+    if (!b.lastMessageDate) return -1
+    return b.lastMessageDate - a.lastMessageDate
+  })
+
+  const newMatches = matchedUsersWithMessages.filter((matchedUser) =>
+    !matchedUser.lastMessage
+  )
+
+  const recentChats = matchedUsersWithMessages.filter((matchedUser) =>
+    matchedUser.lastMessage
+  )
+
+  res.render('pages/chatroom', {
+    user: req.session.user,
+    newMatches,
+    recentChats
+  })
+  } catch (err) {
+    console.error(err)
+    res.status(500).send('Fout bij ophalen van chatroom')
+    }
   })
     
   app.get('/chat-channel/:userId', requireLogin, async (req, res) => {
     try {
-      const { userId } = req.params
-      const myUserId = req.session.user._id.toString()
+      const { currentUserIdString } = getSessionUserIds(req)
+      const chatPartnerId = req.params.userId
 
       const chatPartner = await users.findOne({
-        _id: toObjectId(userId)
+        _id: toObjectId(chatPartnerId)
       })
 
       if (!chatPartner) {
@@ -442,7 +492,10 @@ app.get('/logout', (req, res) => {
         })
       }
 
-      const conversationId = getConversationRoom(myUserId, userId)
+      const conversationId = getConversationRoom(
+        currentUserIdString,
+        chatPartnerId
+      )
 
       const conversationHistory = await messages
         .find({ conversationId })
