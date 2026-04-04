@@ -58,5 +58,10 @@ export default defineConfig([
   {files: ["**/*.js"], languageOptions: { sourceType: "commonjs" }},
   {rules:{"semi": [ "error", "never" ]}}
 
+      // codekwaliteit
+      "no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
+      "no-undef": "error",
+      "no-redeclare": "error",
+      "no-console": "off",
 
 ]);

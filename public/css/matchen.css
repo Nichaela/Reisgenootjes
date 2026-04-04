@@ -1,3 +1,13 @@
+:root {
+  /* core colors */
+  color-scheme: light dark;
+  --clr-icon: light-dark(#E9F8FF, #FC9B5E);
+}
+
+h2{
+  color: var(--clr-primary);
+}
+
 section:nth-of-type(1) {
   position: relative;
   border-radius: .5rem;
@@ -32,6 +42,7 @@ section:nth-of-type(1) > img:nth-of-type(1) {
 .profile-info>h2 {
   color: var(--clr-surface);
   font-family: 'inter';
+  font-weight: 600;
 }
 
 main ul {
@@ -120,8 +131,8 @@ a.start-over-link {
   display: flex;
   gap: 0.75rem;
   flex-wrap: wrap;
-  margin-top: 1.5em;
-  margin-bottom: 1.5em;
+  margin-top: .5rem;
+  margin-bottom: 1rem;
 }
 
 .preference-buttons input[type="radio"] {
@@ -137,6 +148,8 @@ a.start-over-link {
   font-size: 1em;
   color: var(--clr-text);
   transition: all 0.2s ease;
+  flex: 1;
+  text-align: center;
 }
 
 /* geselecteerd */
@@ -144,4 +157,8 @@ a.start-over-link {
   background: var(--gradient-primary);
   color: var(--clr-neutral);
   border: none;
+}
+
+form button>svg{
+  fill: var(--clr-icon);
 }
