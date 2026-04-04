@@ -2,10 +2,10 @@
   /* core colors */
   --clr-primary: #c1510b;
   --clr-primary-dark: #F9AC72;
-  --clr-text: #154159;
+  --clr-text: light-dark(#154159, #fff);
   --clr-surface: #E9F8FF;
-  --clr-neutral: #FFFFFF;
-  --clr-input-text: #BBBBBB;
+  --clr-neutral: light-dark(#fff, #154159);
+  --clr-input-text: #939393;
 
   /* gradients */
   --gradient-primary: linear-gradient(66deg, var(--clr-primary) -12.56%, rgba(249, 172, 114, 0.60) 120.1%);
@@ -13,12 +13,14 @@
   --gradient-surface: linear-gradient(180deg, var(--clr-surface) 0%, #F5FCFFB2 60%);
 
   /* spacing */
+  --bottom-nav-height: 5.5rem;
   --space-side: 1.5rem;
   --space-side-s: 1.25rem;
 
   --space-gap: 2rem;
   --space-gap-s: 1rem;
   --space-gap-xs: .5rem;
+  --space-gap-xxs: .25rem;
 
   --border-radius: .3rem;
 }
@@ -70,7 +72,7 @@
   font-family: 'indie-flower';
   src: url(../font/indie-flower/indieFlower-Regular.ttf) format('woff2');
   font-weight: 400;
-   font-display: swap;
+  font-display: swap;
 }
 
 *,
@@ -86,25 +88,32 @@
 body,
 textarea {
   color: var(--clr-text);
-  background: var(--clr-neutral);
+  background-color: var(--clr-neutral);
   font-family: 'inter';
 }
 
 main {
   padding-bottom: 5rem;
-  margin: 0.5rem;
+  margin: var(--space-side)
 }
 
-h1 {font-size: 2.25rem;}
+h1 {
+  font-size: 2.25rem;
+}
 
 h2 {
   font-family: 'indie-flower';
   font-size: 1.5rem;
+  font-weight: 200;
 }
 
 h3 {
   font-size: 1em;
   font-weight: 400;
+}
+
+svg{
+  fill: var(--clr-text);
 }
 
 .filter-menu h2 {
@@ -113,9 +122,8 @@ h3 {
 }
 
 section {
-  margin: 1.5rem 0;
+  margin-bottom: 1.5rem;
 }
-
 .heading {
   margin-bottom: var(--space-gap-s);
 }
@@ -158,15 +166,18 @@ button {
   border-radius: 2rem;
 }
 
+/* bottom nav */
 .bottom-nav {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: var(--clr-neutral);
-  border-top: 1px solid rgba(0, 0, 0, 0.1);
-  padding: 0rem 0.5rem;
-  z-index: 10;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: var(--bottom-nav-height);
+    background: var(--clr-neutral);
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 0rem 0.5rem;
+    z-index: 10;
+    box-sizing: border-box;
 }
 
 .bottom-nav ul {
@@ -182,35 +193,56 @@ button {
   color: var(--clr-text);
   display: flex;
   flex-direction: column;
+  align-items: center;
+}
+
+.bottom-nav svg {
+  order: -1;
+  padding-bottom: .4rem;
+}
+
+.bottom-nav p{
+  font-weight: 200;
+  font-size: .9rem;
 }
 
 .bottom-nav a.active {
   color: var(--clr-primary);
 }
 
-.bottom-nav img {
-  order: -1;
-  /* een idee voor de nav (zodat ze niet enorm worden bij vergroten scherm */
-  /* min-width: 2.5em;
-  max-width: 2.5em; */
+.bottom-nav a.active svg.line path {
+  stroke: var(--clr-primary);
+  fill: none;
 }
 
+.bottom-nav a.active svg{
+  fill: var(--clr-primary);
+}
+
+svg.line path{
+  stroke: var(--clr-text);
+  fill: none;
+  stroke-width: 2;
+}
 
 /* reisoproep */
 .reizen {
   width: 100%;
   display: grid;
-  gap: 2rem;
+  gap: 1rem;
 }
+
 .reizen a {
   width: 100%;
 }
+
 .reisoproep {
   position: relative;
   height: 25vh;
   background-color: var(--clr-primary-dark);
   border-radius: 0.5rem;
 }
+
 .reisoproep::after {
   position: absolute;
   border-radius: 0.5rem;
@@ -220,6 +252,7 @@ button {
   z-index: 1;
   overflow: hidden;
 }
+
 .reisoproep>img {
   height: 25vh;
   width: 100%;
@@ -228,6 +261,7 @@ button {
   z-index: -1;
   display: block;
 }
+
 .reisoproep span {
   position: absolute;
   top: 0.75rem;
@@ -271,7 +305,10 @@ button {
   width: 2rem;
   height: 2rem;
   cursor: pointer;
-  font-size: 1rem;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 /* Hobbies */
@@ -279,11 +316,12 @@ button {
   display: flex;
   flex-wrap: wrap;
 }
+
 .hobby {
   border: .05rem solid var(--clr-primary);
   border-radius: 5rem;
-  padding: 0.5rem;
-  margin: 0.5rem;
+  padding: .4rem .8rem;
+  margin: 0 .8rem .8rem 0;
 }
 
 .profilecard {
@@ -291,210 +329,40 @@ button {
   margin-bottom: var(--space-gap);
   padding: var(--space-gap-xs);
   border-radius: 5px;
-  display: grid;
+  display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
 }
 
-
-/* FILTER & ZOEKEN */
-.filter-menu h2 {
-  position: absolute;
-  top: 0;
-}
-
-/* Target het input element */
-#birthday {
-  width: 100%;
-  /* -webkit-appearance: none; */
-  background: transparent;
-  margin-top: 2em;
-}
-
-#birthday::-webkit-slider-runnable-track {
-  height: .1em;
-  background: var(--clr-text);
-  border-radius: 1em;
-}
-
-#birthday::-webkit-slider-thumb {
-  /* -webkit-appearance: none; */
-  width: 1.3em;
-  height: 1.3em;
-  background: var(--clr-primary);
-  border-radius: 50%;
-  margin-top: -.6em;
-}
-
-
-/* Filter knop */
-.toggleFilter {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  padding: 0.5em 1em;
-  color: white;
-  border: none;
-  cursor: pointer;
-  border-radius: 4px;
-  z-index: 2000;
-
-}
-
-/* Fullscreen menu */
-.filter-menu {
-  position: fixed;
-  top: 0;
-  right: 0;
-  width: 100vw;       /* kan breder als je wilt */
-  height: 100vh;
-  background: white;
-  padding: 2em 2em; /* meer padding-top */
-  box-sizing: border-box;
-  z-index: 1000;
-
-  /* Animatie */
-  transform: translateX(100%);
-  transition: transform 0.3s ease;
-}
-
-.filter-menu ul {
-  list-style: none;
-}
-
-/* Menu zichtbaar als class show aanwezig is */
-.filter-menu.show {
-  transform: translateX(0);
-}
-
-/* Close knop linksboven */
-.close-menu {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  cursor: pointer;
-  background: none;
-  border: none;
-}
-
-.close-menu img {
-  width: 30px;
-  height: auto;
-  margin-top: 1.5em;
-}
-
-/* Filter buttons styling */
-.filter-btn{
-  display: block;
-  margin: 0.5em 0;
-  padding: 0.3em .5em;
-  border: .05em solid var(--clr-text);
-  border-radius: 10em;
-  cursor: pointer;
-  font-size: 1em;
-  color: var(--clr-text);
-}
-
-.filter-btn.active {
-  background: var(--gradient-primary);
-  color: var(--clr-neutral);
-  border: none;
-}
-
-/* gender buttons */
-.genders {
+.profilecard a {
   display: flex;
   flex-direction: column;
-  
-  margin-top: 5em;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
 }
 
-.genders .buttons, .continents .buttons {
-  display: flex;
-  gap: .5em;
-  flex-wrap: wrap;         /* zodat knoppen op kleinere schermen netjes doorlopen */
+.profilecard p:first-of-type {
+  color: var(--clr-primary);
+  font-size: 1.5rem;
+  margin-top: 1rem;
 }
 
-.genders .buttons .filter-btn, .continents .buttons .filter-btn {
-  flex: 1 1 20%;           /* groeit en krimpt, minimum 30% breedte */
-  text-align: center;      /* knoppen tekst gecentreerd */
-  padding: 0.5em 1em;      /* behoud padding */
-  box-sizing: border-box;  /* zodat padding bij flex-breedte blijft */
-  max-width: 8em;
+.profilecard img {
+  width: 70%;
+  aspect-ratio: 1/1;
+  object-fit: cover;
+  border-radius: 50%;
 }
 
-
-/* Alle labels boven hun input plaatsen */
-.filter-menu label {
-  display: block;         /* Zorgt dat label op een nieuwe regel staat */
-  margin-top: 1em;        /* Ruimte boven label, voor overzicht */
-  margin-bottom: 0.5em;   /* Ruimte tussen label en input */
-  font-weight: 400;       /* Optioneel: iets opvallender */
-  font-size: 1em;
+.profilecard .gradient-btn {
+  margin-top: 1rem;
 }
 
-/* Inputs onder hun label */
-.filter-menu input {
-  border: solid var(--clr-text) .05em;
-  display: block;    
-  width: 100%;           
-  padding: 0.7em;
-  box-sizing: border-box;
-  margin-bottom: 1em;  
-  border-radius: .5em;
-  border: none;
-  background-color: var(--clr-surface);
-  color: var(--clr-input-text);
-  max-width: 30em;
-}
-
-.reset-filters {
-  justify-self: center;
-
-  display: block;
-  margin: 0.5em 0;
-  padding: 0.5em .8em;
-  border-radius: 10em;
-  cursor: pointer;
-  font-size: 1em;
-  color: var(--clr-neutral);
-  background: var(--gradient-primary);
-
-  margin-top: 3em;
-}
-
-
-
-/* zoekbalk */
-
-.search input {
-  border:solid .1em var(--clr-text);
-  border-radius: 2em;
-  padding:7px 14px;
-  margin-bottom:10px;
-  width: 100%;
-}
-
-#searchInput::placeholder {
-  color: var(--clr-input-text);
-}
-
-.search input:focus {
-  outline:none;
-  border: solid .1em var(--clr-text);
-}
-
-#noResults {
-display: flex;
-flex-direction: column;
-align-items: center;
-text-align: center;
-margin-top: 12em;
-}
-
-#noResults p {
-  margin-bottom: 2em;
-  font-size: 1.2em;
+.required {
+  color: var(--clr-primary);
+  font-family: indie flower;
 }
 
 #error{
@@ -506,3 +374,12 @@ margin-top: 12em;
   gap: 1.5rem;
 }
 
+.arrow{
+  transform: rotate(180deg);
+}
+
+.log-out{
+  position: fixed;
+  right: 1.5rem;
+  padding-top: 0.5em;
+}

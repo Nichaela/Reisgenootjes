@@ -3,7 +3,6 @@
 form {
   display: grid;
   grid-template-rows: auto 1fr;
-  margin: var(--space-side);
   position: relative;
 }
 
@@ -17,6 +16,7 @@ a {
 
 form div {
   display: flex;
+  gap: var(--space-gap-s);
 }
 
 form input.gradient-btn {
@@ -42,13 +42,12 @@ select {
   padding: var(--space-gap-xs);
 }
 
-#birthday{
-  background: var(--clr-surface);
+input::placeholder{
+  color: var(--clr-input-text);
 }
 
-textarea {
-  height: fit-content;
-  resize: none;
+#birthday{
+  background: var(--clr-surface);
 }
 
 /* Deze fixt streepje van h1 vanwege de pijl absolutez*/
@@ -67,6 +66,7 @@ form p:first-of-type {
 }
 
 form h2 {
+  font-family: inter;
   font-weight: 300;
   text-align: center;
   font-size: 1.1rem;
@@ -110,8 +110,6 @@ input.gradient-btn {
   top: 0;
   right: 0;
 }
-
-
 
 /* multipage form */
 .form-step {
@@ -191,7 +189,6 @@ button:disabled {
   position: relative;
   display: inline-block;
   width: 100%;
-  margin-bottom: 1em;
 }
 
 .password-wrapper input {
@@ -214,3 +211,56 @@ button:disabled {
   height: 24px;
 }
 
+/* small styling voor error melding */
+small{
+  color: var(--clr-primary);
+  font-size: 0.8rem;
+  margin-top: var(--space-gap-xs);
+}
+
+/* form textarea auto-resize */
+.image-upload-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  grid-template-rows: 10rem 5rem;
+  position: relative;
+}
+
+.upload-wrapper {
+  position: relative;
+  height: 100%;
+}
+
+.upload-box {
+  background: #dcecf2;
+  border-radius: 0.75rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  font-weight: bold;
+  color: #666;
+  overflow: hidden;
+  position: relative;
+  height: 100%;
+  width: 100%;
+  margin-top: 0;
+}
+
+.upload-box span{
+  font-family: 'inter';
+  font-size: .8rem;
+  font-weight: 400;
+}
+
+.upload-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.large { grid-row: span 2; }
+.top-right { grid-column: 2 / 4; }

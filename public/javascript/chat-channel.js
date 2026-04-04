@@ -1,7 +1,8 @@
+// eslint-disable-next-line no-undef
 const socket = io()
 
 const messages = document.getElementById('messages')
-const input = document.getElementById('messageInput')
+const messageInput = document.getElementById('message-input')
 const sendButton = document.getElementById('sendButton')
 const chatPartnerId = document.getElementById('chatPartnerId').value
 const chatPartnerName = document.getElementById('chatPartnerName').textContent
@@ -14,55 +15,70 @@ socket.emit('join private chat', {
   otherUserName: chatPartnerName
 })
 
-function addMessageToScreen(data) {
-  const div = document.createElement('div')
-  div.classList.add('message')
-  div.classList.add(data.fromSelf ? 'messageSent' : 'messageReceived')
-  div.textContent = `${data.fromSelf ? 'Jij' : data.fromName}: ${data.text}`
+function addMessageToScreen(messageData) {
+  const messageElement = document.createElement('div')
+  messageElement.classList.add('message')
+  messageElement.classList.add(
+    messageData.fromSelf ? 'message-sent' : 'message-received'
+  )
+  messageElement.textContent =
+    `${messageData.fromSelf ? 'Jij' : messageData.fromName}: ` +
+    `${messageData.text}`
 
-  messages.appendChild(div)
+  messages.appendChild(messageElement)
   messages.scrollTop = messages.scrollHeight
 }
 
 function sendMessage() {
-  const text = input.value.trim()
-  if (!text) return
+  const messageText = messageInput.value.trim()
+
+  if (!messageText) {
+    return
+  }
 
   socket.emit('private message', {
     toUserId: chatPartnerId,
-    text: text
+    text: messageText
   })
 
-  socket.emit('stop typing', { toUserId: chatPartnerId })
+  socket.emit('stop typing', {
+    toUserId: chatPartnerId
+  })
 
-  input.value = ''
+  messageInput.value = ''
   typingIndicator.textContent = ''
 }
 
 sendButton.addEventListener('click', sendMessage)
 
-input.addEventListener('keypress', (event) => {
+messageInput.addEventListener('keypress', (event) => {
   if (event.key === 'Enter') {
     event.preventDefault()
     sendMessage()
   }
 })
 
-input.addEventListener('input', () => {
-  if (input.value.trim()) {
-    socket.emit('typing', { toUserId: chatPartnerId })
+messageInput.addEventListener('input', () => {
+  if (messageInput.value.trim()) {
+    socket.emit('typing', {
+      toUserId: chatPartnerId
+    })
 
     clearTimeout(typingTimeout)
     typingTimeout = setTimeout(() => {
-      socket.emit('stop typing', { toUserId: chatPartnerId })
+      socket.emit('stop typing', {
+        toUserId: chatPartnerId
+      })
     }, 1000)
   } else {
-    socket.emit('stop typing', { toUserId: chatPartnerId })
+    socket.emit('stop typing', {
+      toUserId: chatPartnerId
+    })
   }
 })
 
-socket.on('private message', (data) => {
-  addMessageToScreen(data)
+socket.on('private message', (messageData) => {
+  addMessageToScreen(messageData)
 })
 
 socket.on('typing', () => {
@@ -78,7 +94,9 @@ socket.on('user notification', (message) => {
 })
 
 window.addEventListener('beforeunload', () => {
-  socket.emit('leave private chat', { otherUserId: chatPartnerId })
+  socket.emit('leave private chat', {
+    otherUserId: chatPartnerId
+  })
 })
 
 messages.scrollTop = messages.scrollHeight

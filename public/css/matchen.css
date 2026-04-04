@@ -1,8 +1,18 @@
+:root {
+  /* core colors */
+  color-scheme: light dark;
+  --clr-icon: light-dark(#E9F8FF, #FC9B5E);
+}
 
-
+h2{
+  color: var(--clr-primary);
+}
 
 section:nth-of-type(1) {
   position: relative;
+  border-radius: .5rem;
+  width: 100%;
+  overflow: hidden;
 }
 
 section:nth-of-type(1)::after {
@@ -10,26 +20,29 @@ section:nth-of-type(1)::after {
   position: absolute;
   inset: 0;
   background: linear-gradient(to top, rgba(0, 0, 0, 0.6) 0%, transparent 50%);
-  border-radius: 0.5rem;
+  border-radius: .5rem;
 }  
 
 section:nth-of-type(1) > img:nth-of-type(1) {
   display: block;
-  border-radius: 0.5rem;
+  border-radius: .5rem;
   width: 100%;
+  height: auto;
+  object-fit: contain;
 }
 
 .profile-info {
   position: absolute;
   bottom: 1rem;
   left: 1rem;
-  color: var(--clr-neutral);
+  color: var(--clr-surface);
   z-index: 1;
 }
 
 .profile-info>h2 {
-  color: var(--clr-neutral);
+  color: var(--clr-surface);
   font-family: 'inter';
+  font-weight: 600;
 }
 
 main ul {
@@ -47,7 +60,6 @@ main li {
 
 main li img {
   height: 1rem;
-
 }
 
 /* Gallerij voor het profiel*/
@@ -100,7 +112,7 @@ section:last-of-type form {
 }
 
 section:last-of-type button {
-  margin-bottom: 5rem;
+  /* margin-bottom: 5rem; */
   padding: 1rem;
   background-color: var(--clr-text);
   border-radius: 4rem;
@@ -108,20 +120,26 @@ section:last-of-type button {
 }
 
 
-/* Filter buttons gender */
+/* Filter buttons gender en opnieuw beginnen link */
 
-.voorkeur-buttons {
+a.start-over-link {
+  position: absolute;
+  top: 7em;
+}
+
+.preference-buttons {
   display: flex;
   gap: 0.75rem;
   flex-wrap: wrap;
-  margin-top: 2em;
+  margin-top: .5rem;
+  margin-bottom: 1rem;
 }
 
-.voorkeur-buttons input[type="radio"] {
+.preference-buttons input[type="radio"] {
   display: none;
 }
 
-.voorkeur-buttons label {
+.preference-buttons label, .start-over-link  {
   margin: 0.5em 0;
   padding: 0.5em .8em;
   border: .05em solid var(--clr-text);
@@ -130,11 +148,17 @@ section:last-of-type button {
   font-size: 1em;
   color: var(--clr-text);
   transition: all 0.2s ease;
+  flex: 1;
+  text-align: center;
 }
 
 /* geselecteerd */
-.voorkeur-buttons input[type="radio"]:checked + label {
+.preference-buttons input[type="radio"]:checked + label, .start-over-link  {
   background: var(--gradient-primary);
   color: var(--clr-neutral);
   border: none;
+}
+
+form button>svg{
+  fill: var(--clr-icon);
 }
