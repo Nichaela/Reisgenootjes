@@ -5,8 +5,6 @@
   <link rel="stylesheet" href="/css/chatroom.css">
   </head>
   <body id="chat-channel-page">
-    <header>
-    </header>
     <main>
       <section class="chat-header">
         <% if (user) { %>
@@ -22,7 +20,7 @@
           <section id="messages">
             <% if (conversationHistory && conversationHistory.length > 0) { %>
               <% conversationHistory.forEach((msg) => { %>
-                <div class="message <%= msg.fromUserId === user._id.toString() ? 'messageSent' : 'messageReceived' %>">
+                <div class="message <%= msg.fromUserId === user._id.toString() ? 'message-sent' : 'message-received' %>">
                   <%= msg.fromUserId === user._id.toString() ? 'Jij' : msg.fromName %>: <%= msg.text %>
                 </div>
               <% }) %>
@@ -33,15 +31,17 @@
           <section class="bottom-container">
             <div id="typingIndicator" class="typing-indicator"></div>
             <div class="input-container">
-              <input id="messageInput" type="text" placeholder="Type your message..." autocomplete="off">
+              <input id="message-input" type="text" placeholder="Type your message..." autocomplete="off">
               <button id="sendButton">Send</button>
             </div>
-          <section>
+          </section>
         </section>
     </main>
     <script src="/socket.io/socket.io.js"></script>
     <script src="/javascript/chat-channel.js"></script>
-    <%- include('../partials/bottom-nav'); %>
+    <footer>
+      <%- include('../partials/bottom-nav'); %>
+    </footer>
   </body>
 </html>
 

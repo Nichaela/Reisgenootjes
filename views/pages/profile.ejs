@@ -1,14 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
+  <head>
     <%- include('../partials/head'); %>
         <link rel="stylesheet" href="/css/profiel.css">
         <script defer src="/javascript/filter.js"></script>
         <title>Profielpagina <%= user.name %>
         </title>
-</head>
-
+  </head>
 <body>
     <main>
         <% const profiel = profielUser || user %>
@@ -67,7 +65,7 @@
                                     <%- include('../partials/reisoproep', { post: post }) %>
                                 </a>
                             </li>
-                            <% }) %>
+                        <% }) %>
                     </ul>
                     <% } %>
         </section>

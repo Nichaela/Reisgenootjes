@@ -109,11 +109,11 @@
     animation: slideIn 0.3s ease-out;
 }
 
-.messageSent {
+.message-sent {
     background: #bbdefb;
 }
 
-.messageReceived {
+.message-received {
     background: #c8e6c9;
 }
 
@@ -135,7 +135,7 @@
     justify-content: space-between;
 }
 
-#messageInput {
+#message-input {
     flex: 1;
     padding: 12px 16px;
     border: 2px solid #e0e0e0;
@@ -145,7 +145,7 @@
     transition: border-color 0.3s;
 }
 
-#messageInput:focus {
+#message-input:focus {
     border-color: #667eea;
 }
 
