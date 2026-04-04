@@ -95,6 +95,13 @@
   font-weight: bold;
 }
 
+.hero a{
+  z-index: 10;
+  position: absolute;
+  top: .5rem;
+  left: .5rem;
+}
+
 h2 {
   font-family: 'indie-flower';
   color: var(--clr-primary);
