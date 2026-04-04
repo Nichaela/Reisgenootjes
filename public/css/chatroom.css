@@ -12,8 +12,16 @@
     }
 }
 
+:root {
+    /* core colors */
+    color-scheme: light dark;
+    --clr-send: light-dark(#c8e6c9, #4CAF50);
+    --clr-received: light-dark(#cdefff, #607D8B);
+}
+
 #chatroom-page h2 {
     margin-bottom: .5em;
+    color: var(--clr-primary);
 }
 
 #chat-channel-page {
@@ -47,6 +55,7 @@
     display: flex;
     flex-direction: row;
     gap: 2em;
+    color: var(--clr-text);
    }
 }
 
@@ -73,7 +82,7 @@
 
 /* chat-channel */
 .chat-container {
-    background: white;
+    background: var(--clr-neutral);
     width: 100%;
     height: 100%;
     display: flex;
@@ -97,6 +106,8 @@
     flex: 1;
     min-height: 0;
     padding-bottom: calc(var(--bottom-nav-height) + 1em);
+    display: flex;
+    flex-direction: column;
 }
 
 .message {
@@ -110,11 +121,12 @@
 }
 
 .message-sent {
-    background: #bbdefb;
+    background: var(--clr-send);
+    align-self: flex-end;
 }
 
 .message-received {
-    background: #c8e6c9;
+    background: var(--clr-received);
 }
 
 .bottom-container {
@@ -138,15 +150,17 @@
 #message-input {
     flex: 1;
     padding: 12px 16px;
-    border: 2px solid #e0e0e0;
+    border: 2px solid #ceefff;
     border-radius: 25px;
     outline: none;
     font-size: 14px;
     transition: border-color 0.3s;
+    background: var(--clr-surface);
+    color: var(--clr-input-text);
 }
 
 #message-input:focus {
-    border-color: #667eea;
+    border-color: #607D8B;
 }
 
 #sendButton {

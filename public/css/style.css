@@ -66,7 +66,6 @@
 @font-face {
   font-family: 'indie-flower';
   src: url(../font/indie-flower/indieFlower-Regular.ttf) format('woff2');
-  font-weight: 400;
 }
 
 *,
@@ -98,6 +97,7 @@ h1 {
 h2 {
   font-family: 'indie-flower';
   font-size: 1.5rem;
+  font-weight: 200;
 }
 
 h3 {
@@ -333,6 +333,7 @@ svg.line path{
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  text-decoration: none;
 }
 
 .profilecard p:first-of-type {
@@ -374,5 +375,4 @@ svg.line path{
   position: fixed;
   right: 1.5rem;
   padding-top: 0.5em;
-  z-index: -2;
 }

@@ -110,26 +110,25 @@ dropdowns.forEach(dropdown => {
 
 
 // Oogje om wachtwoord zichtbaar te maken
- 
-const toggles = document.querySelectorAll('.toggle-password')
+function togglePassword(fieldId, eyeSpan) {
+  const input = document.getElementById(fieldId)
+  const img = eyeSpan.querySelector('img')
 
-toggles.forEach(toggle => {
-  toggle.addEventListener('click', function () {
-    const wrapper = this.parentElement
+  if (input.type === 'password') {
+    input.type = 'text'
+    img.src = 'img/Eyeclose.svg' // wissel naar gesloten oog
+  } else {
+    input.type = 'password'
+    img.src = 'img/Eye.svg' // terug naar open oog
+  }
+}
 
-    const input = wrapper.querySelector('input')
+// form textarea auto-resize
+const textareas = document.querySelectorAll(".form-textarea")
 
-    const img = this.querySelector('img')
-
-    if (input.type === 'password') {
-      input.type = 'text'
-
-      img.src = 'img/Eye.svg'
-    } else {
-      input.type = 'password'
-
-      img.src = 'img/Eyeclose.svg'
-    }
-  })
+textareas.forEach(textarea => {
+    textarea.addEventListener("input", function () {
+        textarea.style.height = "auto"
+        textarea.style.height = textarea.scrollHeight + "px"
+    })
 })
-
