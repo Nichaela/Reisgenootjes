@@ -120,7 +120,12 @@ section:last-of-type button {
 }
 
 
-/* Filter buttons gender */
+/* Filter buttons gender en opnieuw beginnen link */
+
+a.start-over-link {
+  position: absolute;
+  top: 7em;
+}
 
 .preference-buttons {
   display: flex;
@@ -134,7 +139,7 @@ section:last-of-type button {
   display: none;
 }
 
-.preference-buttons label {
+.preference-buttons label, .start-over-link  {
   margin: 0.5em 0;
   padding: 0.5em .8em;
   border: .05em solid var(--clr-text);
@@ -148,8 +153,12 @@ section:last-of-type button {
 }
 
 /* geselecteerd */
-.preference-buttons input[type="radio"]:checked + label {
+.preference-buttons input[type="radio"]:checked + label, .start-over-link  {
   background: var(--gradient-primary);
   color: var(--clr-neutral);
   border: none;
+}
+
+form button>svg{
+  fill: var(--clr-icon);
 }

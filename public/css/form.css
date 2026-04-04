@@ -166,6 +166,7 @@ button:disabled {
 .inlogform input:nth-of-type(2) {
   padding: .5rem 2.5rem;
   font-size: 1rem;
+  background: var(--gradient-primary);
 }
 
 .login a.ww {

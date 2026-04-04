@@ -90,7 +90,7 @@
 
 .filter-btn.active {
   background: var(--gradient-primary);
-  color: var(--clr-neutral);
+  color: var(--clr-button-text);
   border: none;
 }
 
@@ -140,7 +140,7 @@
   border-radius: 10em;
   cursor: pointer;
   font-size: 1em;
-  color: var(--clr-neutral);
+  color: var(--clr-button-text);
   background: var(--gradient-primary);
   margin-top: 3em;
 }
