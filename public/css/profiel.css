@@ -1,6 +1,7 @@
 section h2 {
   font-family: 'indie-flower';
   font-size: 1.5rem;
+  color: var(--clr-primary);
 }
 
 /* Gallerij voor het profiel*/
