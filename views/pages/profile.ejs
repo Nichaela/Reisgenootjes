@@ -1,17 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
+  <head>
     <%- include('../partials/head'); %>
         <link rel="stylesheet" href="/css/profiel.css">
-        <script defer src="/javascript/filter.js"></script>
         <title>Profielpagina <%= user.name %>
         </title>
-</head>
-
+  </head>
 <body>
     <main>
-        <% if (user) { %>
+        <% const profiel = profielUser || user %>
+        <% if (profiel) { %>
             <h1 class="underline">Profiel</h1>
             <a href="/login" class="log-out">
                 <svg width="32" height="32" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -20,19 +18,19 @@
             </a>
             <section class="profile-pictures">
                 <h2>Gallerij</h2>
-                <img src="/uploads/<%= user.profileImg %>" alt="profiel foto">
-                <img src="/uploads/<%= user.image2 %>" alt="Galerij foto 2">
-                <img src="/uploads/<%= user.image3 %>" alt="Galerij foto 3">
+                <img src="/uploads/<%= profiel.profileImg %>" alt="profiel foto">
+                <img src="/uploads/<%= profiel.image2 %>" alt="Galerij foto 2">
+                <img src="/uploads/<%= profiel.image3 %>" alt="Galerij foto 3">
             </section>
 
             <section>
                 <h2>
-                    <%= user.name %> • <%= age %>
+                    <%= profiel.name %> • <%= age %>
                 </h2>
                 <div class="profile-info">
                     <ul>
                         <li><img src="/img/GenderFemale.svg">
-                            <%= user.gender %>
+                            <%= profiel.gender %>
                         </li>
                         <li><img src="/img/location.svg">Nederland</li>
                     </ul>
@@ -43,9 +41,9 @@
                 <h2>Interesses:</h2>
                 <ul class="hobbies">
                     <!-- deze dubbele check weghalen als we de databse gaan opschonen want nu werkt het niet door de oude gebruikers -->
-                    <% const interestList = Array.isArray(user.interests) 
-                    ? user.interests 
-                    : (user.interests ? user.interests.split(',').map(i => i.trim()) : []) %>
+                    <% const interestList = Array.isArray(profiel.interests) 
+                    ? profiel.interests 
+                    : (profiel.interests ? profiel.interests.split(',').map(i => i.trim()) : []) %>
 
                     <% interestList.forEach(interesse => { %>                       
                         <li class="hobby">
@@ -66,14 +64,11 @@
                                     <%- include('../partials/reisoproep', { post: post }) %>
                                 </a>
                             </li>
-                            <% }) %>
+                        <% }) %>
                     </ul>
                     <% } %>
-
-
-
-                        </section>
-                        <% } %>
+        </section>
+        <% } %>
     </main>
 
     <footer>

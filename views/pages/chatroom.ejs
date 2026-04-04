@@ -1,60 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <%- include('../partials/head'); %>
-  <link rel="stylesheet" href="/css/chatroom.css">
-</head>
-<body>
-  <header>
-    
-  </header>
-
-  <main id="chatroom-page">
-    <h1 class="underline" >Chatroom</h1>
-    <section>
-  <h2>Nieuwe match</h2>
-  <div class="new-match-list">
-    <% if (users && users.length > 0) { %>
-      <% users.forEach(otherUser => { %>
-        <a href="/chat-channel/<%= otherUser._id %>">
-          <div class="profile-pic-wrapper">
-            <img
-              src="/uploads/<%= otherUser.profileImg %>"
-              alt="<%= otherUser.name %>"
-              class="profile-pic"
-            >
-          </div>
-          <%= otherUser.name %>
-        </a>
-      <% }) %>
-    <% } else { %>
-      <p>Geen nieuwe matches gevonden.</p>
-    <% } %>
-  </div>
-</section>
-    <section>
-      <h2>Recente gesprekken</h2>
-      <ul class="chat-list">
-        <% users.forEach(otherUser => { %>
-          <li class="chat-list-item">
-            <a href="/chat-channel/<%= otherUser._id %>">
-              <div class="profile-pic-wrapper">
-                <img src="/uploads/<%= otherUser.profileImg %>" alt="<%= otherUser.name %>" class="profile-pic" alt="">
-              </div>
-              <div class="chat-info">
-                <%= otherUser.name %>
-                <div class="last-chat">
-                  <%= otherUser.lastMessage ? otherUser.lastMessage : 'Nog geen berichten' %>
+  <head>
+    <%- include('../partials/head'); %>
+    <link rel="stylesheet" href="/css/chatroom.css">
+  </head>
+  <body>
+    <main id="chatroom-page">
+      <h1 class="underline" >Chatroom</h1>
+      <section>
+        <h2>Nieuwe match</h2>
+        <div class="new-match-list">
+          <% if (newMatches && newMatches.length > 0) { %>
+            <% newMatches.forEach(matchedUser => { %>
+              <a href="/chat-channel/<%= matchedUser._id %>">
+                <div class="profile-pic-wrapper">
+                  <img
+                    src="/uploads/<%= matchedUser.profileImg %>"
+                    alt="<%= matchedUser.name %>"
+                    class="profile-pic"
+                  >
                 </div>
-              </div>
-            </a>
-          </li>
-        <% }) %>
-      </ul>
-    </section>
-  </main>
-  <footer>
-    <%- include('../partials/bottom-nav'); %>
-  </footer>
-</body>
+                <%= matchedUser.name %>
+              </a>
+            <% }) %>
+          <% } else { %>
+            <p>Geen nieuwe matches gevonden.</p>
+          <% } %>
+        </div>
+      </section>
+      <section>
+        <h2>Recente gesprekken</h2>
+        <ul class="chat-list">
+          <!-- chatgpt prompt: toon alleen recente gesprekken -->
+          <% if (recentChats && recentChats.length > 0) { %> 
+            <% recentChats.forEach((matchedUser) => { %>
+            <li class="chat-list-item">
+              <a href="/chat-channel/<%= matchedUser._id %>">
+                <div class="profile-pic-wrapper">
+                  <img src="/uploads/<%= matchedUser.profileImg %>" alt="<%= matchedUser.name %>" class="profile-pic">
+                </div>
+                <div class="chat-info">
+                  <%= matchedUser.name %>
+                  <div class="last-chat">
+                    <%= matchedUser.lastMessage %>
+                  </div>
+                </div>
+              </a>
+            </li>
+          <% }) %>
+          <% } else { %>
+            <li class="chat-list-item">
+              <p>Geen gesprekken gevonden.</p>
+            </li>
+          <% } %>
+        </ul>
+      </section>
+    </main>
+    <footer>
+      <%- include('../partials/bottom-nav'); %>
+    </footer>
+  </body>
 </html>
