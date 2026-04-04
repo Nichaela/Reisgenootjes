@@ -151,10 +151,6 @@ function getSessionUserIds(req) {
   }
 }
 
-function toObjectIdArray(ids = []) {
-  return ids.map((id) => toObjectId(id))
-}
-
 // =======================
 // MIDDELWARE (ALGEMEEN)
 // =======================
@@ -561,7 +557,6 @@ function registerGetRoutes() {
     }
   })
 }
-
 
 // =======================
 // POST ROUTES
