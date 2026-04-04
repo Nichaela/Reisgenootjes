@@ -79,6 +79,8 @@ input.gradient-btn {
   position: absolute;
   right: 0;
   bottom: var(--space-gap-s);
+  padding: .5rem 2.5rem;
+  font-size: 1rem;
 }
 
 .voortgangsbalk {
@@ -121,7 +123,6 @@ input.gradient-btn {
 }
 
 
-
 /* checkboxes voor aanmeldform */
 .options {
   display: flex;
@@ -159,7 +160,12 @@ button:disabled {
 }
 
 .inlogform {
-  height: 80vh;
+  height: 50vh;
+}
+
+.inlogform input:nth-of-type(2) {
+  padding: .5rem 2.5rem;
+  font-size: 1rem;
 }
 
 .login a.ww {
