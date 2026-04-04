@@ -150,9 +150,6 @@ input.gradient-btn {
   border: none;
 }
 
-/* a in inlog form */
-
-
 /* disabled button form*/
 button:disabled {
   opacity: 0.5;
@@ -160,7 +157,7 @@ button:disabled {
 }
 
 .inlogform {
-  height: 50vh;
+  height: 55vh;
 }
 
 .inlogform input:nth-of-type(2) {
