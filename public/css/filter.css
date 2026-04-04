@@ -71,8 +71,7 @@
   border: none;
 }
 
-.close-menu img {
-  width: 1.875em;
+.close-menu svg {
   height: auto;
   margin-top: 2em;
 }

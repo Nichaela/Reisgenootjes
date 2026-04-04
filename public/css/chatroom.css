@@ -84,7 +84,7 @@
 .chat-container {
     background: var(--clr-neutral);
     width: 100%;
-    height: 100%;
+    height: 96%;
     display: flex;
     flex-direction: column;
     overflow: hidden;
