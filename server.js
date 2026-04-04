@@ -222,8 +222,53 @@ function registerGetRoutes() {
     res.render('pages/register', { error: null })
   })
 
-  app.get('/profile', requireLogin, async (req, res) => {
+
+  // profiel van iemand anders
+  app.get('/profile/:id', async (req, res) => {
     try {
+      console.log('profile/:id aangeroepen met id:', req.params.id)
+
+      const profielUser = await users.findOne({ _id: new ObjectId(req.params.id) })
+  
+      if (!profielUser) {
+        return res.status(404).send('Gebruiker niet gevonden')
+      }
+  
+      const mijnPosts = await discover.find({
+        userId: new ObjectId(profielUser._id),
+      }).toArray()
+      const gejoindePosts = await discover.find({
+        reizigers: new ObjectId(profielUser._id)
+      }).toArray()
+  
+      const alleReizen = [...mijnPosts, ...gejoindePosts].sort((a, b) =>
+        new Date(a.startDate) - new Date(b.startDate)
+      )
+  
+      const today = new Date()
+      const birthDate = new Date(profielUser.birthday)
+      let age = today.getFullYear() - birthDate.getFullYear()
+      const month = today.getMonth() - birthDate.getMonth()
+      if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) age--
+  
+      res.render('pages/profile', {
+        user: req.session.user || null,
+        profielUser,
+        alleReizen,
+        age
+      })
+    } catch (err) {
+      console.error(err)
+      res.status(500).send('Fout bij laden van profiel')
+    }
+  })
+
+  //eigen profiel
+  app.get('/profile', requireLogin, async (req, res) => {
+    if (!req.session.user) return res.redirect('/login')
+
+    try {
+      // haal de gemaakte en gejoinde reizen van de gebruiker op
       const mijnPosts = await discover.find({
         userId: toObjectId(req.session.user._id),
       }).toArray()
@@ -755,7 +800,10 @@ function registerPostRoutes() {
   })
 
   // create-post formulier
-  app.post('/post', requireLogin, upload.single('postCoverImg'), async (req, res) => {
+  app.post('/post', requireLogin, upload.fields([
+    { name: 'postCoverImg', maxCount: 1 },
+    { name: 'route', maxCount: 1 },
+  ]), async (req, res) => {
     try {
       sanitizeBodyFields(req.body)
 
@@ -770,7 +818,8 @@ function registerPostRoutes() {
         gender
       } = req.body
 
-      const postCoverImg = req.file ? req.file.filename : null
+      const postCoverImg = req.files.postCoverImg ? req.files.postCoverImg[0].filename : null
+      const route = req.files.route ? req.files.route[0].filename : null
 
       let age = req.body.age
       if (!Array.isArray(age)) {
@@ -784,6 +833,10 @@ function registerPostRoutes() {
           .filter(Boolean)
         : []
 
+      const interestsArray = Array.isArray(req.body.interests)
+      ? req.body.interests
+      : (req.body.interests ? [req.body.interests] : [])
+
       const result = await discover.insertOne({
         userId: toObjectId(req.session.user._id),
         title,
@@ -794,9 +847,11 @@ function registerPostRoutes() {
         continent,
         persons: Number(persons),
         discription,
+        route,
         supplies,
         age,
-        gender
+        gender,
+        interests: interestsArray
       })
 
       return res.redirect(`/post/${result.insertedId}`)
@@ -823,7 +878,11 @@ function registerPostRoutes() {
       }
 
       if (post.age && post.age.length > 0) {
-        const userAge = calculateAge(req.session.user.birthday)
+        const birthDate = new Date(req.session.user.birthday)
+        const today = new Date()
+        let userAge = today.getFullYear() - birthDate.getFullYear()
+        const month = today.getMonth() - birthDate.getMonth()
+        if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) userAge--
 
         const ranges = {
           '18': (age) => age >= 18 && age < 21,

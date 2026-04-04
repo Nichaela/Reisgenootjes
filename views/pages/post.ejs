@@ -46,7 +46,7 @@
                 mederezigers.slice(0, maxVisible).forEach(reiziger => { 
               %>
                 <li>
-                  <a href="/profiel/<%= reiziger._id %>">
+                  <a href="/profile/<%= reiziger._id %>">
                     <img src="/uploads/<%= reiziger.profileImg %>" alt="<%= reiziger.name %>">
                   </a>
                 </li>
@@ -78,10 +78,12 @@
         </section>
 
         <h2>Omschrijving</h2>
-        <p><%= post.description %> </p>
+        <p><%= post.discription %> </p>
 
-        <h2>De route</h2>
-        <!-- <img src="  " alt="route <%= post.title %>"> -->
+        <% if (post.route) { %>
+          <h2>De route</h2>
+          <img src="/uploads/<%= post.route %>" alt="<%= post.title %>" >
+        <% } %>
 
         <h2>Benodigdheden</h2>
         <ul>
@@ -94,7 +96,7 @@
       <section>
         <h2>Gepost door</h2>
         <article class="profilecard">
-          <a href="/profiel/<%= post.userId %>">
+          <a href="/profile/<%= postUser._id %>">
             <img src="/uploads/<%= postUser.profileImg %>" alt="<%= postUser.name %>">
             <p><%= postUser.name %></p>
             <p>
