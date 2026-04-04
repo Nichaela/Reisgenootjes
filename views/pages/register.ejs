@@ -116,11 +116,39 @@
           <p>Hier iets van tekst nog</p>
           <h2>Profiel</h2>
 
-          <label for="profileImg">Profiel Afbeeldingen <span class="required">*</span> </label>
-          <input type="file" id="profileImg" name="profileImg" accept="image/*" required>
-          <input type="file" id="image1" name="image1" accept="image/*">
-          <input type="file" id="image2" name="image2" accept="image/*">
-          <input type="file" id="image3" name="image3" accept="image/*">
+          <div class="image-upload-grid">
+            <div class="upload-wrapper large">
+                <label for="profileImg" class="upload-box">
+                    <span>Profiel foto</span>
+                    <img id="preview-profileImg" src="" alt="" hidden>
+                </label>
+                <input type="file" id="profileImg" name="profileImg" accept="image/*" hidden>
+            </div>
+        
+            <div class="upload-wrapper top-right">
+                <label for="image1" class="upload-box">
+                    <span>Extra afbeelding</span>
+                    <img id="preview-image1" src="" alt="" hidden>
+                </label>
+                <input type="file" id="image1" name="image1" accept="image/*" hidden>
+            </div>
+        
+            <div class="upload-wrapper bottom-left">
+                <label for="image2" class="upload-box">
+                    <span>Extra afbeelding</span>
+                    <img id="preview-image2" src="" alt="" hidden>
+                </label>
+                <input type="file" id="image2" name="image2" accept="image/*" hidden>
+            </div>
+        
+            <div class="upload-wrapper bottom-right">
+                <label for="image3" class="upload-box">
+                    <span>Extra afbeelding</span>
+                    <img id="preview-image3" src="" alt="" hidden>
+                </label>
+                <input type="file" id="image3" name="image3" accept="image/*" hidden>
+            </div>
+        </div>
 
           <label for="status">Status <span class="required">*</span></label>
           <select id="status" name="status" required>
@@ -130,10 +158,10 @@
           </select>
 
           <label for="bio">Bio <span class="required">*</span> </label>
-          <input type="text" id="bio" name="bio" placeholder="Schrijf hier een bio" required>
+          <textarea class="form-textarea" id="bio" name="bio" placeholder="Schrijf hier iets over jezelf" required></textarea>
 
           <label for="opzoek">Op zoek naar <span class="required">*</span></label>
-          <input type="text" id="opzoek" name="opzoek" placeholder="Naar wie ben je op zoek" required>
+          <textarea class="form-textarea" id="opzoek" name="opzoek" placeholder="Naar wat voor reisgenootje ben je opzoek" required></textarea>
 
           <button type="button" class="gradient-btn" data-next>Volgende</button>
         </section>
