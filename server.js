@@ -223,28 +223,34 @@ function registerGetRoutes() {
     try {
       console.log('profile/:id aangeroepen met id:', req.params.id)
 
-      const profileUser = await users.findOne({ _id: toObjectId(req.params.id) })
-  
+      const profileUserId = toObjectId(req.params.id)
+
+      if (!profileUserId) {
+        return res.status(404).render('pages/error-state', {
+          status: 404,
+          message: 'Ongeldige gebruiker'
+        })
+      }
+
+      const profileUser = await users.findOne({ _id: profileUserId })
+
       if (!profileUser) {
         return res.status(404).send('Gebruiker niet gevonden')
       }
-  
+
       const myPosts = await discover.find({
-        userId: toObjectId(profileUser._id),
+        userId: profileUserId
       }).toArray()
+
       const joinedPosts = await discover.find({
-        travellers: toObjectId(profileUser._id)
+        travellers: profileUserId
       }).toArray()
-  
+
       const allTrips = [...myPosts, ...joinedPosts].sort((a, b) =>
         new Date(a.startDate) - new Date(b.startDate)
       )
 
-      const today = new Date()
-      const birthDate = new Date(profileUser.birthday)
-      let age = today.getFullYear() - birthDate.getFullYear()
-      const month = today.getMonth() - birthDate.getMonth()
-      if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) age--
+      const age = calculateAge(profileUser.birthday)
 
       res.render('pages/profile', {
         user: req.session.user || null,
@@ -260,8 +266,6 @@ function registerGetRoutes() {
 
   //eigen profiel
   app.get('/profile', requireLogin, async (req, res) => {
-    if (!req.session.user) return res.redirect('/login')
-
     try {
       // haal de gemaakte en gejoinde reizen van de gebruiker op
       const myPosts = await discover.find({
@@ -351,7 +355,7 @@ function registerGetRoutes() {
     }
   })
 
-  app.get('/matchen', requireLogin, async (req, res) => {
+  app.get('/matching', requireLogin, async (req, res) => {
     try {
       if (!req.session.gezien) req.session.gezien = []
 
@@ -372,7 +376,7 @@ function registerGetRoutes() {
       const matchUser = await users.findOne(query)
 
       if (!matchUser) {
-        return res.render('pages/matchen', {
+        return res.render('pages/matching', {
           user: req.session.user,
           post: null,
           matchUser: null,
@@ -386,7 +390,7 @@ function registerGetRoutes() {
 
       const age = calculateAge(matchUser.birthday)
 
-      return res.render('pages/matchen', {
+      return res.render('pages/matching', {
         user: {
           ...req.session.user,
           genderPreference: req.session.genderPreference
@@ -396,15 +400,15 @@ function registerGetRoutes() {
         age
       })
     } catch (err) {
-      console.error('Fout in /matchen:', err)
+      console.error('Fout in /matching:', err)
       return res.status(500).send('Fout bij laden van matchen')
     }
   })
 
-  app.get('/matchen/reset', (req, res) => {
+  app.get('/matching/reset', (req, res) => {
     req.session.gezien = []
     req.session.genderPreference = null
-    res.redirect('/matchen')
+    res.redirect('/matching')
   })
 
   app.get('/logout', (req, res) => {
@@ -502,7 +506,7 @@ function registerGetRoutes() {
       })
 
       if (!chatPartner) {
-        return res.status(404).render('pages/errorstate', {
+        return res.status(404).render('pages/error-state', {
           status: 404,
           message: 'Gebruiker niet gevonden'
         })
@@ -565,7 +569,7 @@ function registerPostRoutes() {
 
       req.session.user = createSessionUser(user)
 
-      return res.redirect('/matchen')
+      return res.redirect('/matching')
     } catch (err) {
       console.error(err)
       return res.status(500).render('pages/login', {
@@ -690,8 +694,6 @@ function registerPostRoutes() {
     { name: 'image2', maxCount: 1 },
     { name: 'image3', maxCount: 1 },
   ]), async (req, res) => {
-    sanitizeBodyFields(req.body)
-
     const {
       name,
       lastName,
@@ -766,7 +768,7 @@ function registerPostRoutes() {
   //gender voorkeur bij matchen, realtime update
   app.post('/set-preference', (req, res) => {
     req.session.genderPreference = req.body.genderPreference
-    res.redirect('/matchen')
+    res.redirect('/matching')
   })
 
   // create-post formulier
@@ -775,8 +777,6 @@ function registerPostRoutes() {
     { name: 'route', maxCount: 1 },
   ]), async (req, res) => {
     try {
-      sanitizeBodyFields(req.body)
-
       const {
         title,
         startDate,
@@ -788,8 +788,8 @@ function registerPostRoutes() {
         gender
       } = req.body
 
-      const postCoverImg = req.files.postCoverImg ? req.files.postCoverImg[0].filename : null
-      const route = req.files.route ? req.files.route[0].filename : null
+      const postCoverImg = req.files?.postCoverImg?.[0]?.filename || null
+      const route = req.files?.route?.[0]?.filename || null
 
       let age = req.body.age
       if (!Array.isArray(age)) {
@@ -848,11 +848,7 @@ function registerPostRoutes() {
       }
 
       if (post.age && post.age.length > 0) {
-        const birthDate = new Date(req.session.user.birthday)
-        const today = new Date()
-        let userAge = today.getFullYear() - birthDate.getFullYear()
-        const month = today.getMonth() - birthDate.getMonth()
-        if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) userAge--
+        const userAge = calculateAge(req.session.user.birthday)
 
         const ranges = {
           '18': (age) => age >= 18 && age < 21,
@@ -927,7 +923,7 @@ function registerPostRoutes() {
         }
       }
 
-      return res.redirect('/matchen')
+      return res.redirect('/matching')
     } catch (err) {
       console.error('Fout in /likes:', err)
       return res.status(500).send('Fout bij verwerken van like')
@@ -955,12 +951,10 @@ function registerSocketHandlers() {
     }
 
     const myUserId = user._id.toString()
-    socket.join(myUserId)
 
     connectedUsers++
     console.log(`🎉 A user connected: ${socket.id} Total users: ${connectedUsers}`)
 
-    // gebruiker opent een specifiek chatkanaal
     socket.on('join private chat', ({ otherUserId, otherUserName }) => {
       if (!otherUserId) return
 
@@ -1059,7 +1053,7 @@ function registerErrorHandlers() {
     }
 
     console.error('404 error at URL: ' + req.url)
-    res.status(404).render('pages/errorstate', {
+    res.status(404).render('pages/error-state', {
       status: 404,
       message: 'Pagina niet gevonden'
     })

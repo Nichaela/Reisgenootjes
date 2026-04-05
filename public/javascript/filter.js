@@ -1,5 +1,5 @@
 // ==========================================
-// FILTEREN (matchen & discover)
+// FILTEREN (matching & discover)
 // ==========================================
 
 // Variabelen
