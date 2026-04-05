@@ -13,7 +13,6 @@ const xss = require('xss')
 const validator = require('validator')
 const bcrypt = require('bcryptjs')
 
-
 const crypto = require('crypto')
 const nodemailer = require('nodemailer')
 
@@ -94,6 +93,7 @@ let messages
 
 // helper functies
 function toObjectId(id) {
+  if (!ObjectId.isValid(id)) return null
   return new ObjectId(id)
 }
 
@@ -137,7 +137,7 @@ function createSessionUser(user) {
     gender: user.gender,
     birthday: user.birthday,
     interests: user.interests,
-    opzoek: user.opzoek
+    lookingFor: user.lookingFor
   }
 }
 
@@ -218,39 +218,38 @@ function registerGetRoutes() {
     res.render('pages/register', { error: null })
   })
 
-
   // profiel van iemand anders
   app.get('/profile/:id', async (req, res) => {
     try {
       console.log('profile/:id aangeroepen met id:', req.params.id)
 
-      const profielUser = await users.findOne({ _id: new ObjectId(req.params.id) })
-
-      if (!profielUser) {
+      const profileUser = await users.findOne({ _id: toObjectId(req.params.id) })
+  
+      if (!profileUser) {
         return res.status(404).send('Gebruiker niet gevonden')
       }
-
-      const mijnPosts = await discover.find({
-        userId: new ObjectId(profielUser._id),
+  
+      const myPosts = await discover.find({
+        userId: toObjectId(profileUser._id),
       }).toArray()
-      const gejoindePosts = await discover.find({
-        reizigers: new ObjectId(profielUser._id)
+      const joinedPosts = await discover.find({
+        travellers: toObjectId(profileUser._id)
       }).toArray()
-
-      const alleReizen = [...mijnPosts, ...gejoindePosts].sort((a, b) =>
+  
+      const allTrips = [...myPosts, ...joinedPosts].sort((a, b) =>
         new Date(a.startDate) - new Date(b.startDate)
       )
 
       const today = new Date()
-      const birthDate = new Date(profielUser.birthday)
+      const birthDate = new Date(profileUser.birthday)
       let age = today.getFullYear() - birthDate.getFullYear()
       const month = today.getMonth() - birthDate.getMonth()
       if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) age--
 
       res.render('pages/profile', {
         user: req.session.user || null,
-        profielUser,
-        alleReizen,
+        profileUser,
+        allTrips,
         age
       })
     } catch (err) {
@@ -265,15 +264,15 @@ function registerGetRoutes() {
 
     try {
       // haal de gemaakte en gejoinde reizen van de gebruiker op
-      const mijnPosts = await discover.find({
+      const myPosts = await discover.find({
         userId: toObjectId(req.session.user._id),
       }).toArray()
 
-      const gejoindePosts = await discover.find({
-        reizigers: toObjectId(req.session.user._id)
+      const joinedPosts = await discover.find({
+        travellers: toObjectId(req.session.user._id)
       }).toArray()
 
-      const alleReizen = [...mijnPosts, ...gejoindePosts].sort((a, b) =>
+      const allTrips = [...myPosts, ...joinedPosts].sort((a, b) =>
         new Date(a.startDate) - new Date(b.startDate)
       )
 
@@ -281,7 +280,7 @@ function registerGetRoutes() {
 
       res.render('pages/profile', {
         user: req.session.user,
-        alleReizen,
+        allTrips,
         age
       })
     } catch (err) {
@@ -333,16 +332,16 @@ function registerGetRoutes() {
 
       const postUser = await users.findOne({ _id: post.userId })
 
-      // haal alle mederezigers op
-      const reizigersIds = post.reizigers || []
-      const mederezigers = await users.find({
-        _id: { $in: reizigersIds.map((reizigerId) => toObjectId(reizigerId)) }
+      // haal alle travelBuddies/medereizigers op
+      const travellersIds = post.travellers || []
+      const travelBuddies = await users.find({
+        _id: { $in: travellersIds.map((travellerId) => toObjectId(travellerId)) }
       }).toArray()
 
       res.render('pages/post', {
         post,
         postUser,
-        mederezigers,
+        travelBuddies,
         user: req.session.user || null,
         error: null
       })
@@ -420,76 +419,76 @@ function registerGetRoutes() {
     })
   })
 
-  app.get('/chatroom', requireLogin, async (req, res) => {
-    try {
-      const currentUserId = req.session.user._id.toString()
+ app.get('/chatroom', requireLogin, async (req, res) => {
+  try {
+    const currentUserId = req.session.user._id.toString()
 
-      const currentUser = await users.findOne({
-        _id: toObjectId(req.session.user._id)
-      })
+    const currentUser = await users.findOne({
+      _id: toObjectId(req.session.user._id)
+    })
 
-      if (!currentUser) {
-        return res.status(404).send('Gebruiker niet gevonden')
-      }
+    if (!currentUser) {
+      return res.status(404).send('Gebruiker niet gevonden')
+    }
 
-      const likedUserIds = currentUser.likes || []
+    const likedUserIds = currentUser.likes || []
 
-      if (likedUserIds.length === 0) {
-        return res.render('pages/chatroom', {
-          user: req.session.user,
-          newMatches: [],
-          recentChats: []
-        })
-      }
-
-      const matchedUsers = await users.find({
-        _id: { $in: likedUserIds.map((id) => toObjectId(id)) },
-        likes: currentUserId
-      }).toArray()
-      // chatgptPrompt: sorteer deze lijst van recentChats op basis van de datum van het laatste bericht, zodat de meest recente chats bovenaan staan. Zorg ervoor dat chats zonder berichten onderaan komen te staan.
-      const matchedUsersWithMessages = await Promise.all(
-        matchedUsers.map(async (matchedUser) => {
-          const conversationId = getConversationRoom(
-            currentUserId,
-            matchedUser._id.toString()
-          )
-
-          const lastMessage = await messages.findOne(
-            { conversationId },
-            { sort: { createdAt: -1 } }
-          )
-
-          return {
-            ...matchedUser,
-            lastMessage: lastMessage ? lastMessage.text : null,
-            lastMessageDate: lastMessage ? lastMessage.createdAt : null
-          }
-        })
-      )
-
-      matchedUsersWithMessages.sort((a, b) => {
-        if (!a.lastMessageDate && !b.lastMessageDate) return 0
-        if (!a.lastMessageDate) return 1
-        if (!b.lastMessageDate) return -1
-        return b.lastMessageDate - a.lastMessageDate
-      })
-
-      const newMatches = matchedUsersWithMessages.filter((matchedUser) =>
-        !matchedUser.lastMessage
-      )
-
-      const recentChats = matchedUsersWithMessages.filter((matchedUser) =>
-        matchedUser.lastMessage
-      )
-
-      res.render('pages/chatroom', {
+    if (likedUserIds.length === 0) {
+      return res.render('pages/chatroom', {
         user: req.session.user,
-        newMatches,
-        recentChats
+        newMatches: [],
+        recentChats: []
       })
-    } catch (err) {
-      console.error(err)
-      res.status(500).send('Fout bij ophalen van chatroom')
+    }
+
+    const matchedUsers = await users.find({
+      _id: { $in: likedUserIds.map((id) => toObjectId(id)) },
+      likes: currentUserId
+    }).toArray()
+    // chatgptPrompt: sorteer deze lijst van recentChats op basis van de datum van het laatste bericht, zodat de meest recente chats bovenaan staan. Zorg ervoor dat chats zonder berichten onderaan komen te staan.
+    const matchedUsersWithMessages = await Promise.all(
+    matchedUsers.map(async (matchedUser) => {
+      const conversationId = getConversationRoom(
+        currentUserId,
+        matchedUser._id.toString()
+      )
+
+      const lastMessage = await messages.findOne(
+        { conversationId },
+        { sort: { createdAt: -1 } }
+      )
+
+      return {
+        ...matchedUser,
+        lastMessage: lastMessage ? lastMessage.text : null,
+        lastMessageDate: lastMessage ? lastMessage.createdAt : null
+      }
+    })
+  )
+
+  matchedUsersWithMessages.sort((a, b) => {
+    if (!a.lastMessageDate && !b.lastMessageDate) return 0
+    if (!a.lastMessageDate) return 1
+    if (!b.lastMessageDate) return -1
+    return b.lastMessageDate - a.lastMessageDate
+  })
+
+  const newMatches = matchedUsersWithMessages.filter((matchedUser) =>
+    !matchedUser.lastMessage
+  )
+
+  const recentChats = matchedUsersWithMessages.filter((matchedUser) =>
+    matchedUser.lastMessage
+  )
+
+  res.render('pages/chatroom', {
+    user: req.session.user,
+    newMatches,
+    recentChats
+  })
+  } catch (err) {
+    console.error(err)
+    res.status(500).send('Fout bij ophalen van chatroom')
     }
   })
 
@@ -533,7 +532,6 @@ function registerGetRoutes() {
     }
   })
 }
-
 
 // =======================
 // POST ROUTES
@@ -705,7 +703,7 @@ function registerPostRoutes() {
       status,
       bio,
       interests,
-      opzoek
+      lookingFor
     } = req.body
 
     const profileImg = req.files?.profileImg?.[0]?.filename || null
@@ -753,7 +751,7 @@ function registerPostRoutes() {
       status,
       bio,
       interests: interestsArray,
-      opzoek
+      lookingFor
     })
 
     const newUser = await users.findOne({
@@ -872,21 +870,21 @@ function registerPostRoutes() {
         }
       }
 
-      const aantalReizigers = post.reizigers ? post.reizigers.length : 0
-      if (aantalReizigers >= post.persons) {
+      const aantaltravellers = post.travellers ? post.travellers.length : 0
+      if (aantaltravellers >= post.persons) {
         return res.status(403).send('Deze reis is vol')
       }
 
-      const alGejoint = post.reizigers && post.reizigers.some(
-        (reizigerId) =>
-          reizigerId.toString() === req.session.user._id.toString()
+      const alGejoint = post.travellers && post.travellers.some(
+        (travellerId) =>
+          travellerId.toString() === req.session.user._id.toString()
       )
 
       if (alGejoint) return res.redirect(`/post/${id}`)
 
       await discover.updateOne(
         { _id: toObjectId(id) },
-        { $push: { reizigers: toObjectId(req.session.user._id) } }
+        { $push: { travellers: toObjectId(req.session.user._id) } }
       )
 
       return res.redirect(`/post/${id}`)
@@ -900,7 +898,7 @@ function registerPostRoutes() {
 
   app.post('/likes', requireLogin, async (req, res) => {
     try {
-      const { matchedUser: matchedUserId, actie } = req.body
+      const { matchedUser: matchedUserId, action } = req.body
 
       if (!req.session.gezien) req.session.gezien = []
 
@@ -908,22 +906,22 @@ function registerPostRoutes() {
         req.session.gezien.push(matchedUserId)
       }
 
-      if (actie === 'like') {
+      if (action === 'like') {
         await users.updateOne(
           { _id: toObjectId(req.session.user._id) },
           { $addToSet: { likes: matchedUserId } }
         )
 
-        const andereUser = await users.findOne({
+        const otherUser = await users.findOne({
           _id: toObjectId(matchedUserId)
         })
 
         const matchId = req.session.user._id.toString()
 
         if (
-          andereUser &&
-          andereUser.likes &&
-          andereUser.likes.includes(matchId)
+          otherUser &&
+          otherUser.likes &&
+          otherUser.likes.includes(matchId)
         ) {
           return res.redirect('/chatroom')
         }

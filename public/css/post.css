@@ -120,16 +120,14 @@ section:nth-child(2) img {
   width: 100%;
 }
 
-.medereizigers {
+.travelBuddies {
   display: flex;
   gap: .5rem;
 }
-
-.medereizigers a {
+.travelBuddies a {
   width: 4rem;
 }
-
-.medereizigers a img {
+.travelBuddies a img{
   width: 4rem;
   aspect-ratio: 1/1;
   object-fit: cover;
