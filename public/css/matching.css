@@ -157,6 +157,6 @@ a.start-over-link {
   border: none;
 }
 
-form button>svg{
+form button>svg {
   fill: var(--clr-icon);
 }
