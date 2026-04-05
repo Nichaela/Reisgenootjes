@@ -64,15 +64,14 @@
 /* Close knop linksboven */
 .close-menu {
   position: absolute;
-  top: 1.25em;
+  top: 1.5em;
   right: 1.25em;
   cursor: pointer;
   background: none;
   border: none;
 }
 
-.close-menu img {
-  width: 1.875em;
+.close-menu svg {
   height: auto;
   margin-top: 2em;
 }
@@ -91,7 +90,7 @@
 
 .filter-btn.active {
   background: var(--gradient-primary);
-  color: var(--clr-neutral);
+  color: var(--clr-button-text);
   border: none;
 }
 
@@ -134,16 +133,16 @@
 }
 
 .reset-filters {
-  justify-self: center;
-  display: block;
+  align-self: center;
   margin: 0.5em 0;
   padding: 0.5em 0.8em;
   border-radius: 10em;
   cursor: pointer;
   font-size: 1em;
-  color: var(--clr-neutral);
+  color: var(--clr-button-text);
   background: var(--gradient-primary);
   margin-top: 3em;
+  width: 10em;
 }
 
 /* zoekbalk */

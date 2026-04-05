@@ -1,6 +1,7 @@
 section h2 {
   font-family: 'indie-flower';
   font-size: 1.5rem;
+  color: var(--clr-primary);
 }
 
 /* Gallerij voor het profiel*/
@@ -50,6 +51,7 @@ section h2 {
 section:nth-of-type(2) h2{
   font-family: 'inter';
   color: var(--clr-primary);
+  font-weight: 600;
 }
 
 section:nth-of-type(3) p {

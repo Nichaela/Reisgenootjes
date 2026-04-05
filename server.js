@@ -239,13 +239,13 @@ function registerGetRoutes() {
       const allTrips = [...myPosts, ...joinedPosts].sort((a, b) =>
         new Date(a.startDate) - new Date(b.startDate)
       )
-  
+
       const today = new Date()
       const birthDate = new Date(profileUser.birthday)
       let age = today.getFullYear() - birthDate.getFullYear()
       const month = today.getMonth() - birthDate.getMonth()
       if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) age--
-  
+
       res.render('pages/profile', {
         user: req.session.user || null,
         profileUser,
@@ -387,7 +387,10 @@ function registerGetRoutes() {
       const age = calculateAge(matchUser.birthday)
 
       return res.render('pages/matchen', {
-        user: req.session.user,
+        user: {
+          ...req.session.user,
+          genderPreference: req.session.genderPreference
+        },
         post,
         matchUser,
         age
@@ -400,7 +403,7 @@ function registerGetRoutes() {
 
   app.get('/matchen/reset', (req, res) => {
     req.session.gezien = []
-    req.session.genderPreference = null 
+    req.session.genderPreference = null
     res.redirect('/matchen')
   })
 
@@ -488,7 +491,7 @@ function registerGetRoutes() {
     res.status(500).send('Fout bij ophalen van chatroom')
     }
   })
-    
+
   app.get('/chat-channel/:userId', requireLogin, async (req, res) => {
     try {
       const { currentUserIdString } = getSessionUserIds(req)
@@ -524,8 +527,8 @@ function registerGetRoutes() {
         conversationHistory
       })
     } catch (err) {
-        console.error(err)
-        res.status(500).send('Fout bij ophalen van chatkanaal')
+      console.error(err)
+      res.status(500).send('Fout bij ophalen van chatkanaal')
     }
   })
 }
@@ -562,7 +565,7 @@ function registerPostRoutes() {
 
       req.session.user = createSessionUser(user)
 
-      return res.redirect('/discover')
+      return res.redirect('/matchen')
     } catch (err) {
       console.error(err)
       return res.status(500).render('pages/login', {
@@ -759,7 +762,7 @@ function registerPostRoutes() {
 
     return res.redirect('/discover')
   })
- 
+
   //gender voorkeur bij matchen, realtime update
   app.post('/set-preference', (req, res) => {
     req.session.genderPreference = req.body.genderPreference
@@ -801,8 +804,8 @@ function registerPostRoutes() {
         : []
 
       const interestsArray = Array.isArray(req.body.interests)
-      ? req.body.interests
-      : (req.body.interests ? [req.body.interests] : [])
+        ? req.body.interests
+        : (req.body.interests ? [req.body.interests] : [])
 
       const result = await discover.insertOne({
         userId: toObjectId(req.session.user._id),
@@ -986,10 +989,10 @@ function registerSocketHandlers() {
       console.log(`${user.name} left room: ${roomName}`)
     })
 
-    socket.on('private message', async({ toUserId, text }) => {
+    socket.on('private message', async ({ toUserId, text }) => {
       if (!toUserId || !text) return
 
-      const cleanText = xss(String(text).trim()) 
+      const cleanText = xss(String(text).trim())
       if (!cleanText) return
 
       const roomName = getConversationRoom(myUserId, toUserId)
@@ -1100,4 +1103,3 @@ async function start() {
 }
 
 start()
- 

@@ -28,7 +28,7 @@
             <div class="progressbar-inactive"></div>
           </div>
 
-          <p>Hier iets van tekst nog</p>
+          <p>Wie ben jij?</p>
           <h2>Account aanmaken</h2>
 
           <label for="name">Voornaam <span class="required">*</span> </label>
@@ -45,7 +45,7 @@
             <label for="password">Wachtwoord <span class="required">*</span> </label>
             <input type="password" id="password" name="password" placeholder="Wachtwoord" required minlength="8">
             <span class="toggle-password">
-              <img src="img/Eye.svg" alt="Toon wachtwoord" class="eye-icon">
+              <img src="img/Eyeclose.svg" alt="Toon wachtwoord" class="eye-icon">
             </span>
           </div>
 
@@ -53,7 +53,7 @@
             <label for="confirmPassword">Herhaal wachtwoord <span class="required">*</span> </label>
             <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Herhaal wachtwoord" required>
             <span class="toggle-password">
-              <img src="img/Eye.svg" alt="Toon wachtwoord" class="eye-icon">
+              <img src="img/Eyeclose.svg" alt="Toon wachtwoord" class="eye-icon">
             </span>
             <small id="passwordError"></small>
           </div>
@@ -77,14 +77,14 @@
             <div class="progressbar-inactive"></div>
           </div>
 
-          <p>Hier iets van tekst nog</p>
+          <p>Nog meer informatie over jou</p>
           <h2>Persoonlijke gegevens</h2>
 
           <label for="birthday">Verjaardag <span class="required">*</span> </label>
           <input type="date" name="birthday" required>
 
           <label for="tel">Telefoon</label>
-          <input type="tel" id="tel" name="tel" placeholder="(06) 1234567890">
+          <input type="tel" id="tel" name="tel" placeholder="(06) 123 456 78">
 
           <label for="gender">Gender <span class="required">*</span> </label>
           <select id="gender" name="gender" required>
@@ -113,14 +113,42 @@
             <div class="progressbar-inactive"></div>
           </div>
 
-          <p>Hier iets van tekst nog</p>
+          <p>Dit word jouw profiel</p>
           <h2>Profiel</h2>
 
-          <label for="profileImg">Profiel Afbeeldingen <span class="required">*</span> </label>
-          <input type="file" id="profileImg" name="profileImg" accept="image/*" required>
-          <input type="file" id="image1" name="image1" accept="image/*">
-          <input type="file" id="image2" name="image2" accept="image/*">
-          <input type="file" id="image3" name="image3" accept="image/*">
+          <div class="image-upload-grid">
+            <div class="upload-wrapper large">
+                <label for="profileImg" class="upload-box">
+                    <span>Profiel foto</span>
+                    <img id="preview-profileImg" src="" alt="" hidden>
+                </label>
+                <input type="file" id="profileImg" name="profileImg" accept="image/*" hidden>
+            </div>
+        
+            <div class="upload-wrapper top-right">
+                <label for="image1" class="upload-box">
+                    <span>Extra afbeelding</span>
+                    <img id="preview-image1" src="" alt="" hidden>
+                </label>
+                <input type="file" id="image1" name="image1" accept="image/*" hidden>
+            </div>
+        
+            <div class="upload-wrapper bottom-left">
+                <label for="image2" class="upload-box">
+                    <span>Extra afbeelding</span>
+                    <img id="preview-image2" src="" alt="" hidden>
+                </label>
+                <input type="file" id="image2" name="image2" accept="image/*" hidden>
+            </div>
+        
+            <div class="upload-wrapper bottom-right">
+                <label for="image3" class="upload-box">
+                    <span>Extra afbeelding</span>
+                    <img id="preview-image3" src="" alt="" hidden>
+                </label>
+                <input type="file" id="image3" name="image3" accept="image/*" hidden>
+            </div>
+        </div>
 
           <label for="status">Status <span class="required">*</span></label>
           <select id="status" name="status" required>
@@ -130,10 +158,10 @@
           </select>
 
           <label for="bio">Bio <span class="required">*</span> </label>
-          <input type="text" id="bio" name="bio" placeholder="Schrijf hier een bio" required>
+          <textarea class="form-textarea" id="bio" name="bio" placeholder="Schrijf hier iets over jezelf" required></textarea>
 
           <label for="lookingFor">Op zoek naar <span class="required">*</span></label>
-          <input type="text" id="lookingFor" name="lookingFor" placeholder="Naar wie ben je op zoek" required>
+          <textarea class="form-textarea" id="lookingFor" name="lookingFor" placeholder="Naar wat voor reisgenootje ben je opzoek" required></textarea>
 
           <button type="button" class="gradient-btn" data-next>Volgende</button>
         </section>

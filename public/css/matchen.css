@@ -1,3 +1,13 @@
+:root {
+  /* core colors */
+  color-scheme: light dark;
+  --clr-icon: light-dark(#E9F8FF, #FC9B5E);
+}
+
+h2{
+  color: var(--clr-primary);
+}
+
 section:nth-of-type(1) {
   position: relative;
   border-radius: .5rem;
@@ -32,6 +42,7 @@ section:nth-of-type(1) > img:nth-of-type(1) {
 .profile-info>h2 {
   color: var(--clr-surface);
   font-family: 'inter';
+  font-weight: 600;
 }
 
 main ul {
@@ -108,22 +119,25 @@ section:last-of-type button {
   border-style: none;
 }
 
+/* Filteren */
+a.start-over-link {
+  position: absolute;
+  top: 7em;
+}
 
-/* Filter buttons gender */
-
-.voorkeur-buttons {
+.preference-buttons {
   display: flex;
   gap: 0.75rem;
   flex-wrap: wrap;
-  margin-top: 1.5em;
-  margin-bottom: 1.5em;
+  margin-top: .5rem;
+  margin-bottom: 1.5rem;
 }
 
-.voorkeur-buttons input[type="radio"] {
+.preference-buttons input[type="radio"] {
   display: none;
 }
 
-.voorkeur-buttons label {
+.preference-buttons label, .start-over-link  {
   margin: 0.5em 0;
   padding: 0.5em .8em;
   border: .05em solid var(--clr-text);
@@ -132,11 +146,17 @@ section:last-of-type button {
   font-size: 1em;
   color: var(--clr-text);
   transition: all 0.2s ease;
+  flex: 1;
+  text-align: center;
 }
 
 /* geselecteerd */
-.voorkeur-buttons input[type="radio"]:checked + label {
+.preference-buttons input[type="radio"]:checked + label, .start-over-link  {
   background: var(--gradient-primary);
   color: var(--clr-neutral);
   border: none;
+}
+
+form button>svg{
+  fill: var(--clr-icon);
 }
