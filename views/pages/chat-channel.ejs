@@ -22,6 +22,7 @@
             <% if (conversationHistory && conversationHistory.length > 0) { %>
               <% conversationHistory.forEach((msg) => { %>
                 <div class="message <%= msg.fromUserId === user._id.toString() ? 'message-sent' : 'message-received' %>">
+                  <!-- bepaalt wie de afzender is -->
                   <%= msg.fromUserId === user._id.toString() ? 'Jij' : msg.fromName %>: <%= msg.text %>
                 </div>
               <% }) %>

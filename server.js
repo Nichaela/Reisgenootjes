@@ -943,17 +943,74 @@ function getConversationRoom(userId1, userId2) {
 
 function registerSocketHandlers() {
   io.on('connection', (socket) => {
+    // Elke nieuwe verbinding krijgt een eigen socket object
     const user = socket.request.session.user
-    console.log('session user:', user)
 
+    // Verbreek de verbinding als er geen ingelogde gebruiker is
     if (!user) {
       return socket.disconnect()
     }
 
     const myUserId = user._id.toString()
 
+    // Laat deze gebruiker meteen een persoonlijke room joinen
+    // Zo kun je altijd direct naar deze user zenden
+    socket.join(myUserId)
+
     connectedUsers++
     console.log(`🎉 A user connected: ${socket.id} Total users: ${connectedUsers}`)
+
+    socket.on('private message', async ({ toUserId, text }) => {
+      try {
+        if (!toUserId || !text) return
+
+        const cleanText = xss(String(text).trim())
+        if (!cleanText) return
+
+        const roomName = getConversationRoom(myUserId, toUserId)
+        const createdAt = new Date()
+
+        // Bericht opslaan in MongoDB
+        await messages.insertOne({
+          conversationId: roomName,
+          fromUserId: myUserId,
+          toUserId,
+          fromName: user.name,
+          text: cleanText,
+          createdAt
+        })
+
+        const payloadForReceiver = {
+          fromUserId: myUserId,
+          fromName: user.name,
+          text: cleanText,
+          timestamp: createdAt.toISOString(),
+          fromSelf: false
+        }
+
+        const payloadForSender = {
+          fromUserId: myUserId,
+          fromName: user.name,
+          text: cleanText,
+          timestamp: createdAt.toISOString(),
+          fromSelf: true
+        }
+
+        // Stuur het bericht direct terug naar de verzender
+        socket.emit('private message', payloadForSender)
+
+        // Stuur het bericht naar de persoonlijke room van de ontvanger
+        socket.to(toUserId).emit('private message', payloadForReceiver)
+
+        console.log(`Privébericht in room ${roomName}: ${cleanText}`)
+      } catch (err) {
+        console.error('Fout bij versturen privébericht:', err)
+
+        socket.emit('chat error', {
+          message: 'Bericht kon niet worden verstuurd'
+        })
+      }
+    })
 
     socket.on('join private chat', ({ otherUserId, otherUserName }) => {
       if (!otherUserId) return
@@ -983,45 +1040,6 @@ function registerSocketHandlers() {
       console.log(`${user.name} left room: ${roomName}`)
     })
 
-    socket.on('private message', async ({ toUserId, text }) => {
-      if (!toUserId || !text) return
-
-      const cleanText = xss(String(text).trim())
-      if (!cleanText) return
-
-      const roomName = getConversationRoom(myUserId, toUserId)
-
-      await messages.insertOne({
-        conversationId: roomName,
-        fromUserId: myUserId,
-        toUserId,
-        fromName: user.name,
-        text: cleanText,
-        createdAt: new Date()
-      })
-
-      const payloadForReceiver = {
-        fromUserId: myUserId,
-        fromName: user.name,
-        text: cleanText,
-        timestamp: new Date().toISOString(),
-        fromSelf: false
-      }
-
-      const payloadForSender = {
-        fromUserId: myUserId,
-        fromName: user.name,
-        text: cleanText,
-        timestamp: new Date().toISOString(),
-        fromSelf: true
-      }
-
-      socket.emit('private message', payloadForSender)
-      socket.to(roomName).emit('private message', payloadForReceiver)
-
-      console.log(`Privébericht in room ${roomName}: ${cleanText}`)
-    })
-
     socket.on('typing', ({ toUserId }) => {
       if (!toUserId) return
 
@@ -1042,6 +1060,7 @@ function registerSocketHandlers() {
     })
   })
 }
+
 // =======================
 // ERROR HANDLING
 // =======================
@@ -1065,6 +1084,7 @@ function registerErrorHandlers() {
     res.status(500).send('500: server error')
   })
 }
+
 // =======================
 // START SERVER
 // =======================

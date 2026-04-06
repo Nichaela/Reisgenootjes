@@ -10,11 +10,13 @@ const typingIndicator = document.getElementById('typingIndicator')
 
 let typingTimeout
 
+// Laat de server weten dat we een privéchat willen joinen met deze gebruiker
 socket.emit('join private chat', {
   otherUserId: chatPartnerId,
   otherUserName: chatPartnerName
 })
 
+// Maak een bericht element aan en voeg het toe aan het scherm
 function addMessageToScreen(messageData) {
   const messageElement = document.createElement('div')
   messageElement.classList.add('message')
@@ -35,7 +37,7 @@ function sendMessage() {
   if (!messageText) {
     return
   }
-
+  // Stuur het bericht naar de server, inclusief de ID van de chatpartner
   socket.emit('private message', {
     toUserId: chatPartnerId,
     text: messageText
@@ -44,7 +46,7 @@ function sendMessage() {
   socket.emit('stop typing', {
     toUserId: chatPartnerId
   })
-
+  //reset
   messageInput.value = ''
   typingIndicator.textContent = ''
 }
@@ -90,6 +92,7 @@ socket.on('stop typing', () => {
 })
 
 socket.on('user notification', (message) => {
+  typingIndicator.textContent = message
   console.log(message)
 })
 
@@ -99,4 +102,5 @@ window.addEventListener('beforeunload', () => {
   })
 })
 
+// Scroll naar beneden bij het laden van de pagina
 messages.scrollTop = messages.scrollHeight

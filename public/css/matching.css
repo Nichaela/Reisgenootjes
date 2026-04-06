@@ -4,6 +4,11 @@
   --clr-icon: light-dark(#E9F8FF, #FC9B5E);
 }
 
+#genderFilterForm {
+  display: flex;
+  width: 100%;
+}
+
 h2{
   color: var(--clr-primary);
 }
@@ -138,7 +143,7 @@ a.start-over-link {
 }
 
 .preference-buttons label, .start-over-link  {
-  margin: 0.5em 0;
+  margin: 0.5em;
   padding: 0.5em .8em;
   border: .05em solid var(--clr-text);
   border-radius: 10em;

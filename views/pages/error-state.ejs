@@ -13,9 +13,11 @@
 
       <a class="gradient-btn" href="/">Terug naar home</a>
       </main> 
-    <footer>
-      <%- include('../partials/bottom-nav'); %>
-    </footer>
+      <% if (user) { %>
+        <footer>
+          <%- include('../partials/bottom-nav'); %>
+        </footer>
+      <% } %>
   </body>
 </html>
 
