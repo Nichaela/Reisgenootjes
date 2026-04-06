@@ -325,6 +325,14 @@ function registerGetRoutes() {
   app.get('/post/:id', async (req, res) => {
     try {
       const { id } = req.params
+      const objectId = toObjectId(id)
+
+      if (!objectId) {
+        return res.status(404).render('pages/error-state', {
+          status: 404,
+          message: 'Ongeldige id'
+        })
+      }
 
       const post = await discover.findOne({
         _id: toObjectId(id),
@@ -423,86 +431,96 @@ function registerGetRoutes() {
     })
   })
 
- app.get('/chatroom', requireLogin, async (req, res) => {
-  try {
-    const currentUserId = req.session.user._id.toString()
+  app.get('/chatroom', requireLogin, async (req, res) => {
+    try {
+      const currentUserId = req.session.user._id.toString()
+      const objectId = toObjectId(currentUserId)
 
-    const currentUser = await users.findOne({
-      _id: toObjectId(req.session.user._id)
-    })
-
-    if (!currentUser) {
-      return res.status(404).send('Gebruiker niet gevonden')
-    }
-
-    const likedUserIds = currentUser.likes || []
-
-    if (likedUserIds.length === 0) {
-      return res.render('pages/chatroom', {
-        user: req.session.user,
-        newMatches: [],
-        recentChats: []
+      const currentUser = await users.findOne({
+        _id: objectId
       })
-    }
 
-    const matchedUsers = await users.find({
-      _id: { $in: likedUserIds.map((id) => toObjectId(id)) },
-      likes: currentUserId
-    }).toArray()
-    // chatgptPrompt: sorteer deze lijst van recentChats op basis van de datum van het laatste bericht, zodat de meest recente chats bovenaan staan. Zorg ervoor dat chats zonder berichten onderaan komen te staan.
-    const matchedUsersWithMessages = await Promise.all(
-    matchedUsers.map(async (matchedUser) => {
-      const conversationId = getConversationRoom(
-        currentUserId,
-        matchedUser._id.toString()
-      )
-
-      const lastMessage = await messages.findOne(
-        { conversationId },
-        { sort: { createdAt: -1 } }
-      )
-
-      return {
-        ...matchedUser,
-        lastMessage: lastMessage ? lastMessage.text : null,
-        lastMessageDate: lastMessage ? lastMessage.createdAt : null
+      if (!currentUser) {
+        return res.status(404).send('Gebruiker niet gevonden')
       }
-    })
-  )
 
-  matchedUsersWithMessages.sort((a, b) => {
-    if (!a.lastMessageDate && !b.lastMessageDate) return 0
-    if (!a.lastMessageDate) return 1
-    if (!b.lastMessageDate) return -1
-    return b.lastMessageDate - a.lastMessageDate
-  })
+      const likedUserIds = currentUser.likes || []
 
-  const newMatches = matchedUsersWithMessages.filter((matchedUser) =>
-    !matchedUser.lastMessage
-  )
+      if (likedUserIds.length === 0) {
+        return res.render('pages/chatroom', {
+          user: req.session.user,
+          newMatches: [],
+          recentChats: []
+        })
+      }
+      // haal matched users op
+      const matchedUsers = await users.find({
+        _id: { $in: likedUserIds.map((id) => toObjectId(id)) },
+        likes: currentUserId
+      }).toArray()
 
-  const recentChats = matchedUsersWithMessages.filter((matchedUser) =>
-    matchedUser.lastMessage
-  )
+      // chatgptPrompt: sorteer deze lijst van recentChats op basis van de datum van het laatste bericht, zodat de meest recente chats bovenaan staan. Zorg ervoor dat chats zonder berichten onderaan komen te staan.
+      const matchedUsersWithMessages = await Promise.all(
+        matchedUsers.map(async (matchedUser) => {
+          const conversationId = getConversationRoom(
+            currentUserId,
+            matchedUser._id.toString()
+          )
 
-  res.render('pages/chatroom', {
-    user: req.session.user,
-    newMatches,
-    recentChats
-  })
-  } catch (err) {
-    console.error(err)
-    res.status(500).send('Fout bij ophalen van chatroom')
-    }
+          const lastMessage = await messages.findOne(
+            { conversationId },
+            { sort: { createdAt: -1 } }
+          )
+
+          return {
+            ...matchedUser,
+            lastMessage: lastMessage ? lastMessage.text : null,
+            lastMessageDate: lastMessage ? lastMessage.createdAt : null
+          }
+        })
+      )
+
+      matchedUsersWithMessages.sort((a, b) => {
+        if (!a.lastMessageDate && !b.lastMessageDate) return 0
+        if (!a.lastMessageDate) return 1
+        if (!b.lastMessageDate) return -1
+        return b.lastMessageDate - a.lastMessageDate
+      })
+
+      const newMatches = matchedUsersWithMessages.filter((matchedUser) =>
+        !matchedUser.lastMessage
+      )
+
+      const recentChats = matchedUsersWithMessages.filter((matchedUser) =>
+        matchedUser.lastMessage
+      )
+
+      res.render('pages/chatroom', {
+        user: req.session.user,
+        newMatches,
+        recentChats
+      })
+    } catch (err) {
+      console.error(err)
+      res.status(500).send('Fout bij ophalen van chatroom')
+      }
   })
 
   app.get('/chat-channel/:userId', requireLogin, async (req, res) => {
     try {
       const { currentUserIdString } = getSessionUserIds(req)
       const chatPartnerId = req.params.userId
+      const objectId = toObjectId(chatPartnerId)
+
+      if (!objectId) {
+        return res.status(404).render('pages/error-state', {
+          status: 404,
+          message: 'Ongeldige id'
+        })
+      }
 
       const chatPartner = await users.findOne({
-        _id: toObjectId(chatPartnerId)
+        _id: objectId
       })
 
       if (!chatPartner) {
@@ -835,8 +853,15 @@ function registerPostRoutes() {
   app.post('/post/:id/join', requireLogin, async (req, res) => {
     try {
       const { id } = req.params
+      const objectId = toObjectId(id)
 
-      const post = await discover.findOne({ _id: toObjectId(id) })
+      if (!objectId) {
+        return res.status(404).render('pages/error-state', {
+          status: 404,
+          message: 'Ongeldige id'
+        })
+      }
+      const post = await discover.findOne({ _id: objectId })
       if (!post) return res.status(404).send('Post niet gevonden')
 
       if (post.gender && post.gender !== 'gemengd') {
@@ -879,7 +904,7 @@ function registerPostRoutes() {
       if (alGejoint) return res.redirect(`/post/${id}`)
 
       await discover.updateOne(
-        { _id: toObjectId(id) },
+        { _id: objectId },
         { $push: { travellers: toObjectId(req.session.user._id) } }
       )
 

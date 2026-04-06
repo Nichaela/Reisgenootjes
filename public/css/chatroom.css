@@ -15,8 +15,8 @@
 :root {
     /* core colors */
     color-scheme: light dark;
-    --clr-send: light-dark(#c8e6c9, #4CAF50);
-    --clr-received: light-dark(#cdefff, #607D8B);
+    --clr-send: light-dark(#cdefff, #607D8B);
+    --clr-received: light-dark(#c8e6c9, #4CAF50);
 }
 
 #chatroom-page h2 {
@@ -140,6 +140,7 @@
     box-sizing: border-box;
     min-height: var(--input-height);
     border-top: 1px solid #e0e0e0;
+    background: var(--clr-neutral);
 }
 
 .input-container {
