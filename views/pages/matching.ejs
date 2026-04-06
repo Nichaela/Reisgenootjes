@@ -1,21 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-  <%- include('../partials/head'); %>
-  <link rel="stylesheet" href="/css/matchen.css">
-  <link rel="stylesheet" href="/css/filter.css">
-</head>
-
-<body>
-  <main>
-    <h1 class="underline">Matchen</h1>
-
-      <% if (!matchUser) { %>
-        <p>Je hebt iedereen gezien!</p>
-        <a class="start-over-link" href="/matchen/reset">Opnieuw beginnen</a>
+  <head>
+    <%- include('../partials/head'); %>
+    <link rel="stylesheet" href="/css/matching.css">
+    <link rel="stylesheet" href="/css/filter.css">
+    <title>Matchen</title>
+  </head>
+  <body>
+    <main>
+      <h1 class="underline">Matchen</h1>
+        <% if (!matchUser) { %>
+          <p>Je hebt iedereen gezien!</p>
+          <a class="start-over-link" href="/matching/reset">Opnieuw beginnen</a>
         <% } else { %>
-
           <div class="preference-buttons">
             <form id="genderFilterForm" action="/set-preference" method="POST">
           
@@ -30,7 +27,6 @@
           
             </form>
           </div>
-
           <section>
             <img src="/uploads/<%= matchUser.profileImg %>" alt="Account foto">
             <div class="profile-info">
@@ -47,13 +43,11 @@
               </ul>
             </div>
           </section>
-
           <section>
             <p>State • Opzoek naar reisgenootje</p>
             <h2>Bio</h2>
             <p><%= matchUser.bio %></p>
           </section>
-
           <section>
             <h2>Interesse</h2>
             <ul class="hobbies">
@@ -70,32 +64,28 @@
               <% }) %>
             </ul>
           </section>
-
           <section>
             <h2>Geplande trip</h2>
             <% if (post) { %>
               <a href="/post/<%= post._id %>">
-                <%- include('../partials/reisoproep', { post: post }) %>
+                <%- include('../partials/travel-alert', { post: post }) %>
               </a>
-              <% } else { %>
-                <p>Geen geplande trip beschikbaar.</p>
-                <% } %>
+            <% } else { %>
+              <p>Geen geplande trip beschikbaar.</p>
+            <% } %>
           </section>
-
           <section>
             <h2>Op zoek naar:</h2>
             <p>
               <%= matchUser.lookingFor %>
             </p>
           </section>
-
           <section>
             <h2>Gallerij</h2>
             <img src="/uploads/<%= matchUser.image1 %>" alt="Galerij foto 1" loading="lazy">
             <img src="/uploads/<%= matchUser.image2 %>" alt="Galerij foto 2" loading="lazy">
             <img src="/uploads/<%= matchUser.image3 %>" alt="Galerij foto 3" loading="lazy">
           </section>
-
           <section>
             <form id="likeForm" action="/likes" method="POST">
               <% if (post) { %>
@@ -116,12 +106,9 @@
                   </button>
             </form>
           </section>
-
-          <% } %>
-  </main>
-
-  <%- include('../partials/bottom-nav'); %>
-  <script defer src="/javascript/genderfilter.js"></script>
-</body>
-
+        <% } %>
+    </main>
+    <%- include('../partials/bottom-nav'); %>
+    <script defer src="/javascript/gender-filter.js"></script>
+  </body>
 </html>

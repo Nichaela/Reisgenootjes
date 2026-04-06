@@ -2,17 +2,18 @@
 <html lang="en">
   <head>
     <%- include('../partials/head'); %>
-    <link rel="stylesheet" href="/css/matchen.css">
+    <link rel="stylesheet" href="/css/matching.css">
     <link rel="stylesheet" href="/css/filter.css">
+    <title>Ontdek</title>
   </head>
   <body>
     <main>
       <h1 class="underline" >Ontdek</h1>
       <%- include('../partials/ontdekfiltermenu') %>
 
-      <%- include('../partials/zoekbalk') %>
+      <%- include('../partials/search-bar') %>
 
-  <!-- Nieuw stukje, dat de pagina niet crasht als er geen posts zijn -->
+    <!-- Nieuw stukje, dat de pagina niet crasht als er geen posts zijn -->
       <ul class="trips">
         <% if (posts && posts.length > 0) { %>
           <% posts.forEach(post => { %>
@@ -23,7 +24,7 @@
               data-birthday="<%= post.user?.birthday || '' %>"
             >
               <a href="/post/<%= post._id %>">
-                <%- include('../partials/reisoproep', { post: post }) %>
+                <%- include('../partials/travel-alert', { post: post }) %>
               </a>
             </li>
           <% }) %>
@@ -38,13 +39,10 @@
         <p>Geen resultaten gevonden</p>
         <img src="/img/404.svg" alt="error 404 afbeelding">
       </div>
-
     </main>
-
     <footer>
       <%- include('../partials/bottom-nav'); %>
     </footer>
-
     <script src="../javascript/form.js"></script>
     <script src="../javascript/filter.js"></script>
   </body>

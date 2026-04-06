@@ -3,6 +3,7 @@
   <head>
     <%- include('../partials/head'); %>
   <link rel="stylesheet" href="/css/chatroom.css">
+  <title>Chat met <%= chatPartner.name %></title>
   </head>
   <body id="chat-channel-page">
     <main>
@@ -21,6 +22,7 @@
             <% if (conversationHistory && conversationHistory.length > 0) { %>
               <% conversationHistory.forEach((msg) => { %>
                 <div class="message <%= msg.fromUserId === user._id.toString() ? 'message-sent' : 'message-received' %>">
+                  <!-- bepaalt wie de afzender is -->
                   <%= msg.fromUserId === user._id.toString() ? 'Jij' : msg.fromName %>: <%= msg.text %>
                 </div>
               <% }) %>
@@ -31,8 +33,8 @@
           <section class="bottom-container">
             <div id="typingIndicator" class="typing-indicator"></div>
             <div class="input-container">
-              <input id="message-input" type="text" placeholder="Type your message..." autocomplete="off">
-              <button id="sendButton">Send</button>
+              <input id="message-input" type="text" placeholder="Typ je bericht..." autocomplete="off">
+              <button id="sendButton">Versturen</button>
             </div>
           </section>
         </section>

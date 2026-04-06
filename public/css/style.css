@@ -128,9 +128,6 @@ svg{
 section {
   margin-bottom: 1.5rem;
 }
-.heading {
-  margin-bottom: var(--space-gap-s);
-}
 
 .underline {
   position: relative;
@@ -229,7 +226,7 @@ svg.line path{
   stroke-width: 2;
 }
 
-/* reisoproep */
+/* travel-alert */
 .trips {
   width: 100%;
   display: grid;
@@ -239,14 +236,14 @@ svg.line path{
   }
 }
 
-.reisoproep {
+.travel-alert {
   position: relative;
   height: 25vh;
   background-color: var(--clr-primary-dark);
   border-radius: 0.5rem;
 }
 
-.reisoproep::after {
+.travel-alert::after {
   position: absolute;
   border-radius: 0.5rem;
   inset: 0;
@@ -256,7 +253,7 @@ svg.line path{
   overflow: hidden;
 }
 
-.reisoproep>img {
+.travel-alert>img {
   height: 25vh;
   width: 100%;
   object-fit: cover;
@@ -265,7 +262,7 @@ svg.line path{
   display: block;
 }
 
-.reisoproep span {
+.travel-alert span {
   position: absolute;
   top: 0.75rem;
   left: 0.75rem;
@@ -278,7 +275,7 @@ svg.line path{
   border-radius: 5rem;
 }
 
-.reisoproep p {
+.travel-alert p {
   position: absolute;
   bottom: 2.5rem;
   left: 0.75rem;
@@ -287,7 +284,7 @@ svg.line path{
   font-size: 0.75rem;
 }
 
-.reisoproep h3 {
+.travel-alert h3 {
   position: absolute;
   bottom: 0.75rem;
   left: 0.75rem;
@@ -297,7 +294,7 @@ svg.line path{
   font-weight: 700;
 }
 
-.reisoproep button {
+.travel-alert button {
   position: absolute;
   bottom: 0.75rem;
   right: 1rem;
@@ -369,7 +366,7 @@ svg.line path{
 }
 
 #error{
-   display: flex;
+  display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;

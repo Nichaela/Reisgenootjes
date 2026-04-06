@@ -223,28 +223,34 @@ function registerGetRoutes() {
     try {
       console.log('profile/:id aangeroepen met id:', req.params.id)
 
-      const profileUser = await users.findOne({ _id: toObjectId(req.params.id) })
-  
+      const profileUserId = toObjectId(req.params.id)
+
+      if (!profileUserId) {
+        return res.status(404).render('pages/error-state', {
+          status: 404,
+          message: 'Ongeldige gebruiker'
+        })
+      }
+
+      const profileUser = await users.findOne({ _id: profileUserId })
+
       if (!profileUser) {
         return res.status(404).send('Gebruiker niet gevonden')
       }
-  
+
       const myPosts = await discover.find({
-        userId: toObjectId(profileUser._id),
+        userId: profileUserId
       }).toArray()
+
       const joinedPosts = await discover.find({
-        travellers: toObjectId(profileUser._id)
+        travellers: profileUserId
       }).toArray()
-  
+
       const allTrips = [...myPosts, ...joinedPosts].sort((a, b) =>
         new Date(a.startDate) - new Date(b.startDate)
       )
 
-      const today = new Date()
-      const birthDate = new Date(profileUser.birthday)
-      let age = today.getFullYear() - birthDate.getFullYear()
-      const month = today.getMonth() - birthDate.getMonth()
-      if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) age--
+      const age = calculateAge(profileUser.birthday)
 
       res.render('pages/profile', {
         user: req.session.user || null,
@@ -260,8 +266,6 @@ function registerGetRoutes() {
 
   //eigen profiel
   app.get('/profile', requireLogin, async (req, res) => {
-    if (!req.session.user) return res.redirect('/login')
-
     try {
       // haal de gemaakte en gejoinde reizen van de gebruiker op
       const myPosts = await discover.find({
@@ -321,6 +325,14 @@ function registerGetRoutes() {
   app.get('/post/:id', async (req, res) => {
     try {
       const { id } = req.params
+      const objectId = toObjectId(id)
+
+      if (!objectId) {
+        return res.status(404).render('pages/error-state', {
+          status: 404,
+          message: 'Ongeldige id'
+        })
+      }
 
       const post = await discover.findOne({
         _id: toObjectId(id),
@@ -351,7 +363,7 @@ function registerGetRoutes() {
     }
   })
 
-  app.get('/matchen', requireLogin, async (req, res) => {
+  app.get('/matching', requireLogin, async (req, res) => {
     try {
       if (!req.session.gezien) req.session.gezien = []
 
@@ -372,7 +384,7 @@ function registerGetRoutes() {
       const matchUser = await users.findOne(query)
 
       if (!matchUser) {
-        return res.render('pages/matchen', {
+        return res.render('pages/matching', {
           user: req.session.user,
           post: null,
           matchUser: null,
@@ -386,7 +398,7 @@ function registerGetRoutes() {
 
       const age = calculateAge(matchUser.birthday)
 
-      return res.render('pages/matchen', {
+      return res.render('pages/matching', {
         user: {
           ...req.session.user,
           genderPreference: req.session.genderPreference
@@ -396,15 +408,15 @@ function registerGetRoutes() {
         age
       })
     } catch (err) {
-      console.error('Fout in /matchen:', err)
+      console.error('Fout in /matching:', err)
       return res.status(500).send('Fout bij laden van matchen')
     }
   })
 
-  app.get('/matchen/reset', (req, res) => {
+  app.get('/matching/reset', (req, res) => {
     req.session.gezien = []
     req.session.genderPreference = null
-    res.redirect('/matchen')
+    res.redirect('/matching')
   })
 
   app.get('/logout', (req, res) => {
@@ -419,90 +431,100 @@ function registerGetRoutes() {
     })
   })
 
- app.get('/chatroom', requireLogin, async (req, res) => {
-  try {
-    const currentUserId = req.session.user._id.toString()
+  app.get('/chatroom', requireLogin, async (req, res) => {
+    try {
+      const currentUserId = req.session.user._id.toString()
+      const objectId = toObjectId(currentUserId)
 
-    const currentUser = await users.findOne({
-      _id: toObjectId(req.session.user._id)
-    })
-
-    if (!currentUser) {
-      return res.status(404).send('Gebruiker niet gevonden')
-    }
-
-    const likedUserIds = currentUser.likes || []
-
-    if (likedUserIds.length === 0) {
-      return res.render('pages/chatroom', {
-        user: req.session.user,
-        newMatches: [],
-        recentChats: []
+      const currentUser = await users.findOne({
+        _id: objectId
       })
-    }
 
-    const matchedUsers = await users.find({
-      _id: { $in: likedUserIds.map((id) => toObjectId(id)) },
-      likes: currentUserId
-    }).toArray()
-    // chatgptPrompt: sorteer deze lijst van recentChats op basis van de datum van het laatste bericht, zodat de meest recente chats bovenaan staan. Zorg ervoor dat chats zonder berichten onderaan komen te staan.
-    const matchedUsersWithMessages = await Promise.all(
-    matchedUsers.map(async (matchedUser) => {
-      const conversationId = getConversationRoom(
-        currentUserId,
-        matchedUser._id.toString()
-      )
-
-      const lastMessage = await messages.findOne(
-        { conversationId },
-        { sort: { createdAt: -1 } }
-      )
-
-      return {
-        ...matchedUser,
-        lastMessage: lastMessage ? lastMessage.text : null,
-        lastMessageDate: lastMessage ? lastMessage.createdAt : null
+      if (!currentUser) {
+        return res.status(404).send('Gebruiker niet gevonden')
       }
-    })
-  )
 
-  matchedUsersWithMessages.sort((a, b) => {
-    if (!a.lastMessageDate && !b.lastMessageDate) return 0
-    if (!a.lastMessageDate) return 1
-    if (!b.lastMessageDate) return -1
-    return b.lastMessageDate - a.lastMessageDate
-  })
+      const likedUserIds = currentUser.likes || []
 
-  const newMatches = matchedUsersWithMessages.filter((matchedUser) =>
-    !matchedUser.lastMessage
-  )
+      if (likedUserIds.length === 0) {
+        return res.render('pages/chatroom', {
+          user: req.session.user,
+          newMatches: [],
+          recentChats: []
+        })
+      }
+      // haal matched users op
+      const matchedUsers = await users.find({
+        _id: { $in: likedUserIds.map((id) => toObjectId(id)) },
+        likes: currentUserId
+      }).toArray()
 
-  const recentChats = matchedUsersWithMessages.filter((matchedUser) =>
-    matchedUser.lastMessage
-  )
+      // chatgptPrompt: sorteer deze lijst van recentChats op basis van de datum van het laatste bericht, zodat de meest recente chats bovenaan staan. Zorg ervoor dat chats zonder berichten onderaan komen te staan.
+      const matchedUsersWithMessages = await Promise.all(
+        matchedUsers.map(async (matchedUser) => {
+          const conversationId = getConversationRoom(
+            currentUserId,
+            matchedUser._id.toString()
+          )
 
-  res.render('pages/chatroom', {
-    user: req.session.user,
-    newMatches,
-    recentChats
-  })
-  } catch (err) {
-    console.error(err)
-    res.status(500).send('Fout bij ophalen van chatroom')
-    }
+          const lastMessage = await messages.findOne(
+            { conversationId },
+            { sort: { createdAt: -1 } }
+          )
+
+          return {
+            ...matchedUser,
+            lastMessage: lastMessage ? lastMessage.text : null,
+            lastMessageDate: lastMessage ? lastMessage.createdAt : null
+          }
+        })
+      )
+
+      matchedUsersWithMessages.sort((a, b) => {
+        if (!a.lastMessageDate && !b.lastMessageDate) return 0
+        if (!a.lastMessageDate) return 1
+        if (!b.lastMessageDate) return -1
+        return b.lastMessageDate - a.lastMessageDate
+      })
+
+      const newMatches = matchedUsersWithMessages.filter((matchedUser) =>
+        !matchedUser.lastMessage
+      )
+
+      const recentChats = matchedUsersWithMessages.filter((matchedUser) =>
+        matchedUser.lastMessage
+      )
+
+      res.render('pages/chatroom', {
+        user: req.session.user,
+        newMatches,
+        recentChats
+      })
+    } catch (err) {
+      console.error(err)
+      res.status(500).send('Fout bij ophalen van chatroom')
+      }
   })
 
   app.get('/chat-channel/:userId', requireLogin, async (req, res) => {
     try {
       const { currentUserIdString } = getSessionUserIds(req)
       const chatPartnerId = req.params.userId
+      const objectId = toObjectId(chatPartnerId)
+
+      if (!objectId) {
+        return res.status(404).render('pages/error-state', {
+          status: 404,
+          message: 'Ongeldige id'
+        })
+      }
 
       const chatPartner = await users.findOne({
-        _id: toObjectId(chatPartnerId)
+        _id: objectId
       })
 
       if (!chatPartner) {
-        return res.status(404).render('pages/errorstate', {
+        return res.status(404).render('pages/error-state', {
           status: 404,
           message: 'Gebruiker niet gevonden'
         })
@@ -565,7 +587,7 @@ function registerPostRoutes() {
 
       req.session.user = createSessionUser(user)
 
-      return res.redirect('/matchen')
+      return res.redirect('/matching')
     } catch (err) {
       console.error(err)
       return res.status(500).render('pages/login', {
@@ -690,8 +712,6 @@ function registerPostRoutes() {
     { name: 'image2', maxCount: 1 },
     { name: 'image3', maxCount: 1 },
   ]), async (req, res) => {
-    sanitizeBodyFields(req.body)
-
     const {
       name,
       lastName,
@@ -766,7 +786,7 @@ function registerPostRoutes() {
   //gender voorkeur bij matchen, realtime update
   app.post('/set-preference', (req, res) => {
     req.session.genderPreference = req.body.genderPreference
-    res.redirect('/matchen')
+    res.redirect('/matching')
   })
 
   // create-post formulier
@@ -775,8 +795,6 @@ function registerPostRoutes() {
     { name: 'route', maxCount: 1 },
   ]), async (req, res) => {
     try {
-      sanitizeBodyFields(req.body)
-
       const {
         title,
         startDate,
@@ -788,8 +806,8 @@ function registerPostRoutes() {
         gender
       } = req.body
 
-      const postCoverImg = req.files.postCoverImg ? req.files.postCoverImg[0].filename : null
-      const route = req.files.route ? req.files.route[0].filename : null
+      const postCoverImg = req.files?.postCoverImg?.[0]?.filename || null
+      const route = req.files?.route?.[0]?.filename || null
 
       let age = req.body.age
       if (!Array.isArray(age)) {
@@ -835,8 +853,15 @@ function registerPostRoutes() {
   app.post('/post/:id/join', requireLogin, async (req, res) => {
     try {
       const { id } = req.params
+      const objectId = toObjectId(id)
 
-      const post = await discover.findOne({ _id: toObjectId(id) })
+      if (!objectId) {
+        return res.status(404).render('pages/error-state', {
+          status: 404,
+          message: 'Ongeldige id'
+        })
+      }
+      const post = await discover.findOne({ _id: objectId })
       if (!post) return res.status(404).send('Post niet gevonden')
 
       if (post.gender && post.gender !== 'gemengd') {
@@ -848,11 +873,7 @@ function registerPostRoutes() {
       }
 
       if (post.age && post.age.length > 0) {
-        const birthDate = new Date(req.session.user.birthday)
-        const today = new Date()
-        let userAge = today.getFullYear() - birthDate.getFullYear()
-        const month = today.getMonth() - birthDate.getMonth()
-        if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) userAge--
+        const userAge = calculateAge(req.session.user.birthday)
 
         const ranges = {
           '18': (age) => age >= 18 && age < 21,
@@ -883,7 +904,7 @@ function registerPostRoutes() {
       if (alGejoint) return res.redirect(`/post/${id}`)
 
       await discover.updateOne(
-        { _id: toObjectId(id) },
+        { _id: objectId },
         { $push: { travellers: toObjectId(req.session.user._id) } }
       )
 
@@ -927,7 +948,7 @@ function registerPostRoutes() {
         }
       }
 
-      return res.redirect('/matchen')
+      return res.redirect('/matching')
     } catch (err) {
       console.error('Fout in /likes:', err)
       return res.status(500).send('Fout bij verwerken van like')
@@ -947,20 +968,75 @@ function getConversationRoom(userId1, userId2) {
 
 function registerSocketHandlers() {
   io.on('connection', (socket) => {
+    // Elke nieuwe verbinding krijgt een eigen socket object
     const user = socket.request.session.user
-    console.log('session user:', user)
 
+    // Verbreek de verbinding als er geen ingelogde gebruiker is
     if (!user) {
       return socket.disconnect()
     }
 
     const myUserId = user._id.toString()
+
+    // Laat deze gebruiker meteen een persoonlijke room joinen
+    // Zo kun je altijd direct naar deze user zenden
     socket.join(myUserId)
 
     connectedUsers++
     console.log(`🎉 A user connected: ${socket.id} Total users: ${connectedUsers}`)
 
-    // gebruiker opent een specifiek chatkanaal
+    socket.on('private message', async ({ toUserId, text }) => {
+      try {
+        if (!toUserId || !text) return
+
+        const cleanText = xss(String(text).trim())
+        if (!cleanText) return
+
+        const roomName = getConversationRoom(myUserId, toUserId)
+        const createdAt = new Date()
+
+        // Bericht opslaan in MongoDB
+        await messages.insertOne({
+          conversationId: roomName,
+          fromUserId: myUserId,
+          toUserId,
+          fromName: user.name,
+          text: cleanText,
+          createdAt
+        })
+
+        const payloadForReceiver = {
+          fromUserId: myUserId,
+          fromName: user.name,
+          text: cleanText,
+          timestamp: createdAt.toISOString(),
+          fromSelf: false
+        }
+
+        const payloadForSender = {
+          fromUserId: myUserId,
+          fromName: user.name,
+          text: cleanText,
+          timestamp: createdAt.toISOString(),
+          fromSelf: true
+        }
+
+        // Stuur het bericht direct terug naar de verzender
+        socket.emit('private message', payloadForSender)
+
+        // Stuur het bericht naar de persoonlijke room van de ontvanger
+        socket.to(toUserId).emit('private message', payloadForReceiver)
+
+        console.log(`Privébericht in room ${roomName}: ${cleanText}`)
+      } catch (err) {
+        console.error('Fout bij versturen privébericht:', err)
+
+        socket.emit('chat error', {
+          message: 'Bericht kon niet worden verstuurd'
+        })
+      }
+    })
+
     socket.on('join private chat', ({ otherUserId, otherUserName }) => {
       if (!otherUserId) return
 
@@ -989,45 +1065,6 @@ function registerSocketHandlers() {
       console.log(`${user.name} left room: ${roomName}`)
     })
 
-    socket.on('private message', async ({ toUserId, text }) => {
-      if (!toUserId || !text) return
-
-      const cleanText = xss(String(text).trim())
-      if (!cleanText) return
-
-      const roomName = getConversationRoom(myUserId, toUserId)
-
-      await messages.insertOne({
-        conversationId: roomName,
-        fromUserId: myUserId,
-        toUserId,
-        fromName: user.name,
-        text: cleanText,
-        createdAt: new Date()
-      })
-
-      const payloadForReceiver = {
-        fromUserId: myUserId,
-        fromName: user.name,
-        text: cleanText,
-        timestamp: new Date().toISOString(),
-        fromSelf: false
-      }
-
-      const payloadForSender = {
-        fromUserId: myUserId,
-        fromName: user.name,
-        text: cleanText,
-        timestamp: new Date().toISOString(),
-        fromSelf: true
-      }
-
-      socket.emit('private message', payloadForSender)
-      socket.to(roomName).emit('private message', payloadForReceiver)
-
-      console.log(`Privébericht in room ${roomName}: ${cleanText}`)
-    })
-
     socket.on('typing', ({ toUserId }) => {
       if (!toUserId) return
 
@@ -1048,6 +1085,7 @@ function registerSocketHandlers() {
     })
   })
 }
+
 // =======================
 // ERROR HANDLING
 // =======================
@@ -1059,7 +1097,7 @@ function registerErrorHandlers() {
     }
 
     console.error('404 error at URL: ' + req.url)
-    res.status(404).render('pages/errorstate', {
+    res.status(404).render('pages/error-state', {
       status: 404,
       message: 'Pagina niet gevonden'
     })
@@ -1071,6 +1109,7 @@ function registerErrorHandlers() {
     res.status(500).send('500: server error')
   })
 }
+
 // =======================
 // START SERVER
 // =======================
