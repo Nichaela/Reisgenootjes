@@ -8,7 +8,7 @@ const toggleButton = document.getElementById("toggleFilter")
 const filterMenu = document.getElementById("filterMenu")
 const closeButton = document.getElementById("closeMenu")
 
-const items = document.querySelectorAll(".reizen li") // alle list elementen in de lijst reizen
+const items = document.querySelectorAll(".trips li") // alle list elementen in de lijst reizen
 
 const dateFilter = document.getElementById("dateFilter")
 
@@ -189,3 +189,4 @@ searchInput?.addEventListener("input", (event) => {
 
   checkNoResults() 
 })
+

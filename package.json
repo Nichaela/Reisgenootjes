@@ -30,6 +30,8 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@html-eslint/eslint-plugin": "^0.58.1",
+    "@html-eslint/parser": "^0.58.1",
     "eslint": "^10.1.0",
     "globals": "^17.4.0",
     "nodemon": "^3.1.14"

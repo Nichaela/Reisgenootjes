@@ -79,24 +79,26 @@ input.gradient-btn {
   position: absolute;
   right: 0;
   bottom: var(--space-gap-s);
+  padding: .5rem 2.5rem;
+  font-size: 1rem;
 }
 
-.voortgangsbalk {
+.progressbar {
   display: flex;
   gap: var(--space-gap-xs);
 }
 
-.voortgangsbalk div {
+.progressbar div {
   height: .3rem;
   width: 100%;
   border-radius: var(--border-radius);
 }
 
-.voortgangsbalk-active {
+.progressbar-active {
   background-color: var(--clr-primary);
 }
 
-.voortgangsbalk-inactive {
+.progressbar-inactive {
   background-color: var(--clr-surface);
 }
 
@@ -119,7 +121,6 @@ input.gradient-btn {
 .form-step.form-active {
   display: block;
 }
-
 
 
 /* checkboxes voor aanmeldform */
@@ -149,9 +150,6 @@ input.gradient-btn {
   border: none;
 }
 
-/* a in inlog form */
-
-
 /* disabled button form*/
 button:disabled {
   opacity: 0.5;
@@ -159,7 +157,13 @@ button:disabled {
 }
 
 .inlogform {
-  height: 80vh;
+  height: 55vh;
+}
+
+.inlogform input:nth-of-type(2) {
+  padding: .5rem 2.5rem;
+  font-size: 1rem;
+  background: var(--gradient-primary);
 }
 
 .login a.ww {

@@ -1,11 +1,13 @@
 :root {
   /* core colors */
-  --clr-primary: #c1510b;
+  color-scheme: light dark;
+  --clr-primary: light-dark(#c1510b, #FC9B5E);
   --clr-primary-dark: #F9AC72;
   --clr-text: light-dark(#154159, #fff);
   --clr-surface: #E9F8FF;
   --clr-neutral: light-dark(#fff, #154159);
   --clr-input-text: #939393;
+  --clr-button-text: #fff;
 
   /* gradients */
   --gradient-primary: linear-gradient(66deg, var(--clr-primary) -12.56%, rgba(249, 172, 114, 0.60) 120.1%);
@@ -119,6 +121,8 @@ svg{
 .filter-menu h2 {
   font-size: 2.25rem;
   font-family: 'inter';
+  color: var(--clr-text);
+  font-weight: 800;
 }
 
 section {
@@ -159,7 +163,7 @@ button {
 .gradient-btn {
   background-image: var(--gradient-primary);
   border: none;
-  color: var(--clr-neutral);
+  color: var(--clr-button-text);
   text-align: center;
   width: fit-content;
   padding: .5rem 1rem;
@@ -226,14 +230,13 @@ svg.line path{
 }
 
 /* reisoproep */
-.reizen {
+.trips {
   width: 100%;
   display: grid;
   gap: 1rem;
-}
-
-.reizen a {
-  width: 100%;
+  a {
+    width: 100%;
+  }
 }
 
 .reisoproep {

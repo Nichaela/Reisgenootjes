@@ -119,9 +119,7 @@ section:last-of-type button {
   border-style: none;
 }
 
-
-/* Filter buttons gender en opnieuw beginnen link */
-
+/* Filteren */
 a.start-over-link {
   position: absolute;
   top: 7em;
@@ -132,7 +130,7 @@ a.start-over-link {
   gap: 0.75rem;
   flex-wrap: wrap;
   margin-top: .5rem;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .preference-buttons input[type="radio"] {
