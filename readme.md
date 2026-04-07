@@ -11,10 +11,8 @@ Onze website genaamd 'Reisgenootjes' is gemaakt voor solo reizigers tussen de 18
 Een kleine preview van de website:
 
 | Matchen | Ontdekken |
-|---------|---------|
-| <img width="177" height="376" alt="matchenpagina" src="https://github.com/user-attachments/assets/493203e4-67eb-4ee7-984e-cb939d2e24f7" /> | 
-<img width="215" height="459" alt="ontdekpagina" src="https://github.com/user-attachments/assets/7a54f052-43ab-4fa6-8cad-b1b70936b93c" />|
-
+|---------|-----------|
+| <img width="177" height="376" src="https://github.com/user-attachments/assets/493203e4-67eb-4ee7-984e-cb939d2e24f7" /> | <img width="215" height="459" src="https://github.com/user-attachments/assets/7a54f052-43ab-4fa6-8cad-b1b70936b93c" /> |
 
 ## Hoe bijdragen
 Om mee te kunnen helpen aan dit project kun je de onderstaande tutorial volgen:
