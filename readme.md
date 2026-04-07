@@ -1,5 +1,7 @@
 # Reisgenootjes
-In dit project is het doel om een werkende website te maken om solo reizigers aan andere solo reizigers te matchen. Hier komen functies in voor zoals:
+Onze website genaamd 'Reisgenootjes' is gemaakt voor solo reizigers 
+
+Deze applicatie helpt solo reizigers om makkelijk reismaatjes te vinden op basis van interesses en voorkeuren.
 * Kunnen registreren en inloggen;
 * Interesses en voorkeuren kunnen opgeven;
 * Kunnen filteren en zoeken;
