@@ -31,9 +31,8 @@ DB_COLLECTION=users"
 ## Tech stack
 Modules om te installeren in dit project:
 - Node.js
-- Express
+- Express.js
 - MongoDB
-- EJS
 - Socket.io
 - Helmet
 - List.js
